@@ -14,6 +14,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { TestimonialItem, CompanySettings } from "@/lib/types";
+import PartnerLogosSection from "@/components/PartnerLogosSection";
 
 export default function DynamicTestimonialsSection({
   testimonials,
@@ -252,7 +253,10 @@ export default function DynamicTestimonialsSection({
         </div>
       </div>
 
-      {/* ================= 2. BAGIAN FOTO DOKUMENTASI BERJALAN (INFINITE MARQUEE ANIMASI) ================= */}
+      {/* ================= 2. LOGO MITRA KERJA SAMA DENGAN ANIMASI BERGERAK ================= */}
+      <PartnerLogosSection />
+
+      {/* ================= 3. BAGIAN FOTO DOKUMENTASI BERJALAN (INFINITE MARQUEE ANIMASI) ================= */}
       <div className="w-full space-y-4">
         <div className="w-full max-w-[1650px] mx-auto px-4 sm:px-8 lg:px-12">
           <div className="flex items-center justify-between border-b border-rose-200 pb-3">
@@ -296,7 +300,7 @@ export default function DynamicTestimonialsSection({
         </div>
       </div>
 
-      {/* ================= 3. BAGIAN VIDEO HASIL PEMASANGAN & UJI TARIK PINTU ================= */}
+      {/* ================= 4. BAGIAN VIDEO HASIL PEMASANGAN & UJI TARIK PINTU ================= */}
       <div className="w-full max-w-[1650px] mx-auto px-4 sm:px-8 lg:px-12 space-y-6">
         <div className="flex items-center justify-between border-b border-rose-200 pb-3">
           <div>

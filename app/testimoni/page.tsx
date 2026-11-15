@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { getSettings, getTestimonials } from "@/lib/db";
 import TestimonialListAndForm from "@/components/TestimonialListAndForm";
+import PartnerLogosSection from "@/components/PartnerLogosSection";
 
 export const metadata: Metadata = {
   title: "Testimoni & Ulasan Pelanggan Pintu Harmonika",
@@ -35,6 +36,8 @@ export default async function TestimonialsPage() {
       <div className="w-full max-w-[1650px] mx-auto px-4 sm:px-8 lg:px-12">
         <TestimonialListAndForm testimonials={testimonials} settings={settings} />
       </div>
+
+      <PartnerLogosSection />
     </div>
   );
 }
