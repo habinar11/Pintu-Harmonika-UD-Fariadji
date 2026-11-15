@@ -1,0 +1,441 @@
+{
+  "settings": {
+    "companyName": "UD.Fariadji",
+    "tagline": "Pabrik & Spesialis Pembuatan Pintu Harmonika Presisi, Kokoh & Bergaransi",
+    "logoUrl": "/images/company-logo.png",
+    "phone": "0812-3229-066",
+    "whatsapp": "628123229066",
+    "email": "Halo@Fariadji.com",
+    "address": "Jl. Sri Jaya No.2a, Rejomulyo, Kec. Kartoharjo, Kota Madiun, Jawa Timur 63111",
+    "workshopAddress": "Jl. Sri Jaya No.2a, Rejomulyo, Kec. Kartoharjo, Kota Madiun, Jawa Timur 63111",
+    "workingHours": "Senin - Sabtu: 07.00 - 17.00 WIB (Layanan Darurat / WhatsApp 24 Jam)",
+    "googleMapsUrl": "https://maps.google.com",
+    "googleMapsEmbed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126646.20786968846!2d112.678912!3d-7.2754438!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7fbf8381ac015%3A0x3027a76e352be40!2sSurabaya%2C%20East%20Java!5e0!3m2!1sen!2sid!4v1700000000000!5m2!1sen!2sid",
+    "heroBadge": "PABRIK PINTU HARMONIKA NO. 1 TERPERCAYA SEJAK 2011",
+    "heroTitle": "Pintu Harmonika Kokoh, Elegan & Tahan Puluhan Tahun",
+    "heroSubtitle": "Melayani pembuatan, perakitan, dan pemasangan Pintu Harmonika untuk Ruko, Toko, Gudang, dan Garasi Rumah. Menggunakan besi SNI pilihan dengan garansi resmi hingga 5 tahun.",
+    "aboutStory": "Harmonika Steel Mandiri adalah perusahaan spesialis fabrikasi dan kontraktor pintu pengaman logam (Folding Gate / Pintu Harmonika) terdepan di Indonesia. Didirikan sejak tahun 2011, kami telah menyelesaikan lebih dari 3.500 unit pintu harmonika untuk berbagai sektor mulai dari ruko perbelanjaan, pergudangan industri, pasar modern, hingga garasi hunian pribadi. Kami mengutamakan ketebalan bahan murni (bukan banci), presisi las CO2, bearing dobel berkualitas tinggi, serta finishing oven anti karat.",
+    "vision": "Menjadi mitra fabrikasi pintu harmonika nomor satu yang mengedepankan kualitas tanpa kompromi, keamanan maksimal, dan pelayanan terpercaya bagi seluruh masyarakat Indonesia.",
+    "mission": [
+      "Menggunakan material baja SNI asli dengan ketebalan standar pabrik tanpa manipulasi ukuran.",
+      "Menerapkan teknologi perakitan modern untuk menghasilkan pintu yang ringan didorong, anti anjlok, dan kokoh.",
+      "Memberikan pelayanan menyeluruh mulai dari free survey, estimasi transparan, hingga garansi pemeliharaan berkala.",
+      "Membangun kemitraan yang saling menguntungkan dengan kontraktor, arsitek, dan pemilik properti di seluruh Nusantara."
+    ],
+    "yearsExperience": 14,
+    "completedProjects": 3500,
+    "citiesServed": 48,
+    "warrantyYears": 5,
+    "aboutImage": "/images/pintu-harmonika-hero.svg",
+    "workshopImage": "/images/pintu-harmonika-hero.svg",
+    "galleryPhotos": [
+      {
+        "id": "gal-1",
+        "url": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80",
+        "caption": "Pemasangan Ruko Central Park Surabaya"
+      },
+      {
+        "id": "gal-2",
+        "url": "/images/harmonika-cat-oven.svg",
+        "caption": "Finishing Cat Oven Pintu Harmonika Ruko"
+      },
+      {
+        "id": "gal-3",
+        "url": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80",
+        "caption": "Perakitan Plat Daun SNI di Workshop"
+      },
+      {
+        "id": "gal-4",
+        "url": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
+        "caption": "Pintu Harmonika Garasi Minimalis Mewah"
+      },
+      {
+        "id": "gal-5",
+        "url": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80",
+        "caption": "Instalasi Gudang Industri Bentang Lebar"
+      },
+      {
+        "id": "gal-6",
+        "url": "https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80",
+        "caption": "Uji Kelancaran Double Bearing Jepang"
+      }
+    ],
+    "reviewVideos": [
+      {
+        "id": "vid-1",
+        "title": "Video Uji Tarik Enteng Pintu Harmonika dengan 1 Jari",
+        "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        "clientName": "Bpk. Bambang Trihatmojo",
+        "location": "Surabaya Barat",
+        "thumbnail": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        "id": "vid-2",
+        "title": "Dokumentasi Pemasangan 8 Unit Ruko Central Business",
+        "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        "clientName": "PT Sinar Surya Properti",
+        "location": "Surabaya Timur",
+        "thumbnail": "/images/harmonika-ruko.svg"
+      },
+      {
+        "id": "vid-3",
+        "title": "Review Kontraktor: Kecepatan Produksi & Kerapian Las",
+        "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        "clientName": "Ir. Denny Pratama, IAI",
+        "location": "Malang",
+        "thumbnail": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80"
+      }
+    ]
+  },
+  "products": [
+    {
+      "id": "prod-1",
+      "name": "Pintu Harmonika Tipe Super Heavy (Premium)",
+      "slug": "tipe-super-heavy-premium",
+      "category": "Super Heavy",
+      "badge": "Paling Kokoh & Aman",
+      "daunThickness": "1.2 mm - 1.5 mm (SNI Asli)",
+      "stripThickness": "5.5 mm x 24 mm Plat Strip Full",
+      "unpSize": "UNP 6.5 Tebal",
+      "bearingType": "Double Bearing 6204 Asli (Anti Macet)",
+      "lockType": "Handle & Silinder Kunci Magnet Kuningan Anti-Linggis",
+      "finishing": "Cat Dasar Meni Epoxy + Finishing Oven Duco Gloss/Matte",
+      "pricePerMeter": 780000,
+      "priceDisplay": "Rp 780.000 / m²",
+      "description": "Tipe terbaik dengan ketahanan maksimal terhadap benturan dan pembobolan. Sangat direkomendasikan untuk Toko Perhiasan, Bank, Gudang Logistik Bernilai Tinggi, dan Ruko Strategis.",
+      "features": [
+        "Daun tebal 1.2 mm - 1.5 mm tahan linggis & palu besar",
+        "Rangka silangan 3 lapis plat strip 5.5 mm sangat rigid",
+        "Rel bawah behel baja tanam as 19 mm anti slip",
+        "Garansi servis mekanikal & roda selama 5 Tahun",
+        "Pilihan warna cat oven custom sesuai brand ruko"
+      ],
+      "image": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80",
+      "isPopular": true,
+      "order": 1
+    },
+    {
+      "id": "prod-2",
+      "name": "Pintu Harmonika Tipe Medium (Bisnis)",
+      "slug": "tipe-medium-bisnis",
+      "category": "Medium",
+      "badge": "Terlaris (Best Seller)",
+      "daunThickness": "0.9 mm - 1.0 mm (Full)",
+      "stripThickness": "4.8 mm x 21 mm",
+      "unpSize": "UNP 5",
+      "bearingType": "High-Grade Sealed Bearing",
+      "lockType": "Silinder Kuningan Extra Safety + Kupingan Gembok Baja",
+      "finishing": "Primer Anti-Karat + Cat Semprot Synthesic Oven",
+      "pricePerMeter": 620000,
+      "priceDisplay": "Rp 620.000 / m²",
+      "description": "Pilihan terfavorit para pemilik Ruko, Kios, dan Perkantoran. Memberikan perpaduan sempurna antara kekuatan pengamanan prima dan harga yang sangat bersahabat.",
+      "features": [
+        "Daun 1.0 mm presisi bebas goyang",
+        "Dorongan sangat enteng bahkan untuk wanita atau lansia",
+        "Kupingan pengaman gembok dobel tebal 6 mm",
+        "Garansi rangka & rel 3 Tahun",
+        "Anti karat prima untuk segala cuaca"
+      ],
+      "image": "/images/harmonika-cat-oven.svg",
+      "isPopular": true,
+      "order": 2
+    },
+    {
+      "id": "prod-3",
+      "name": "Pintu Harmonika Tipe Standar (Ekonomis)",
+      "slug": "tipe-standar-ekonomis",
+      "category": "Standar",
+      "badge": "Hemat & Handal",
+      "daunThickness": "0.7 mm - 0.8 mm",
+      "stripThickness": "4.0 mm x 19 mm",
+      "unpSize": "UNP 5 Ekonomis",
+      "bearingType": "Single High Durability Bearing",
+      "lockType": "Handle Stainless + Kunci Silinder Standar",
+      "finishing": "Cat Dasar Meni Besi + Cat Warna Kilap",
+      "pricePerMeter": 490000,
+      "priceDisplay": "Rp 490.000 / m²",
+      "description": "Solusi hemat untuk keamanan toko, kios kelontong, garasi perumahan subsidi/cluster, dan penyekat ruangan indoor.",
+      "features": [
+        "Harga sangat terjangkau mulai Rp 490.000/m²",
+        "Kekuatan besi tetap standar SNI bukan seng kaleng",
+        "Pemasangan cepat 3-5 hari kerja",
+        "Garansi servis 1 Tahun",
+        "Tersedia aneka pilihan warna favorit"
+      ],
+      "image": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80",
+      "isPopular": false,
+      "order": 3
+    },
+    {
+      "id": "prod-4",
+      "name": "Pintu Harmonika Garasi Minimalis Elegan",
+      "slug": "pintu-harmonika-garasi-minimalis",
+      "category": "Medium",
+      "badge": "Desain Hunian Modern",
+      "daunThickness": "1.0 mm Motif Minimalis",
+      "stripThickness": "5.0 mm Plat Strip",
+      "unpSize": "UNP 5 Rapi",
+      "bearingType": "Silent Smooth Ball Bearing",
+      "lockType": "Kunci Mortise Minimalis Modern",
+      "finishing": "Powder Coating Matte Grey / Hitam Doff / Wood Pattern",
+      "pricePerMeter": 690000,
+      "priceDisplay": "Rp 690.000 / m²",
+      "description": "Didesain khusus untuk fasad rumah tinggal modern. Memadukan fungsi proteksi tinggi dengan estetika arsitektur minimalis modern yang tidak berisik saat dibuka-tutup.",
+      "features": [
+        "Mekanisme suara senyap (Silent Smooth Action)",
+        "Finishing Powder Coating tahan gores & tahan sinar UV",
+        "Desain daun bersih dan proporsional untuk fasad rumah",
+        "Garansi servis 3 Tahun",
+        "Bisa dikombinasikan dengan ventilasi kisi-kisi udara"
+      ],
+      "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
+      "isPopular": false,
+      "order": 4
+    }
+  ],
+  "materials": [
+    {
+      "id": "mat-1",
+      "name": "Daun Pintu Harmonika (Slat)",
+      "subtitle": "Baja Cold Rolled Steel (SPCC) SNI Berkualitas",
+      "specs": "Ketebalan: 0.8 mm, 1.0 mm, 1.2 mm, 1.5 mm (Ukuran Presisi Murni)",
+      "description": "Daun merupakan tameng terluar pintu harmonika. Kami hanya menggunakan plat baja roll baru berstandar SNI yang di-press dengan lekukan pengaku gelombang simetris, sehingga tidak bergelombang dan anti penyok saat terkena benturan keras.",
+      "advantages": [
+        "Plat murni (bukan plat banci yang ditipiskan)",
+        "Tekukan presisi dengan mesin hidrolik otomatis",
+        "Permukaan rata memudahkan penempelan cat anti karat secara merata",
+        "Tersedia berbagai pilihan ketebalan sesuai tingkat keamanan yang diinginkan"
+      ],
+      "image": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80",
+      "order": 1
+    },
+    {
+      "id": "mat-2",
+      "name": "Plat Strip Silangan (Jari-Jari Harmonika)",
+      "subtitle": "Rangka Anyaman Penopang Tekanan Horizontal",
+      "specs": "Ketebalan: 4.0 mm, 5.0 mm, 5.5 mm hingga 6.0 mm (Lebar 21 - 25 mm)",
+      "description": "Plat silangan adalah rangka utama penggerak lipatan. Kekokohan pintu harmonika sangat ditentukan oleh ketebalan plat ini. Kami menggunakan plat strip padat dengan jarak bentangan rapat sehingga sangat sulit ditembus oleh linggis pembobol.",
+      "advantages": [
+        "Plat strip padat bukan plat sisa potongan (afval)",
+        "Keling baja tempa keras anti patah",
+        "Konfigurasi silangan 3 lapis untuk tipe Super Heavy",
+        "Pergerakan melipat dan melebar tetap simetris tanpa tersendat"
+      ],
+      "image": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80",
+      "order": 2
+    },
+    {
+      "id": "mat-3",
+      "name": "Tiang Tegak UNP",
+      "subtitle": "Tulang Belakang Penahan Beban Pintu",
+      "specs": "Tipe: UNP 5 dan UNP 6.5 Tebal",
+      "description": "Tiang UNP berfungsi menopang seluruh rangkaian daun dan silangan. Profil kanal U yang kokoh memastikan pintu tetap tegak lurus vertikal bertahun-tahun tanpa risiko melengkung ke depan maupun ke belakang.",
+      "advantages": [
+        "Baja profil UNP bersertifikasi uji kekuatan lentur",
+        "Mencegah pintu bergetar atau oleng saat ditiup angin kencang",
+        "Pengelasan sistem mig/CO2 pada titik sambungan untuk fusi maksimal",
+        "Dilapisi meni antikarat bagian dalam kanal"
+      ],
+      "image": "https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?auto=format&fit=crop&w=800&q=80",
+      "order": 3
+    },
+    {
+      "id": "mat-4",
+      "name": "Roda Bearing & Box Roda",
+      "subtitle": "Penggerak Halus Tanpa Suara Berisik",
+      "specs": "Bearing: 6204 / 6205 Heavy Duty Sealed Ball Bearing",
+      "description": "Roda adalah komponen mekanikal paling vital. Pintu yang berat akan terasa sangat ringan bila menggunakan bearing berkualitas tinggi. Kami memakai double bearing tertutup pelumas sintetis yang anti karat dan anti debu pasir.",
+      "advantages": [
+        "Pintu tetap enteng didorong hanya dengan satu tangan",
+        "Bearing bersegel karet/baja anti kemasukan air dan kotoran",
+        "Rumah roda (box) plat tebal 4 mm anti jebol",
+        "Tersedia sistem bearing swing (pintu bisa dibuka lipat keluar/ke dalam)"
+      ],
+      "image": "https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=800&q=80",
+      "order": 4
+    },
+    {
+      "id": "mat-5",
+      "name": "Rel Tanam Bawah & Rel Atas",
+      "subtitle": "Jalur Lintasan Baja Anti Anjlok",
+      "specs": "Bawah: Rel Tanam As Besi 19mm / Siku 5x5; Atas: Kanal U Presisi",
+      "description": "Rel bawah menggunakan besi as bulat utuh yang ditanam ke dalam lantai cor beton bertulang, sehingga tidak akan melengkung saat terlindas mobil, truk barang, atau forklift.",
+      "advantages": [
+        "Besi as padat tahan beban lindasan kendaraan berton-ton",
+        "Ditanam rata lantai agar tidak merusak ban kendaraan yang lewat",
+        "Rel atas dilengkapi stopper pengaman agar roda tidak keluar jalur",
+        "Sistem drainase jalur rel agar tidak mudah tergenang air hujan"
+      ],
+      "image": "/images/harmonika-cat-oven.svg",
+      "order": 5
+    },
+    {
+      "id": "mat-6",
+      "name": "Sistem Penguncian & Finishing Anti Karat",
+      "subtitle": "Sistem Gembok Terlindung & Cat Oven Tahan Cuaca Ekstrem",
+      "specs": "Kunci: Silinder Magnetik + Kupingan Baja 8mm; Cat: Epoxy Primer + Duco Oven",
+      "description": "Kunci menggunakan sistem silinder putar yang terlindung dari akses linggis atau bor. Sistem pelapisan cat menggunakan epoxy primer anti-korosi dilanjutkan cat oven agar warna tetap mengkilap dan tidak mudah terkelupas dalam kurun waktu 10 tahun.",
+      "advantages": [
+        "Slot gembok terlindung di dalam plat pelindung (anti gergaji / cairan kimia)",
+        "Cat anti karat metode celup/semprot oven",
+        "Tahan semprotan air asin untuk ruko di kawasan pesisir pantai",
+        "Bisa memilih warna custom selaras dengan identitas toko Anda"
+      ],
+      "image": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80",
+      "order": 6
+    }
+  ],
+  "projects": [
+    {
+      "id": "proj-1",
+      "title": "Pemasangan Pintu Harmonika 8 Unit Kompleks Ruko Central Park",
+      "category": "Ruko & Komersial",
+      "location": "Surabaya Timur, Jawa Timur",
+      "client": "PT Sinar Surya Properti",
+      "year": "2024",
+      "productType": "Tipe Super Heavy (Daun 1.2 mm)",
+      "unitsCount": "8 Unit Ruko (Lebar 4.2m x Tinggi 3.8m)",
+      "description": "Proyek pengadaan dan pemasangan pintu harmonika untuk deretan ruko bisnis perbankan dan retail dengan spesifikasi keamanan tertinggi dan warna dark grey oven modern.",
+      "image": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80",
+      "isFeatured": true
+    },
+    {
+      "id": "proj-2",
+      "title": "Instalasi Pintu Harmonika Gudang Logistik Pelabuhan",
+      "category": "Gudang & Industri",
+      "location": "Gresik, Jawa Timur",
+      "client": "CV Samudera Logistik Jaya",
+      "year": "2024",
+      "productType": "Tipe Super Heavy Industrial (Bentang Lebar)",
+      "unitsCount": "3 Unit Gudang Besar (Lebar 7m x Tinggi 4.5m)",
+      "description": "Pintu harmonika bentang ekstra lebar dengan sistem swing ke samping agar truk tronton kontainer dapat leluasa keluar masuk area bongkar muat.",
+      "image": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80",
+      "isFeatured": true
+    },
+    {
+      "id": "proj-3",
+      "title": "Pintu Harmonika Toko Mas & Perhiasan Pasar Besar",
+      "category": "Toko & Pasar",
+      "location": "Malang, Jawa Timur",
+      "client": "Toko Mas Berkah Abadi",
+      "year": "2023",
+      "productType": "Tipe Super Heavy Keamanan Maksimal",
+      "unitsCount": "2 Unit Toko Emas (Daun 1.5mm Silangan 6mm)",
+      "description": "Dilengkapi plat pengaman ganda dan handle silinder magnetik khusus pencegah tindak kriminalitas pembobolan ruko emas.",
+      "image": "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=800&q=80",
+      "isFeatured": true
+    },
+    {
+      "id": "proj-4",
+      "title": "Pintu Harmonika Garasi Rumah Tinggal Mewah",
+      "category": "Garasi Rumah",
+      "location": "Pakuwon City, Surabaya",
+      "client": "Bpk. Hendra Gunawan",
+      "year": "2024",
+      "productType": "Tipe Minimalis Silent Smooth",
+      "unitsCount": "1 Unit Garasi 2 Mobil (Lebar 5.2m x Tinggi 2.7m)",
+      "description": "Finishing warna hitam doff powder coating dengan peredam suara gesekan, sangat menyatu dengan konsep fasad rumah kontemporer modern.",
+      "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
+      "isFeatured": true
+    },
+    {
+      "id": "proj-5",
+      "title": "Pintu Harmonika Sentra Kuliner & Kios Pujasera",
+      "category": "Toko & Pasar",
+      "location": "Sidoarjo, Jawa Timur",
+      "client": "Pengelola Food Center Taman Indah",
+      "year": "2023",
+      "productType": "Tipe Medium Bisnis",
+      "unitsCount": "12 Kios Kuliner (Ukuran 2.8m x 2.4m)",
+      "description": "Pengadaan untuk kios makanan semi-outdoor dengan cat cerah tahan cuaca terik matahari dan hujan lebat.",
+      "image": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80",
+      "isFeatured": false
+    },
+    {
+      "id": "proj-6",
+      "title": "Peremajaan Pintu Harmonika Pasar Grosir Tekstil",
+      "category": "Ruko & Komersial",
+      "location": "Semarang, Jawa Tengah",
+      "client": "Koperasi Pedagang Tekstil",
+      "year": "2023",
+      "productType": "Tipe Standar SNI",
+      "unitsCount": "15 Unit Kios Pasar",
+      "description": "Penggantian pintu lama yang karatan dan macet dengan pintu baru beroda dobel bearing jepang yang enteng dibuka tiap subuh.",
+      "image": "/images/harmonika-cat-oven.svg",
+      "isFeatured": false
+    }
+  ],
+  "testimonials": [
+    {
+      "id": "test-1",
+      "name": "Bpk. Bambang Trihatmojo",
+      "role": "Owner Toko Bangunan Sumber Makmur",
+      "companyOrLocation": "Surabaya Barat",
+      "rating": 5,
+      "content": "Pintu harmonika dari pabrik ini benar-benar enteng! Dulu pintu toko saya yang lama harus didorong sekuat tenaga berdua, sekarang ditarik satu tangan oleh istri saya pun meluncur mulus. Ketebalan plat daunnya juga real sesuai kesepakatan awal tanpa dioplos plat banci.",
+      "projectType": "Tipe Super Heavy Daun 1.2mm",
+      "date": "10 Oktober 2024",
+      "photoUrl": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80"
+    },
+    {
+      "id": "test-2",
+      "name": "Ibu Ratna Dewi",
+      "role": "Pengelola Apotek 24 Jam Sehat Sentosa",
+      "companyOrLocation": "Sidoarjo",
+      "rating": 5,
+      "content": "Sangat puas dengan layanannya. Dari tim survey yang datang gratis ukur ke lokasi, konsultasi ketebalan, sampai pemasangan cuma butuh 4 hari kerja. Kunci gemboknya ada pelindung anti linggis, jadi saya sangat tenang saat tutup malam.",
+      "projectType": "Tipe Medium Daun 1.0mm",
+      "date": "28 September 2024",
+      "photoUrl": "/images/harmonika-ruko.svg"
+    },
+    {
+      "id": "test-3",
+      "name": "Ir. Denny Pratama, IAI",
+      "role": "Kontraktor & Desainer Properti",
+      "companyOrLocation": "PT Artha Graha Konstruksi, Malang",
+      "rating": 5,
+      "content": "Kami sudah 3 tahun langganan memesan pintu harmonika di sini untuk proyek ruko komersial. Harganya pabrik langsung jadi sangat bersaing untuk kontraktor, presisinya rapi, dan after-sales garansi servisnya tidak pernah mengecewakan.",
+      "projectType": "Kemitraan Kontraktor 16 Unit Ruko",
+      "date": "15 Agustus 2024",
+      "photoUrl": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80"
+    },
+    {
+      "id": "test-4",
+      "name": "Haji Ahmad Fauzi",
+      "role": "Pemilik Gudang Sembako",
+      "companyOrLocation": "Gresik",
+      "rating": 5,
+      "content": "Pintu gudang lebar 6 meter dibuatkan sistem swing sehingga saat truk masuk pintu bisa dilipat mepet tembok dan tidak mengganggu jalan. Sudah 2 tahun dipakai setiap hari kena debu dan panas tetap lancar tidak pernah macet.",
+      "projectType": "Pintu Harmonika Gudang Swing",
+      "date": "2 Juli 2024",
+      "photoUrl": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80"
+    }
+  ],
+  "messages": [
+    {
+      "id": "msg-1",
+      "name": "Agus Setiawan",
+      "phone": "081399887766",
+      "email": "agus@gmail.com",
+      "city": "Surabaya",
+      "type": "survey_request",
+      "width": "4.5",
+      "height": "3.2",
+      "productInterest": "Tipe Medium (Bisnis)",
+      "message": "Halo, saya ada ruko baru di daerah Merr Rungkut, mau minta tolong tim teknisi survey ke lokasi besok lusa untuk pengukuran dan estimasi harga resmi.",
+      "createdAt": "2024-11-10T10:30:00Z",
+      "status": "contacted"
+    },
+    {
+      "id": "msg-2",
+      "name": "PT Cipta Karya Perkasa (Bpk. Fajar)",
+      "phone": "081122334455",
+      "email": "procurement@ciptakarya.id",
+      "city": "Semarang",
+      "type": "partnership",
+      "message": "Kami sedang membangun cluster ruko 10 unit di Semarang Barat, mohon penawaran harga khusus kemitraan kontraktor untuk spesifikasi daun 1.0mm dan 1.2mm.",
+      "createdAt": "2024-11-12T14:15:00Z",
+      "status": "new"
+    }
+  ]
+}

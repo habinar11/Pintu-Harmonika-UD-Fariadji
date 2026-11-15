@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="60%" stop-color="#311042"/>
+      <stop offset="100%" stop-color="#4a044e"/>
+    </linearGradient>
+    <linearGradient id="rukoWall" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="gateColor" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4c0519"/>
+      <stop offset="50%" stop-color="#9f1239"/>
+      <stop offset="100%" stop-color="#4c0519"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="800" height="600" fill="url(#skyGrad)"/>
+
+  <!-- Modern Commercial Ruko Facade -->
+  <rect x="60" y="80" width="680" height="480" rx="16" fill="url(#rukoWall)" stroke="#475569" stroke-width="4"/>
+
+  <!-- Second Floor Windows of Ruko -->
+  <rect x="100" y="110" width="160" height="110" rx="8" fill="#0f172a" stroke="#64748b" stroke-width="2"/>
+  <rect x="320" y="110" width="160" height="110" rx="8" fill="#0f172a" stroke="#64748b" stroke-width="2"/>
+  <rect x="540" y="110" width="160" height="110" rx="8" fill="#0f172a" stroke="#64748b" stroke-width="2"/>
+  <line x1="180" y1="110" x2="180" y2="220" stroke="#475569" stroke-width="2"/>
+  <line x1="400" y1="110" x2="400" y2="220" stroke="#475569" stroke-width="2"/>
+  <line x1="620" y1="110" x2="620" y2="220" stroke="#475569" stroke-width="2"/>
+
+  <!-- Signboard Canopy -->
+  <rect x="80" y="240" width="640" height="36" rx="6" fill="#be123c" stroke="#fcd34d" stroke-width="2"/>
+  <text x="400" y="264" text-anchor="middle" fill="#fef08a" font-size="16" font-weight="900" font-family="sans-serif" letter-spacing="3">CENTRAL BUSINESS RUKO</text>
+
+  <!-- Ground Floor: Pintu Harmonika Opening -->
+  <rect x="90" y="290" width="620" height="260" fill="#020617"/>
+
+  <!-- Top and Bottom Guide Rails -->
+  <rect x="90" y="285" width="620" height="18" fill="#cbd5e1" stroke="#334155"/>
+  <rect x="90" y="535" width="620" height="15" fill="#475569"/>
+
+  <!-- Folding Gate Panels (Closed & Folded) -->
+  <g stroke="#881337" stroke-width="1.5">
+    <rect x="110" y="303" width="45" height="232" fill="url(#gateColor)"/>
+    <rect x="160" y="303" width="45" height="232" fill="url(#gateColor)"/>
+    <rect x="210" y="303" width="45" height="232" fill="url(#gateColor)"/>
+    <rect x="260" y="303" width="45" height="232" fill="url(#gateColor)"/>
+    <rect x="310" y="303" width="45" height="232" fill="url(#gateColor)"/>
+    <rect x="360" y="303" width="45" height="232" fill="url(#gateColor)"/>
+    <rect x="410" y="303" width="45" height="232" fill="url(#gateColor)"/>
+    <rect x="460" y="303" width="45" height="232" fill="url(#gateColor)"/>
+    <rect x="510" y="303" width="45" height="232" fill="url(#gateColor)"/>
+    <rect x="560" y="303" width="45" height="232" fill="url(#gateColor)"/>
+    <rect x="610" y="303" width="45" height="232" fill="url(#gateColor)"/>
+    <rect x="660" y="303" width="40" height="232" fill="#1e293b" stroke="#fcd34d" stroke-width="2"/>
+  </g>
+
+  <!-- Silangan Harmonika Gold -->
+  <g stroke="#fcd34d" stroke-width="2" stroke-linecap="round" opacity="0.9">
+    <line x1="110" y1="340" x2="210" y2="400"/>
+    <line x1="210" y1="340" x2="110" y2="400"/>
+    <line x1="210" y1="340" x2="310" y2="400"/>
+    <line x1="310" y1="340" x2="210" y2="400"/>
+    <line x1="310" y1="340" x2="410" y2="400"/>
+    <line x1="410" y1="340" x2="310" y2="400"/>
+    <line x1="410" y1="340" x2="510" y2="400"/>
+    <line x1="510" y1="340" x2="410" y2="400"/>
+    <line x1="510" y1="340" x2="610" y2="400"/>
+    <line x1="610" y1="340" x2="510" y2="400"/>
+
+    <line x1="110" y1="440" x2="210" y2="500"/>
+    <line x1="210" y1="440" x2="110" y2="500"/>
+    <line x1="210" y1="440" x2="310" y2="500"/>
+    <line x1="310" y1="440" x2="210" y2="500"/>
+    <line x1="310" y1="440" x2="410" y2="500"/>
+    <line x1="410" y1="440" x2="310" y2="500"/>
+    <line x1="410" y1="440" x2="510" y2="500"/>
+    <line x1="510" y1="440" x2="410" y2="500"/>
+    <line x1="510" y1="440" x2="610" y2="500"/>
+    <line x1="610" y1="440" x2="510" y2="500"/>
+  </g>
+
+  <!-- Paving Floor -->
+  <rect x="60" y="550" width="680" height="20" fill="#334155"/>
+</svg>

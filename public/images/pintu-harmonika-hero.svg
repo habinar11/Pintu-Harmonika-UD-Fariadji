@@ -1,0 +1,197 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e0509"/>
+      <stop offset="50%" stop-color="#2d0a11"/>
+      <stop offset="100%" stop-color="#140205"/>
+    </linearGradient>
+
+    <!-- Metallic Steel Gradient -->
+    <linearGradient id="steelBeam" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="25%" stop-color="#94a3b8"/>
+      <stop offset="50%" stop-color="#f8fafc"/>
+      <stop offset="75%" stop-color="#64748b"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+
+    <!-- Maroon Panel Gradient -->
+    <linearGradient id="maroonPanel" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4c0519"/>
+      <stop offset="30%" stop-color="#881337"/>
+      <stop offset="60%" stop-color="#be123c"/>
+      <stop offset="100%" stop-color="#4c0519"/>
+    </linearGradient>
+
+    <!-- Gold Accent Gradient -->
+    <linearGradient id="goldAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="50%" stop-color="#fcd34d"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+
+    <!-- Floor Reflection Gradient -->
+    <linearGradient id="floorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1f2937"/>
+      <stop offset="30%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#030712"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Wall Background -->
+  <rect width="800" height="600" fill="url(#bgGrad)"/>
+
+  <!-- Modern Workshop / Ruko Opening Archway -->
+  <rect x="40" y="30" width="720" height="520" rx="16" fill="#0f172a" stroke="#334155" stroke-width="4"/>
+
+  <!-- Top Guide Rail / Rel Atas -->
+  <rect x="40" y="30" width="720" height="40" fill="url(#steelBeam)" stroke="#1e293b" stroke-width="2"/>
+  <line x1="40" y1="50" x2="760" y2="50" stroke="#fcd34d" stroke-width="3"/>
+
+  <!-- Bottom Track / Rel Bawah Tanam Anti Selip -->
+  <rect x="40" y="510" width="720" height="40" fill="url(#steelBeam)" stroke="#0f172a" stroke-width="2"/>
+  <rect x="50" y="525" width="700" height="10" fill="#020617"/>
+
+  <!-- Folding Gate Slat Slits & Vertical UNP Beams -->
+  <!-- Panel 1 -->
+  <rect x="70" y="70" width="60" height="440" fill="url(#maroonPanel)" stroke="#9f1239" stroke-width="1.5"/>
+  <rect x="94" y="70" width="12" height="440" fill="url(#steelBeam)"/>
+
+  <!-- Panel 2 -->
+  <rect x="135" y="70" width="60" height="440" fill="url(#maroonPanel)" stroke="#9f1239" stroke-width="1.5"/>
+  <rect x="159" y="70" width="12" height="440" fill="url(#steelBeam)"/>
+
+  <!-- Panel 3 -->
+  <rect x="200" y="70" width="60" height="440" fill="url(#maroonPanel)" stroke="#9f1239" stroke-width="1.5"/>
+  <rect x="224" y="70" width="12" height="440" fill="url(#steelBeam)"/>
+
+  <!-- Panel 4 -->
+  <rect x="265" y="70" width="60" height="440" fill="url(#maroonPanel)" stroke="#9f1239" stroke-width="1.5"/>
+  <rect x="289" y="70" width="12" height="440" fill="url(#steelBeam)"/>
+
+  <!-- Panel 5 -->
+  <rect x="330" y="70" width="60" height="440" fill="url(#maroonPanel)" stroke="#9f1239" stroke-width="1.5"/>
+  <rect x="354" y="70" width="12" height="440" fill="url(#steelBeam)"/>
+
+  <!-- Panel 6 -->
+  <rect x="395" y="70" width="60" height="440" fill="url(#maroonPanel)" stroke="#9f1239" stroke-width="1.5"/>
+  <rect x="419" y="70" width="12" height="440" fill="url(#steelBeam)"/>
+
+  <!-- Panel 7 -->
+  <rect x="460" y="70" width="60" height="440" fill="url(#maroonPanel)" stroke="#9f1239" stroke-width="1.5"/>
+  <rect x="484" y="70" width="12" height="440" fill="url(#steelBeam)"/>
+
+  <!-- Panel 8 -->
+  <rect x="525" y="70" width="60" height="440" fill="url(#maroonPanel)" stroke="#9f1239" stroke-width="1.5"/>
+  <rect x="549" y="70" width="12" height="440" fill="url(#steelBeam)"/>
+
+  <!-- Panel 9 (Right Lock Master Pillar / Tiang Kunci Anti Linggis) -->
+  <rect x="590" y="70" width="140" height="440" fill="#1e293b" stroke="#fcd34d" stroke-width="3"/>
+
+  <!-- Harmonika Cross Lattice (Silangan Plat Strip Harmonika Baja) -->
+  <g stroke="#fcd34d" stroke-width="3.5" stroke-linecap="round" opacity="0.95">
+    <!-- Top row X pattern -->
+    <line x1="70" y1="120" x2="160" y2="190"/>
+    <line x1="160" y1="120" x2="70" y2="190"/>
+    <line x1="135" y1="120" x2="225" y2="190"/>
+    <line x1="225" y1="120" x2="135" y2="190"/>
+    <line x1="200" y1="120" x2="290" y2="190"/>
+    <line x1="290" y1="120" x2="200" y2="190"/>
+    <line x1="265" y1="120" x2="355" y2="190"/>
+    <line x1="355" y1="120" x2="265" y2="190"/>
+    <line x1="330" y1="120" x2="420" y2="190"/>
+    <line x1="420" y1="120" x2="330" y2="190"/>
+    <line x1="395" y1="120" x2="485" y2="190"/>
+    <line x1="485" y1="120" x2="395" y2="190"/>
+    <line x1="460" y1="120" x2="550" y2="190"/>
+    <line x1="550" y1="120" x2="460" y2="190"/>
+
+    <!-- Middle row X pattern -->
+    <line x1="70" y1="260" x2="160" y2="330"/>
+    <line x1="160" y1="260" x2="70" y2="330"/>
+    <line x1="135" y1="260" x2="225" y2="330"/>
+    <line x1="225" y1="260" x2="135" y2="330"/>
+    <line x1="200" y1="260" x2="290" y2="330"/>
+    <line x1="290" y1="260" x2="200" y2="330"/>
+    <line x1="265" y1="260" x2="355" y2="330"/>
+    <line x1="355" y1="260" x2="265" y2="330"/>
+    <line x1="330" y1="260" x2="420" y2="330"/>
+    <line x1="420" y1="260" x2="330" y2="330"/>
+    <line x1="395" y1="260" x2="485" y2="330"/>
+    <line x1="485" y1="260" x2="395" y2="330"/>
+    <line x1="460" y1="260" x2="550" y2="330"/>
+    <line x1="550" y1="260" x2="460" y2="330"/>
+
+    <!-- Bottom row X pattern -->
+    <line x1="70" y1="400" x2="160" y2="470"/>
+    <line x1="160" y1="400" x2="70" y2="470"/>
+    <line x1="135" y1="400" x2="225" y2="470"/>
+    <line x1="225" y1="400" x2="135" y2="470"/>
+    <line x1="200" y1="400" x2="290" y2="470"/>
+    <line x1="290" y1="400" x2="200" y2="470"/>
+    <line x1="265" y1="400" x2="355" y2="470"/>
+    <line x1="355" y1="400" x2="265" y2="470"/>
+    <line x1="330" y1="400" x2="420" y2="470"/>
+    <line x1="420" y1="400" x2="330" y2="470"/>
+    <line x1="395" y1="400" x2="485" y2="470"/>
+    <line x1="485" y1="400" x2="395" y2="470"/>
+    <line x1="460" y1="400" x2="550" y2="470"/>
+    <line x1="550" y1="400" x2="460" y2="470"/>
+  </g>
+
+  <!-- High-Precision Pivot Rivets / Paku Keling Baja Murni -->
+  <g fill="#ffffff" stroke="#94a3b8" stroke-width="1.5">
+    <circle cx="115" cy="155" r="4"/>
+    <circle cx="180" cy="155" r="4"/>
+    <circle cx="245" cy="155" r="4"/>
+    <circle cx="310" cy="155" r="4"/>
+    <circle cx="375" cy="155" r="4"/>
+    <circle cx="440" cy="155" r="4"/>
+    <circle cx="505" cy="155" r="4"/>
+
+    <circle cx="115" cy="295" r="4"/>
+    <circle cx="180" cy="295" r="4"/>
+    <circle cx="245" cy="295" r="4"/>
+    <circle cx="310" cy="295" r="4"/>
+    <circle cx="375" cy="295" r="4"/>
+    <circle cx="440" cy="295" r="4"/>
+    <circle cx="505" cy="295" r="4"/>
+
+    <circle cx="115" cy="435" r="4"/>
+    <circle cx="180" cy="435" r="4"/>
+    <circle cx="245" cy="435" r="4"/>
+    <circle cx="310" cy="435" r="4"/>
+    <circle cx="375" cy="435" r="4"/>
+    <circle cx="440" cy="435" r="4"/>
+    <circle cx="505" cy="435" r="4"/>
+  </g>
+
+  <!-- Heavy Duty Lock Handle & Steel Lockbox (Kunci Anti-Linggis) -->
+  <rect x="620" y="240" width="80" height="120" rx="8" fill="#0f172a" stroke="#fcd34d" stroke-width="2"/>
+  <rect x="645" y="270" width="30" height="60" rx="6" fill="#e2e8f0" stroke="#475569" stroke-width="2"/>
+  <circle cx="660" cy="290" r="5" fill="#0f172a"/>
+  <line x1="660" y1="295" x2="660" y2="305" stroke="#0f172a" stroke-width="2.5"/>
+
+  <!-- Bottom Heavy-Duty Ball Bearing Rollers (Double Bearing Roda Baja) -->
+  <g fill="url(#steelBeam)" stroke="#fcd34d" stroke-width="2">
+    <circle cx="100" cy="510" r="14"/>
+    <circle cx="165" cy="510" r="14"/>
+    <circle cx="230" cy="510" r="14"/>
+    <circle cx="295" cy="510" r="14"/>
+    <circle cx="360" cy="510" r="14"/>
+    <circle cx="425" cy="510" r="14"/>
+    <circle cx="490" cy="510" r="14"/>
+    <circle cx="555" cy="510" r="14"/>
+  </g>
+
+  <!-- Badge in Top Right -->
+  <g transform="translate(620, 90)">
+    <rect width="100" height="40" rx="8" fill="#881337" stroke="#fcd34d" stroke-width="2"/>
+    <text x="50" y="25" text-anchor="middle" fill="#fef08a" font-size="12" font-weight="900" font-family="sans-serif">SNI STEEL</text>
+  </g>
+
+  <!-- Elegant Lighting Reflections -->
+  <polygon points="40,30 200,30 140,550 40,550" fill="#ffffff" opacity="0.04"/>
+  <polygon points="350,30 520,30 450,550 280,550" fill="#ffffff" opacity="0.03"/>
+</svg>
