@@ -70,51 +70,51 @@ export default async function HomePage() {
               </p>
 
               {/* Action Buttons in Red Maroon & Emerald */}
-              <div className="flex flex-col sm:flex-row gap-3.5 pt-2">
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
                 <a
                   href={waUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center px-7 py-4 rounded-2xl text-base font-extrabold text-white bg-gradient-to-r from-red-700 via-maroon-700 to-red-800 hover:from-red-600 hover:to-maroon-700 shadow-xl shadow-red-950/60 border border-amber-400/40 hover:scale-[1.02] transition-all"
+                  className="w-full sm:w-auto inline-flex items-center justify-center px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-extrabold text-white bg-gradient-to-r from-red-700 via-maroon-700 to-red-800 hover:from-red-600 hover:to-maroon-700 shadow-xl shadow-red-950/60 border border-amber-400/40 hover:scale-[1.02] active:scale-98 transition-all min-h-[48px]"
                 >
-                  <MessageCircle className="w-5 h-5 mr-2.5 fill-white" />
+                  <MessageCircle className="w-5 h-5 mr-2.5 fill-white shrink-0" />
                   Konsultasi & Free Survey via WhatsApp
                 </a>
 
                 <Link
                   href="/produk"
-                  className="inline-flex items-center justify-center px-6 py-4 rounded-2xl text-base font-bold text-rose-100 bg-white/10 hover:bg-white/15 border border-rose-400/30 transition-all hover:text-white"
+                  className="w-full sm:w-auto inline-flex items-center justify-center px-5 sm:px-6 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-bold text-rose-100 bg-white/10 hover:bg-white/15 border border-rose-400/30 transition-all hover:text-white min-h-[48px]"
                 >
                   Lihat Katalog Produk
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  <ArrowRight className="w-4 h-4 ml-2 shrink-0" />
                 </Link>
               </div>
 
               {/* Trust Indicators */}
-              <div className="pt-6 border-t border-maroon-900/70 grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div className="p-3 rounded-2xl bg-white/5 border border-rose-900/40">
-                  <div className="text-2xl sm:text-3xl font-black text-amber-400">
+              <div className="pt-6 border-t border-maroon-900/70 grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
+                <div className="p-2.5 sm:p-3 rounded-2xl bg-white/5 border border-rose-900/40">
+                  <div className="text-xl sm:text-3xl font-black text-amber-400">
                     {settings.yearsExperience}+ Thn
                   </div>
-                  <div className="text-xs text-rose-200 mt-0.5 font-medium">Pengalaman Fabrikasi</div>
+                  <div className="text-[11px] sm:text-xs text-rose-200 mt-0.5 font-medium">Pengalaman Fabrikasi</div>
                 </div>
-                <div className="p-3 rounded-2xl bg-white/5 border border-rose-900/40">
-                  <div className="text-2xl sm:text-3xl font-black text-rose-300">
+                <div className="p-2.5 sm:p-3 rounded-2xl bg-white/5 border border-rose-900/40">
+                  <div className="text-xl sm:text-3xl font-black text-rose-300">
                     {settings.completedProjects.toLocaleString("id-ID")}+
                   </div>
-                  <div className="text-xs text-rose-200 mt-0.5 font-medium">Pintu Terpasang</div>
+                  <div className="text-[11px] sm:text-xs text-rose-200 mt-0.5 font-medium">Pintu Terpasang</div>
                 </div>
-                <div className="p-3 rounded-2xl bg-white/5 border border-rose-900/40">
-                  <div className="text-2xl sm:text-3xl font-black text-emerald-400">
+                <div className="p-2.5 sm:p-3 rounded-2xl bg-white/5 border border-rose-900/40">
+                  <div className="text-xl sm:text-3xl font-black text-emerald-400">
                     {settings.warrantyYears} Tahun
                   </div>
-                  <div className="text-xs text-rose-200 mt-0.5 font-medium">Garansi Servis Resmi</div>
+                  <div className="text-[11px] sm:text-xs text-rose-200 mt-0.5 font-medium">Garansi Servis Resmi</div>
                 </div>
-                <div className="p-3 rounded-2xl bg-white/5 border border-rose-900/40">
-                  <div className="text-2xl sm:text-3xl font-black text-amber-300">
+                <div className="p-2.5 sm:p-3 rounded-2xl bg-white/5 border border-rose-900/40">
+                  <div className="text-xl sm:text-3xl font-black text-amber-300">
                     100% SNI
                   </div>
-                  <div className="text-xs text-rose-200 mt-0.5 font-medium">Baja Murni Pilihan</div>
+                  <div className="text-[11px] sm:text-xs text-rose-200 mt-0.5 font-medium">Baja Murni Pilihan</div>
                 </div>
               </div>
             </div>
@@ -132,19 +132,19 @@ export default async function HomePage() {
 
       {/* KEUNGGULAN UTAMA (6 PILLARS OF EXCELLENCE) */}
       <section className="w-full max-w-[1650px] mx-auto px-4 sm:px-8 lg:px-12">
-        <div className="text-center max-w-3xl mx-auto mb-12">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
           <span className="text-xs font-bold text-maroon-700 uppercase tracking-widest block mb-2">
             Mengapa Memilih Kami?
           </span>
           <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Kualitas Tanpa Kompromi, Keamanan Maksimal
           </h2>
-          <p className="text-slate-600 text-sm sm:text-base mt-3">
+          <p className="text-slate-600 text-xs sm:text-base mt-2 sm:mt-3 leading-relaxed">
             Banyak pintu harmonika di pasaran menggunakan bahan tipis (banci) yang cepat melengkung dan macet. Di {settings.companyName}, kami memegang standar mutu tertinggi.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
           <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-slate-200 hover:shadow-xl hover:border-maroon-300 transition-all group">
             <div className="w-12 h-12 bg-rose-50 text-maroon-700 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-maroon-800 group-hover:text-white transition-colors">
               <ShieldCheck className="w-6 h-6" />
@@ -247,7 +247,7 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
           {products.map((p) => {
             const productWaUrl = `https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(
               `Halo Admin ${settings.companyName}, saya tertarik memesan "${p.name}". Mohon informasi harga dan jadwal survey.`
@@ -256,9 +256,9 @@ export default async function HomePage() {
             return (
               <div
                 key={p.id}
-                className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group hover:border-maroon-300"
+                className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group hover:border-maroon-300"
               >
-                <div className="relative h-48 overflow-hidden bg-slate-100">
+                <div className="relative h-44 sm:h-48 overflow-hidden bg-slate-100">
                   <img
                     src={p.image}
                     alt={p.name}
@@ -274,16 +274,16 @@ export default async function HomePage() {
                   </div>
                 </div>
 
-                <div className="p-5 flex-1 flex flex-col justify-between">
+                <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
                   <div>
-                    <h3 className="font-extrabold text-slate-900 text-base mb-2 group-hover:text-maroon-800 transition-colors">
+                    <h3 className="font-extrabold text-slate-900 text-base mb-1.5 sm:mb-2 group-hover:text-maroon-800 transition-colors">
                       {p.name}
                     </h3>
-                    <p className="text-xs text-slate-500 line-clamp-2 mb-4 leading-relaxed">
+                    <p className="text-xs text-slate-500 line-clamp-2 mb-3 sm:mb-4 leading-relaxed">
                       {p.description}
                     </p>
 
-                    <div className="space-y-1.5 text-xs text-slate-700 bg-rose-50/50 p-3 rounded-2xl border border-rose-100 mb-4">
+                    <div className="space-y-1.5 text-xs text-slate-700 bg-rose-50/50 p-2.5 sm:p-3 rounded-2xl border border-rose-100 mb-3 sm:mb-4">
                       <div className="flex justify-between">
                         <span className="text-slate-500">Tebal Daun:</span>
                         <span className="font-bold text-maroon-900">{p.daunThickness}</span>
@@ -303,9 +303,9 @@ export default async function HomePage() {
                     href={productWaUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full inline-flex items-center justify-center py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-maroon-800 transition-colors"
+                    className="w-full inline-flex items-center justify-center py-2.5 sm:py-3 px-4 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-maroon-800 active:scale-98 transition-colors min-h-[44px]"
                   >
-                    <MessageCircle className="w-3.5 h-3.5 mr-2" />
+                    <MessageCircle className="w-3.5 h-3.5 mr-2 shrink-0" />
                     Pesan Tipe Ini
                   </a>
                 </div>
@@ -420,33 +420,33 @@ export default async function HomePage() {
 
       {/* CALL TO ACTION SECTION: Deep Maroon Banner (Full width text, Tanpa Was-Was Macet tidak terpotong) */}
       <section className="w-full max-w-[1650px] mx-auto px-4 sm:px-8 lg:px-12">
-        <div className="bg-gradient-to-r from-maroon-950 via-[#34050e] to-maroon-950 text-white rounded-3xl p-8 sm:p-14 shadow-2xl relative overflow-hidden border-2 border-maroon-700/60">
-          <div className="w-full space-y-6 relative z-10">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+        <div className="bg-gradient-to-r from-maroon-950 via-[#34050e] to-maroon-950 text-white rounded-2xl sm:rounded-3xl p-6 sm:p-10 lg:p-14 shadow-2xl relative overflow-hidden border-2 border-maroon-700/60">
+          <div className="w-full space-y-5 sm:space-y-6 relative z-10">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-400">
               Layanan Cepat & Bergaransi
             </span>
-            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-snug break-normal hyphens-none">
+            <h2 className="text-xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-snug break-normal hyphens-none">
               Ingin Pasang Pintu Harmonika <span className="whitespace-nowrap">Tanpa Was-Was Macet?</span>
             </h2>
-            <p className="text-rose-100 text-sm sm:text-base leading-relaxed max-w-4xl">
+            <p className="text-rose-100 text-xs sm:text-base leading-relaxed max-w-4xl">
               Konsultasikan ukuran toko atau ruko Anda bersama tim kami. Dapatkan penawaran harga pabrik terbaik dan jadwal survey lokasi GRATIS hari ini juga!
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2">
               <a
                 href={waUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-7 py-3.5 rounded-xl text-base font-bold text-white bg-gradient-to-r from-red-600 to-maroon-700 hover:from-red-500 hover:to-maroon-600 shadow-xl border border-amber-400/30 transition-all transform hover:-translate-y-0.5"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-6 sm:px-7 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base font-bold text-white bg-gradient-to-r from-red-600 to-maroon-700 hover:from-red-500 hover:to-maroon-600 shadow-xl border border-amber-400/30 transition-all transform hover:-translate-y-0.5 active:scale-98 min-h-[48px]"
               >
-                <MessageCircle className="w-5 h-5 mr-2 fill-white" />
+                <MessageCircle className="w-5 h-5 mr-2 fill-white shrink-0" />
                 Chat WhatsApp Sekarang
               </a>
               <Link
                 href="/kontak"
-                className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl text-base font-bold text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-all"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base font-bold text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-all min-h-[48px]"
               >
-                <PhoneCall className="w-4 h-4 mr-2" />
+                <PhoneCall className="w-4 h-4 mr-2 shrink-0" />
                 Info Alamat Workshop & Kontak
               </Link>
             </div>

@@ -165,18 +165,18 @@ export default function DynamicTestimonialsSection({
           </div>
         </div>
 
-        {/* Grid of Testimonial Cards: TULISAN BAWAH 100% RATA SEMUA */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-stretch">
+        {/* Grid of Testimonial Cards: TULISAN BAWAH 100% RATA SEMUA, ADAPTIF UNTUK HP (1 KOLOM), TABLET (2 KOLOM), DESKTOP (3 KOLOM) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8 items-stretch">
           {visibleTestimonials.map((t, idx) => {
             return (
               <div
                 key={`${t.id}-${idx}`}
-                className="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-slate-200 hover:border-maroon-400 hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+                className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 shadow-sm border border-slate-200 hover:border-maroon-400 hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
               >
                 <div>
                   {/* Photo Thumbnail with fallback */}
                   {t.photoUrl ? (
-                    <div className="h-44 w-full mb-4 rounded-2xl overflow-hidden bg-slate-100 relative">
+                    <div className="h-40 sm:h-44 w-full mb-4 rounded-xl sm:rounded-2xl overflow-hidden bg-slate-100 relative">
                       <img
                         src={t.photoUrl}
                         alt={t.name}
@@ -187,7 +187,7 @@ export default function DynamicTestimonialsSection({
                       </span>
                     </div>
                   ) : (
-                    <div className="h-44 w-full mb-4 rounded-2xl overflow-hidden bg-slate-100 relative">
+                    <div className="h-40 sm:h-44 w-full mb-4 rounded-xl sm:rounded-2xl overflow-hidden bg-slate-100 relative">
                       <img
                         src="/images/pintu-harmonika-hero.svg"
                         alt="Hasil Pasang Pintu Harmonika"
@@ -210,7 +210,7 @@ export default function DynamicTestimonialsSection({
                   </div>
 
                   {/* Review Content with guaranteed min-height for even alignment */}
-                  <div className="min-h-[88px] mb-4">
+                  <div className="min-h-[84px] sm:min-h-[88px] mb-4">
                     <p className="text-slate-700 text-xs sm:text-sm italic leading-relaxed line-clamp-4">
                       &ldquo;{t.content}&rdquo;
                     </p>
@@ -228,10 +228,10 @@ export default function DynamicTestimonialsSection({
 
                   {/* Equalized Bottom Row */}
                   <div className="h-9 flex justify-between items-center text-[11px] pt-2 border-t border-slate-100/80">
-                    <span className="font-bold text-maroon-800 truncate max-w-[160px]" title={t.projectType}>
+                    <span className="font-bold text-maroon-800 truncate max-w-[150px]" title={t.projectType}>
                       {t.projectType}
                     </span>
-                    <span className="text-slate-500 truncate max-w-[140px] text-right" title={t.companyOrLocation}>
+                    <span className="text-slate-500 truncate max-w-[130px] text-right" title={t.companyOrLocation}>
                       {t.companyOrLocation}
                     </span>
                   </div>
@@ -281,9 +281,9 @@ export default function DynamicTestimonialsSection({
             {[...galleryPhotos, ...galleryPhotos, ...galleryPhotos].map((photo, i) => (
               <div
                 key={i}
-                className="shrink-0 w-72 sm:w-84 mx-3 rounded-2xl overflow-hidden bg-black/40 border border-maroon-700/80 group shadow-lg"
+                className="shrink-0 w-64 sm:w-80 md:w-84 mx-2.5 sm:mx-3 rounded-2xl overflow-hidden bg-black/40 border border-maroon-700/80 group shadow-lg"
               >
-                <div className="relative h-52 sm:h-56 overflow-hidden">
+                <div className="relative h-44 sm:h-52 md:h-56 overflow-hidden">
                   <img
                     src={photo.url}
                     alt={photo.caption}
@@ -316,15 +316,15 @@ export default function DynamicTestimonialsSection({
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
           {reviewVideos.map((vid) => (
             <div
               key={vid.id}
-              className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all group hover:border-maroon-300 flex flex-col justify-between"
+              className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all group hover:border-maroon-300 flex flex-col justify-between"
             >
               <div
                 onClick={() => setActiveVideoModal(vid.videoUrl)}
-                className="relative h-52 bg-slate-900 overflow-hidden cursor-pointer"
+                className="relative h-44 sm:h-52 bg-slate-900 overflow-hidden cursor-pointer"
               >
                 <img
                   src={vid.thumbnail}

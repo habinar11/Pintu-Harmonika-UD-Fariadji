@@ -151,7 +151,7 @@ export default function Footer({ settings }: { settings: CompanySettings }) {
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center w-full px-4 py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-red-700 to-maroon-900 hover:from-red-600 hover:to-maroon-800 transition-all shadow-lg border border-amber-400/30"
+                className="inline-flex items-center justify-center w-full px-4 py-3.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-red-700 to-maroon-900 hover:from-red-600 hover:to-maroon-800 transition-all shadow-lg border border-amber-400/30 min-h-[48px] active:scale-98"
               >
                 Chat WhatsApp CS 24 Jam
               </a>

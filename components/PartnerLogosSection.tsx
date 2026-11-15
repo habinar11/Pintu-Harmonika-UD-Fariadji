@@ -204,13 +204,13 @@ export default function PartnerLogosSection({
           </div>
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex flex-wrap gap-2 pt-3">
+        {/* Filter Pills with smooth horizontal scrolling on mobile */}
+        <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-2 pt-3 pb-1 -mx-1 px-1">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap min-h-[40px] flex items-center active:scale-95 ${
                 selectedCategory === cat
                   ? "bg-maroon-800 text-white shadow-md shadow-maroon-900/30 border border-amber-400/40"
                   : "bg-white text-slate-600 hover:bg-rose-50 border border-slate-200"
@@ -223,11 +223,11 @@ export default function PartnerLogosSection({
       </div>
 
       {/* CONTINUOUS MOVING LOGO MARQUEE (Animasi Bergerak) */}
-      <div className="w-full overflow-hidden bg-gradient-to-r from-[#200308] via-[#140205] to-[#200308] py-8 border-y-2 border-maroon-800 shadow-2xl relative group">
+      <div className="w-full overflow-hidden bg-gradient-to-r from-[#200308] via-[#140205] to-[#200308] py-6 sm:py-8 border-y-2 border-maroon-800 shadow-2xl relative group">
         
         {/* Subtle left & right gradient fade masks for smooth infinite ticker look */}
-        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-r from-[#200308] to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-l from-[#200308] to-transparent z-10 pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-28 bg-gradient-to-r from-[#200308] to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-28 bg-gradient-to-l from-[#200308] to-transparent z-10 pointer-events-none" />
 
         {/* Infinite Moving Marquee Ticker */}
         <div className="animate-marquee flex items-center">
@@ -235,7 +235,7 @@ export default function PartnerLogosSection({
           {[...filteredPartners, ...filteredPartners, ...filteredPartners].map((partner, idx) => (
             <div
               key={`${partner.id}-${idx}`}
-              className="shrink-0 w-80 sm:w-96 mx-3.5 rounded-2xl bg-gradient-to-b from-white/10 to-white/5 border border-maroon-600/70 p-4 shadow-xl hover:border-amber-400/80 hover:bg-white/15 transition-all duration-300 group/card cursor-default"
+              className="shrink-0 w-72 sm:w-84 md:w-96 mx-2.5 sm:mx-3.5 rounded-2xl bg-gradient-to-b from-white/10 to-white/5 border border-maroon-600/70 p-3.5 sm:p-4 shadow-xl hover:border-amber-400/80 hover:bg-white/15 transition-all duration-300 group/card cursor-default"
             >
               <div className="flex items-center space-x-3.5">
                 {/* Vector Brand Logo */}

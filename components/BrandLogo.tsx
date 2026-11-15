@@ -19,12 +19,12 @@ export default function BrandLogo({
 }: BrandLogoProps) {
   if (size === "hero") {
     return (
-      <div className={`w-full flex flex-col md:flex-row items-center justify-between gap-6 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#32050e] via-[#200308] to-[#140104] border-2 border-maroon-700/70 shadow-2xl ${className}`}>
+      <div className={`w-full flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-[#32050e] via-[#200308] to-[#140104] border-2 border-maroon-700/70 shadow-2xl ${className}`}>
         {/* Left Side: Large Emblem + Title */}
-        <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-5 text-center sm:text-left w-full md:w-auto">
           {/* Large Circular Emblem Icon */}
           <div className="relative shrink-0">
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white p-1 shadow-2xl shadow-red-950/70 border-2 border-amber-400 flex items-center justify-center transform hover:scale-105 transition-transform overflow-hidden">
+            <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-white p-1 shadow-2xl shadow-red-950/70 border-2 border-amber-400 flex items-center justify-center transform hover:scale-105 transition-transform overflow-hidden">
               <img
                 src={logoUrl || "/images/company-logo.png"}
                 alt={companyName}
@@ -32,23 +32,23 @@ export default function BrandLogo({
               />
             </div>
             {/* Quality Seal Badge */}
-            <span className="absolute -bottom-1 -right-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-lg border border-amber-300">
+            <span className="absolute -bottom-1 -right-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 text-[9px] sm:text-[10px] font-black px-2 sm:px-2.5 py-0.5 rounded-full shadow-lg border border-amber-300">
               SNI STEEL
             </span>
           </div>
 
           {/* Text Details */}
-          <div className="space-y-1">
-            <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-md bg-amber-400/20 border border-amber-400/40 text-[11px] font-extrabold text-amber-300 uppercase tracking-widest">
+          <div className="space-y-1 min-w-0">
+            <div className="inline-flex items-center space-x-1.5 px-2.5 sm:px-3 py-1 rounded-md bg-amber-400/20 border border-amber-400/40 text-[9px] sm:text-[11px] font-extrabold text-amber-300 uppercase tracking-widest text-center">
               <span>★ PABRIK RESMI & SPESIALIS PINTU HARMONIKA INDONESIA ★</span>
             </div>
             <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight drop-shadow-md">
               {companyName}
             </h2>
-            <p className="text-xs sm:text-sm font-bold text-rose-200 tracking-wide uppercase">
+            <p className="text-[11px] sm:text-sm font-bold text-rose-200 tracking-wide uppercase">
               {tagline}
             </p>
-            <p className="text-xs text-rose-100/70 pt-0.5">
+            <p className="text-[11px] sm:text-xs text-rose-100/70 pt-0.5 leading-relaxed">
               Plat Baja Roll SNI Tebal Asli • Roda Double Bearing Jepang • Kunci Anti-Linggis
             </p>
           </div>
@@ -72,13 +72,13 @@ export default function BrandLogo({
   // Navbar & standard size
   const iconSizeClass =
     size === "lg"
-      ? "w-13 h-13 sm:w-14 sm:h-14"
+      ? "w-11 h-11 sm:w-14 sm:h-14"
       : size === "sm"
-      ? "w-9 h-9"
-      : "w-11 h-11 sm:w-12 sm:h-12";
+      ? "w-8 h-8 sm:w-9 sm:h-9"
+      : "w-10 h-10 sm:w-12 sm:h-12";
 
   return (
-    <div className={`flex items-center space-x-3 group ${className}`}>
+    <div className={`flex items-center space-x-2.5 sm:space-x-3 group ${className}`}>
       {/* Circular Emblem Icon */}
       <div
         className={`${iconSizeClass} rounded-full bg-white p-0.5 flex items-center justify-center shadow-md border-2 border-amber-400 group-hover:scale-105 transition-transform shrink-0 overflow-hidden`}
@@ -91,11 +91,11 @@ export default function BrandLogo({
       </div>
 
       {showText && (
-        <div>
-          <span className="font-black text-slate-900 text-lg sm:text-xl tracking-tight block leading-tight group-hover:text-maroon-800 transition-colors">
+        <div className="min-w-0">
+          <span className="font-black text-slate-900 text-base sm:text-xl tracking-tight block leading-tight group-hover:text-maroon-800 transition-colors truncate">
             {companyName}
           </span>
-          <span className="text-[11px] text-maroon-700 font-bold tracking-wider uppercase block">
+          <span className="text-[10px] sm:text-[11px] text-maroon-700 font-bold tracking-wider uppercase block truncate">
             {tagline}
           </span>
         </div>
