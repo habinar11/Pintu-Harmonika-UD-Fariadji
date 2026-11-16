@@ -27,9 +27,21 @@ export default function PriceCalculator({
   products: Product[];
   settings: CompanySettings;
 }) {
-  const [width, setWidth] = useState<number>(3.5);
-  const [height, setHeight] = useState<number>(3.0);
-  const [quantity, setQuantity] = useState<number>(1);
+  const [widthStr, setWidthStr] = useState<string>("3.5");
+  const [heightStr, setHeightStr] = useState<string>("3.0");
+  const [quantityStr, setQuantityStr] = useState<string>("1");
+
+  const parseDimension = (str: string, fallback: number = 1): number => {
+    if (!str || str.trim() === "") return fallback;
+    const num = parseFloat(str.replace(",", "."));
+    return isNaN(num) || num <= 0 ? fallback : num;
+  };
+
+  const width = parseDimension(widthStr, 1);
+  const height = parseDimension(heightStr, 1);
+  const rawQty = parseInt(quantityStr, 10);
+  const safeQuantity = isNaN(rawQty) || rawQty < 1 ? 1 : rawQty;
+
   const [selectedProductId, setSelectedProductId] = useState<string>(
     products[0]?.id || ""
   );
@@ -66,7 +78,6 @@ export default function PriceCalculator({
   const stripColorObj =
     STRIP_PRESETS.find((s) => s.id === stripColorId) || STRIP_PRESETS[0];
 
-  const safeQuantity = Math.max(1, quantity || 1);
   const areaPerDoor = Math.max(0, width * height);
   // Ketentuan standar fabrikasi minimal 7 m² per pintu
   const effectiveAreaPerDoor = areaPerDoor < 7 && areaPerDoor > 0 ? 7 : areaPerDoor;
@@ -235,11 +246,16 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
                 <input
                   type="number"
                   step="0.1"
-                  min="1"
+                  min="0.1"
                   max="20"
-                  value={width}
-                  onChange={(e) => setWidth(parseFloat(e.target.value) || 0)}
-                  className="w-full bg-maroon-950/80 border border-maroon-700 rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-white font-bold text-base sm:text-lg focus:outline-none focus:border-amber-400"
+                  value={widthStr}
+                  placeholder="1"
+                  onFocus={(e) => e.target.select()}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setWidthStr(/^0[0-9]/.test(val) ? val.replace(/^0+/, "") : val);
+                  }}
+                  className="w-full bg-maroon-950/80 border border-maroon-700 rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-white font-bold text-base sm:text-lg focus:outline-none focus:border-amber-400 placeholder:text-rose-200/35"
                 />
                 <span className="text-sm font-bold text-rose-300">m</span>
               </div>
@@ -256,11 +272,16 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
                 <input
                   type="number"
                   step="0.1"
-                  min="1"
+                  min="0.1"
                   max="8"
-                  value={height}
-                  onChange={(e) => setHeight(parseFloat(e.target.value) || 0)}
-                  className="w-full bg-maroon-950/80 border border-maroon-700 rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-white font-bold text-base sm:text-lg focus:outline-none focus:border-amber-400"
+                  value={heightStr}
+                  placeholder="1"
+                  onFocus={(e) => e.target.select()}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setHeightStr(/^0[0-9]/.test(val) ? val.replace(/^0+/, "") : val);
+                  }}
+                  className="w-full bg-maroon-950/80 border border-maroon-700 rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-white font-bold text-base sm:text-lg focus:outline-none focus:border-amber-400 placeholder:text-rose-200/35"
                 />
                 <span className="text-sm font-bold text-rose-300">m</span>
               </div>
@@ -279,9 +300,14 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
                   step="1"
                   min="1"
                   max="50"
-                  value={quantity}
-                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-full bg-maroon-950/80 border border-maroon-700 rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-white font-bold text-base sm:text-lg focus:outline-none focus:border-amber-400"
+                  value={quantityStr}
+                  placeholder="1"
+                  onFocus={(e) => e.target.select()}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setQuantityStr(/^0[0-9]/.test(val) ? val.replace(/^0+/, "") : val);
+                  }}
+                  className="w-full bg-maroon-950/80 border border-maroon-700 rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-white font-bold text-base sm:text-lg focus:outline-none focus:border-amber-400 placeholder:text-rose-200/35"
                 />
                 <span className="text-sm font-bold text-rose-300">Unit</span>
               </div>
