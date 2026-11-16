@@ -134,13 +134,14 @@ export default function PriceCalculator({
     const custAddr = customerAddress.trim();
 
     const lines: string[] = [
-      `Halo Admin ${settings.companyName}, saya mau estimasi & pemesanan pintu harmonika:`,
+      `Halo Admin ${settings.companyName}, saya mau pesan pintu harmonika:`,
       custName ? `- Nama: ${custName}` : `- Nama: -`,
       custAddr ? `- Alamat: ${custAddr}` : `- Alamat: -`,
       `- Ukuran: Lebar ${width} m x Tinggi ${height} m`,
       `- Jumlah: ${safeQuantity} Unit`,
       `- Volume: ${totalCalculatedArea.toFixed(2)} m²`,
       `- Varian: ${selectedProduct?.name || "SUPER 1"}`,
+      `- Estimasi Harga: ${formatRupiah(totalCost)}`,
       ``,
       `Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jadwal survey dan penawaran resminya, apakah bisa nego? Terima kasih!`
     ];
