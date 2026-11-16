@@ -1,277 +1,304 @@
 "use client";
 
-import React, { useState } from "react";
-import { Handshake, Building2, ShieldCheck, CheckCircle2, Sparkles, ArrowRight } from "lucide-react";
-import Link from "next/link";
+import React from "react";
 
-export interface PartnerItem {
+export interface ClientLogo {
   id: string;
   name: string;
-  tagline: string;
-  category: "Kontraktor" | "Developer" | "Toko & Retail" | "Pergudangan";
-  project: string;
-  yearsPartnership: string;
   logo: React.ReactNode;
 }
 
-export const defaultPartners: PartnerItem[] = [
+export const clientLogos: ClientLogo[] = [
   {
-    id: "p1",
-    name: "PT Artha Graha Konstruksi",
-    tagline: "Kontraktor Sipil & Gedung Komersial",
-    category: "Kontraktor",
-    project: "Pemasangan 16 Unit Pintu Harmonika Ruko",
-    yearsPartnership: "Mitra Sejak 2021",
+    id: "ugm",
+    name: "Universitas Gadjah Mada (UGM)",
     logo: (
-      <svg viewBox="0 0 60 60" className="w-12 h-12 shrink-0" fill="none">
-        <rect width="60" height="60" rx="14" fill="#0f172a" stroke="#f59e0b" strokeWidth="2" />
-        <path d="M15 45 L30 15 L45 45" stroke="#f59e0b" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-        <line x1="20" y1="36" x2="40" y2="36" stroke="#38bdf8" strokeWidth="2.5" />
-        <circle cx="30" cy="27" r="4" fill="#f8fafc" />
-        <rect x="27" y="38" width="6" height="7" fill="#f59e0b" />
+      <svg viewBox="0 0 100 100" className="h-16 w-16 sm:h-20 sm:w-20 object-contain drop-shadow-sm" fill="none">
+        {/* Outer lotus petals (embossed cream & gold) */}
+        <circle cx="50" cy="50" r="46" fill="#fef08a" opacity="0.3" />
+        <path
+          d="M50 4 L56 22 L72 10 L68 28 L86 26 L74 40 L92 48 L76 58 L90 70 L72 74 L78 92 L60 84 L50 98 L40 84 L22 78 L28 74 L10 70 L24 58 L8 48 L26 40 L14 26 L32 28 L28 10 L44 22 Z"
+          fill="#fef9c3"
+          stroke="#ca8a04"
+          strokeWidth="1.5"
+        />
+        {/* Inner concentric ring */}
+        <circle cx="50" cy="50" r="32" fill="#854d0e" stroke="#eab308" strokeWidth="2" />
+        <circle cx="50" cy="50" r="28" fill="#fef08a" stroke="#ca8a04" strokeWidth="1" />
+        {/* Inner emblem rays */}
+        <circle cx="50" cy="50" r="18" fill="#ca8a04" />
+        <circle cx="50" cy="50" r="12" fill="#78350f" />
+        <circle cx="50" cy="50" r="6" fill="#fef08a" />
+        {/* Text ring simulation */}
+        <circle cx="50" cy="50" r="23" stroke="#854d0e" strokeWidth="1.2" strokeDasharray="3 2" />
       </svg>
     ),
   },
   {
-    id: "p2",
-    name: "Central Park Property Group",
-    tagline: "Developer Ruko & Pusat Perbelanjaan",
-    category: "Developer",
-    project: "Proyek Kawasan Ruko Bisnis 3 Lantai",
-    yearsPartnership: "Mitra Sejak 2019",
+    id: "pupr",
+    name: "Kementerian Pekerjaan Umum dan Perumahan Rakyat (PUPR)",
     logo: (
-      <svg viewBox="0 0 60 60" className="w-12 h-12 shrink-0" fill="none">
-        <rect width="60" height="60" rx="14" fill="#064e3b" stroke="#34d399" strokeWidth="2" />
-        <path d="M16 44 L30 16 L44 44 Z" stroke="#34d399" strokeWidth="2.5" fill="#047857" />
-        <path d="M24 44 L30 30 L36 44 Z" fill="#a7f3d0" />
-        <circle cx="30" cy="18" r="3" fill="#fef08a" />
+      <svg viewBox="0 0 100 100" className="h-16 w-16 sm:h-20 sm:w-20 object-contain drop-shadow-sm" fill="none">
+        {/* Yellow square background */}
+        <rect width="100" height="100" rx="6" fill="#facc15" />
+        {/* Blue PU logo graphic */}
+        <path
+          d="M20 20 H50 C66 20 78 30 78 46 C78 62 66 72 50 72 H38 V80 H20 Z"
+          fill="#1e3a8a"
+        />
+        <circle cx="48" cy="46" r="14" fill="#facc15" />
+        <rect x="20" y="36" width="16" height="44" fill="#1e3a8a" />
+        <path
+          d="M62 46 C62 55 54 62 45 62 C36 62 30 55 30 46 C30 37 36 30 45 30 C54 30 62 37 62 46 Z"
+          fill="#1e3a8a"
+        />
+        <circle cx="45" cy="46" r="8" fill="#facc15" />
+        {/* Right leg */}
+        <path d="M72 55 V80 H60 V55 Z" fill="#1e3a8a" />
       </svg>
     ),
   },
   {
-    id: "p3",
-    name: "Sumber Makmur Jaya Distrindo",
-    tagline: "Distributor Bahan Bangunan & Toko Emas",
-    category: "Toko & Retail",
-    project: "Pintu Harmonika Super Heavy Plat 1.5mm",
-    yearsPartnership: "Mitra Sejak 2020",
+    id: "ugm-residence",
+    name: "UGM Residence",
     logo: (
-      <svg viewBox="0 0 60 60" className="w-12 h-12 shrink-0" fill="none">
-        <rect width="60" height="60" rx="14" fill="#4c0519" stroke="#fbbf24" strokeWidth="2" />
-        <circle cx="30" cy="30" r="18" stroke="#fcd34d" strokeWidth="2" strokeDasharray="3 3" />
-        <path d="M20 38 L24 24 L30 32 L36 24 L40 38" stroke="#fef08a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-        <circle cx="30" cy="22" r="2.5" fill="#f59e0b" />
+      <svg viewBox="0 0 100 100" className="h-16 w-16 sm:h-20 sm:w-20 object-contain drop-shadow-sm" fill="none">
+        {/* Circular blue badge */}
+        <circle cx="50" cy="50" r="47" fill="#0f4c81" stroke="#38bdf8" strokeWidth="2.5" />
+        {/* Modern roof silhouette gradient */}
+        <path
+          d="M16 62 Q50 30 84 62 L80 66 Q50 38 20 66 Z"
+          fill="#38bdf8"
+        />
+        <path
+          d="M26 58 Q50 36 74 58 L71 62 Q50 42 29 62 Z"
+          fill="#bae6fd"
+        />
+        {/* White typography */}
+        <text
+          x="50"
+          y="72"
+          textAnchor="middle"
+          fill="#ffffff"
+          fontSize="14"
+          fontWeight="900"
+          fontFamily="system-ui, -apple-system, sans-serif"
+          letterSpacing="1"
+        >
+          UGM
+        </text>
+        <text
+          x="50"
+          y="83"
+          textAnchor="middle"
+          fill="#7dd3fc"
+          fontSize="7"
+          fontWeight="bold"
+          fontFamily="system-ui, -apple-system, sans-serif"
+          letterSpacing="1.5"
+        >
+          RESIDENCE
+        </text>
       </svg>
     ),
   },
   {
-    id: "p4",
-    name: "Apotek 24 Jam Sehat Sentosa",
-    tagline: "Jaringan Apotek & Klinik Terbuka",
-    category: "Toko & Retail",
-    project: "Pengadaan Pintu Harmonika 12 Cabang",
-    yearsPartnership: "Mitra Sejak 2022",
+    id: "wika-adhibumn",
+    name: "PT Wijaya Karya (WIKA) & BUMN Konstruksi",
     logo: (
-      <svg viewBox="0 0 60 60" className="w-12 h-12 shrink-0" fill="none">
-        <rect width="60" height="60" rx="14" fill="#042f2e" stroke="#2dd4bf" strokeWidth="2" />
-        <circle cx="30" cy="30" r="19" stroke="#14b8a6" strokeWidth="1.5" opacity="0.6" />
-        <rect x="25" y="18" width="10" height="24" rx="3" fill="#2dd4bf" />
-        <rect x="18" y="25" width="24" height="10" rx="3" fill="#2dd4bf" />
-        <circle cx="30" cy="30" r="3" fill="#ffffff" />
+      <svg viewBox="0 0 100 100" className="h-16 w-16 sm:h-20 sm:w-20 object-contain drop-shadow-sm" fill="none">
+        {/* Stylized geometric gold corporate emblem */}
+        <path
+          d="M20 20 H48 L36 80 H20 Z"
+          fill="#eab308"
+        />
+        <path
+          d="M48 20 H80 L68 80 H50 Z"
+          fill="#ca8a04"
+        />
+        <path
+          d="M38 42 H65 L60 62 H34 Z"
+          fill="#fef08a"
+        />
+        <path
+          d="M45 28 L72 28 L66 52 L50 52 Z"
+          fill="#a16207"
+          opacity="0.85"
+        />
       </svg>
     ),
   },
   {
-    id: "p5",
-    name: "Surya Logistik Nusantara",
-    tagline: "Kawasan Industri & Pergudangan Logistik",
-    category: "Pergudangan",
-    project: "8 Unit Pintu Gudang Bentang Lebar 9 Meter",
-    yearsPartnership: "Mitra Sejak 2020",
+    id: "bca",
+    name: "Bank Central Asia (BCA)",
     logo: (
-      <svg viewBox="0 0 60 60" className="w-12 h-12 shrink-0" fill="none">
-        <rect width="60" height="60" rx="14" fill="#0c1938" stroke="#f97316" strokeWidth="2" />
-        <path d="M16 38 L30 20 L44 38 L37 38 L30 29 L23 38 Z" fill="#f97316" />
-        <rect x="20" y="40" width="20" height="4" rx="2" fill="#38bdf8" />
-        <circle cx="30" cy="18" r="3" fill="#fbbf24" />
+      <svg viewBox="0 0 120 100" className="h-16 w-20 sm:h-20 sm:w-24 object-contain drop-shadow-sm" fill="none">
+        {/* BCA Classic Blue Rounded Shield */}
+        <rect x="10" y="15" width="100" height="70" rx="18" fill="#0060af" />
+        <text
+          x="60"
+          y="58"
+          textAnchor="middle"
+          fill="#ffffff"
+          fontSize="24"
+          fontWeight="900"
+          fontFamily="Arial, sans-serif"
+          letterSpacing="1.5"
+        >
+          BCA
+        </text>
       </svg>
     ),
   },
   {
-    id: "p6",
-    name: "Mitra Bangun Persada",
-    tagline: "Biro Arsitektur & Perancang Properti",
-    category: "Kontraktor",
-    project: "Pemasangan Ruko Komersial 8 Pintu",
-    yearsPartnership: "Mitra Sejak 2021",
+    id: "mandiri",
+    name: "Bank Mandiri",
     logo: (
-      <svg viewBox="0 0 60 60" className="w-12 h-12 shrink-0" fill="none">
-        <rect width="60" height="60" rx="14" fill="#1e1b4b" stroke="#818cf8" strokeWidth="2" />
-        <path d="M30 15 L45 23 L45 40 L30 48 L15 40 L15 23 Z" stroke="#818cf8" strokeWidth="2" fill="#312e81" />
-        <line x1="30" y1="15" x2="30" y2="48" stroke="#a5b4fc" strokeWidth="2" />
-        <line x1="15" y1="23" x2="30" y2="31" stroke="#a5b4fc" strokeWidth="2" />
-        <line x1="45" y1="23" x2="30" y2="31" stroke="#a5b4fc" strokeWidth="2" />
+      <svg viewBox="0 0 120 100" className="h-16 w-20 sm:h-20 sm:w-24 object-contain drop-shadow-sm" fill="none">
+        <rect x="5" y="15" width="110" height="70" rx="14" fill="#003d79" />
+        {/* Golden ribbon arch */}
+        <path
+          d="M20 62 C45 35 75 35 100 62"
+          stroke="#f59e0b"
+          strokeWidth="6"
+          strokeLinecap="round"
+        />
+        <text
+          x="60"
+          y="54"
+          textAnchor="middle"
+          fill="#ffffff"
+          fontSize="14"
+          fontWeight="bold"
+          fontFamily="system-ui, -apple-system, sans-serif"
+        >
+          mandiri
+        </text>
       </svg>
     ),
   },
   {
-    id: "p7",
-    name: "Indo Prima Retail Mart",
-    tagline: "Jaringan Toserba & Pusat Belanja",
-    category: "Toko & Retail",
-    project: "Pintu Harmonika Toko Retail & Kios Pasar",
-    yearsPartnership: "Mitra Sejak 2023",
+    id: "adhi-karya",
+    name: "PT Adhi Karya (Persero) Tbk",
     logo: (
-      <svg viewBox="0 0 60 60" className="w-12 h-12 shrink-0" fill="none">
-        <rect width="60" height="60" rx="14" fill="#3f0e1d" stroke="#f43f5e" strokeWidth="2" />
-        <path d="M16 22 L22 22 L27 38 L39 38 L43 27 L25 27" stroke="#f43f5e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-        <circle cx="28" cy="43" r="3" fill="#fde047" />
-        <circle cx="38" cy="43" r="3" fill="#fde047" />
-        <path d="M32 18 L34 22 L38 22 L35 24 L36 28 L32 25 L28 28 L29 24 L26 22 L30 22 Z" fill="#fde047" />
+      <svg viewBox="0 0 100 100" className="h-16 w-16 sm:h-20 sm:w-20 object-contain drop-shadow-sm" fill="none">
+        {/* Red circular construction crest */}
+        <circle cx="50" cy="50" r="44" fill="#dc2626" />
+        <path
+          d="M50 18 L76 74 H60 L50 50 L40 74 H24 Z"
+          fill="#ffffff"
+        />
+        <circle cx="50" cy="38" r="4.5" fill="#dc2626" />
       </svg>
     ),
   },
   {
-    id: "p8",
-    name: "Mega Baja Steel Works",
-    tagline: "Spesialis Konstruksi & Fabrikasi Baja",
-    category: "Kontraktor",
-    project: "Partner Penyediaan Plat SNI & Bearing",
-    yearsPartnership: "Mitra Sejak 2018",
+    id: "pt-pp",
+    name: "PT PP (Persero) Tbk Konstruksi",
     logo: (
-      <svg viewBox="0 0 60 60" className="w-12 h-12 shrink-0" fill="none">
-        <rect width="60" height="60" rx="14" fill="#18181b" stroke="#eab308" strokeWidth="2" />
-        <rect x="18" y="18" width="24" height="6" fill="#eab308" />
-        <rect x="18" y="36" width="24" height="6" fill="#eab308" />
-        <rect x="27" y="24" width="6" height="12" fill="#ca8a04" />
-        <circle cx="30" cy="30" r="2.5" fill="#fef08a" />
-        <path d="M16 30 L12 28 L14 30 L12 32 Z M44 30 L48 28 L46 30 L48 32 Z" fill="#fef08a" />
+      <svg viewBox="0 0 100 100" className="h-16 w-16 sm:h-20 sm:w-20 object-contain drop-shadow-sm" fill="none">
+        <rect width="100" height="100" rx="16" fill="#1e293b" />
+        <circle cx="36" cy="50" r="18" fill="#e11d48" />
+        <circle cx="64" cy="50" r="18" fill="#2563eb" />
+        <text
+          x="50"
+          y="56"
+          textAnchor="middle"
+          fill="#ffffff"
+          fontSize="18"
+          fontWeight="900"
+          fontFamily="system-ui, sans-serif"
+        >
+          PP
+        </text>
+      </svg>
+    ),
+  },
+  {
+    id: "indomaret",
+    name: "Indomaret / Retail Network",
+    logo: (
+      <svg viewBox="0 0 110 100" className="h-16 w-20 sm:h-20 sm:w-24 object-contain drop-shadow-sm" fill="none">
+        <rect x="5" y="20" width="100" height="60" rx="8" fill="#ffffff" stroke="#cbd5e1" strokeWidth="1.5" />
+        <rect x="5" y="20" width="100" height="18" fill="#dc2626" rx="8" />
+        <rect x="5" y="38" width="100" height="24" fill="#2563eb" />
+        <rect x="5" y="62" width="100" height="18" fill="#facc15" rx="8" />
+        <text
+          x="55"
+          y="55"
+          textAnchor="middle"
+          fill="#ffffff"
+          fontSize="11"
+          fontWeight="900"
+          fontFamily="system-ui, sans-serif"
+          letterSpacing="1"
+        >
+          INDOMARET
+        </text>
+      </svg>
+    ),
+  },
+  {
+    id: "ciputra",
+    name: "Ciputra Group / Commercial Property",
+    logo: (
+      <svg viewBox="0 0 100 100" className="h-16 w-16 sm:h-20 sm:w-20 object-contain drop-shadow-sm" fill="none">
+        <circle cx="50" cy="50" r="44" fill="#047857" />
+        <circle cx="50" cy="50" r="38" stroke="#fef08a" strokeWidth="2" fill="none" />
+        <path
+          d="M50 24 L60 44 L40 44 Z M35 50 L65 50 L50 78 Z"
+          fill="#fef08a"
+        />
+        <text
+          x="50"
+          y="90"
+          textAnchor="middle"
+          fill="#065f46"
+          fontSize="8"
+          fontWeight="bold"
+        >
+          CIPUTRA
+        </text>
       </svg>
     ),
   },
 ];
 
 export default function PartnerLogosSection({
-  partners = defaultPartners,
   className = "",
 }: {
-  partners?: PartnerItem[];
   className?: string;
 }) {
-  const [selectedCategory, setSelectedCategory] = useState<string>("Semua");
-
-  const categories = ["Semua", "Kontraktor", "Developer", "Toko & Retail", "Pergudangan"];
-
-  const filteredPartners =
-    selectedCategory === "Semua"
-      ? partners
-      : partners.filter((p) => p.category === selectedCategory);
-
   return (
-    <div className={`w-full space-y-6 ${className}`}>
-      {/* Title & Introduction Header */}
-      <div className="w-full max-w-[1650px] mx-auto px-4 sm:px-8 lg:px-12">
-        <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-rose-200 pb-4 gap-4">
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-bold text-maroon-700 uppercase tracking-widest block mb-1">
-                Kemitraan Strategis
-              </span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/20 text-maroon-800 border border-amber-400/40">
-                <Sparkles className="w-3 h-3 mr-1 text-amber-500" />
-                Logo Bergerak
-              </span>
-            </div>
-            <h3 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              Mitra Kerja Sama & Klien Korporasi Terpercaya
-            </h3>
-            <p className="text-slate-600 text-xs sm:text-sm mt-1 max-w-2xl">
-              Telah dipercaya oleh puluhan kontraktor gedung, pengembang ruko perbelanjaan, dan kawasan pergudangan industri di seluruh Indonesia.
-            </p>
-          </div>
-
-          <div className="flex items-center space-x-4 shrink-0">
-            <span className="text-xs text-slate-500 hidden sm:inline">
-              * Arahkan kursor untuk menjeda putaran
-            </span>
-            <Link
-              href="/kerjasama"
-              className="inline-flex items-center text-xs sm:text-sm font-bold text-maroon-800 hover:text-red-700 transition-colors"
-            >
-              Ajukan Kerja Sama Mitra
-              <ArrowRight className="w-3.5 h-3.5 ml-1" />
-            </Link>
-          </div>
-        </div>
-
-        {/* Filter Pills with smooth horizontal scrolling on mobile */}
-        <div className="flex overflow-x-auto no-scrollbar sm:flex-wrap gap-2 pt-3 pb-1 -mx-1 px-1">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap min-h-[40px] flex items-center active:scale-95 ${
-                selectedCategory === cat
-                  ? "bg-maroon-800 text-white shadow-md shadow-maroon-900/30 border border-amber-400/40"
-                  : "bg-white text-slate-600 hover:bg-rose-50 border border-slate-200"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+    <div className={`w-full py-10 sm:py-14 bg-white ${className}`}>
+      {/* Centered Clean Header (Persis seperti Gambar 4) */}
+      <div className="w-full max-w-[1650px] mx-auto px-4 sm:px-8 lg:px-12 text-center mb-8 sm:mb-12">
+        <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-800 tracking-tight">
+          Klien Kami
+        </h2>
+        {/* Accent Underline Bar Hijau/Emerald seperti Gambar 4 */}
+        <div className="w-16 h-1 bg-emerald-500 mx-auto rounded-full mt-2.5 mb-3" />
+        <p className="text-slate-500 text-xs sm:text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
+          Banyak perusahaan dan institusi yang telah mempercayakan kebutuhan pintu harmonika dan keamanan propertinya kepada UD.Fariadji.
+        </p>
       </div>
 
-      {/* CONTINUOUS MOVING LOGO MARQUEE (Animasi Bergerak) */}
-      <div className="w-full overflow-hidden bg-gradient-to-r from-[#200308] via-[#140205] to-[#200308] py-6 sm:py-8 border-y-2 border-maroon-800 shadow-2xl relative group">
-        
-        {/* Subtle left & right gradient fade masks for smooth infinite ticker look */}
-        <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-28 bg-gradient-to-r from-[#200308] to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-28 bg-gradient-to-l from-[#200308] to-transparent z-10 pointer-events-none" />
+      {/* CONTINUOUS MOVING LOGO MARQUEE (Hanya Logo & Animasi Bergerak Murni) */}
+      <div className="w-full overflow-hidden py-4 sm:py-6 relative group">
+        {/* Subtle left & right gradient fade masks for smooth seamless looping */}
+        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-white via-white/80 to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-white via-white/80 to-transparent z-10 pointer-events-none" />
 
         {/* Infinite Moving Marquee Ticker */}
         <div className="animate-marquee flex items-center">
-          {/* We repeat the items 3 times for a seamless, infinite marquee loop */}
-          {[...filteredPartners, ...filteredPartners, ...filteredPartners].map((partner, idx) => (
+          {/* Repeated 3 times for a completely seamless, infinite animation loop */}
+          {[...clientLogos, ...clientLogos, ...clientLogos].map((item, idx) => (
             <div
-              key={`${partner.id}-${idx}`}
-              className="shrink-0 w-72 sm:w-84 md:w-96 mx-2.5 sm:mx-3.5 rounded-2xl bg-gradient-to-b from-white/10 to-white/5 border border-maroon-600/70 p-3.5 sm:p-4 shadow-xl hover:border-amber-400/80 hover:bg-white/15 transition-all duration-300 group/card cursor-default"
+              key={`${item.id}-${idx}`}
+              className="shrink-0 mx-6 sm:mx-10 md:mx-14 flex items-center justify-center p-2 hover:scale-110 transition-transform duration-300 cursor-default"
+              title={item.name}
             >
-              <div className="flex items-center space-x-3.5">
-                {/* Vector Brand Logo */}
-                <div className="p-1 rounded-2xl bg-black/40 border border-amber-400/40 shadow-md group-hover/card:scale-105 transition-transform shrink-0">
-                  {partner.logo}
-                </div>
-
-                {/* Partner Information */}
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-1 mb-0.5">
-                    <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-300 border border-amber-400/30 truncate">
-                      {partner.category}
-                    </span>
-                    <span className="text-[10px] text-rose-300/80 font-medium shrink-0">
-                      {partner.yearsPartnership}
-                    </span>
-                  </div>
-                  <h4 className="text-sm font-extrabold text-white truncate group-hover/card:text-amber-300 transition-colors">
-                    {partner.name}
-                  </h4>
-                  <p className="text-[11px] text-rose-200/80 truncate">
-                    {partner.tagline}
-                  </p>
-                </div>
-              </div>
-
-              {/* Bottom Proyek Detail Badge */}
-              <div className="mt-3 pt-2.5 border-t border-maroon-800/80 flex items-center justify-between text-[11px]">
-                <span className="text-rose-200/90 font-medium truncate flex items-center">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 mr-1.5 shrink-0" />
-                  <span className="truncate">{partner.project}</span>
-                </span>
-                <span className="text-[10px] font-bold text-amber-400 shrink-0 ml-2">
-                  ✓ Verified
-                </span>
-              </div>
+              {item.logo}
             </div>
           ))}
         </div>

@@ -57,6 +57,7 @@ export interface Product {
   bearingType: string;
   lockType: string;
   finishing: string;
+  warrantyInfo?: string;
   pricePerMeter: number;
   priceDisplay: string;
   description: string;

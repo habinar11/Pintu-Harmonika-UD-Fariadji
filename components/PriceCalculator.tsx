@@ -37,18 +37,20 @@ export default function PriceCalculator({
   const [bukaanType, setBukaanType] = useState<BukaanType>("2_bukaan");
   const [hasPintuExtra, setHasPintuExtra] = useState<boolean>(false);
   const [colorMode, setColorMode] = useState<ColorMode>("1_warna");
+  const [hasStrip, setHasStrip] = useState<boolean>(false);
   const [stripStyle, setStripStyle] = useState<StripStyle>("1_garis");
   const [primaryColorId, setPrimaryColorId] = useState<string>("maroon");
   const [secondaryColorId, setSecondaryColorId] = useState<string>("black");
   const [stripColorId, setStripColorId] = useState<string>("gold");
 
   // Synchronized options
-  const isDualColor = colorMode === "2_warna" || colorMode === "strip_warna";
+  const isCustomColor = colorMode === "2_warna" || hasStrip || colorMode === "strip_warna";
 
-  const handleDualColorToggle = (checked: boolean) => {
+  const handleCustomColorToggle = (checked: boolean) => {
     if (checked) {
-      setColorMode("2_warna");
+      setHasStrip(true);
     } else {
+      setHasStrip(false);
       setColorMode("1_warna");
     }
   };
@@ -72,7 +74,7 @@ export default function PriceCalculator({
   // Harga extra mengikuti harga dasarnya
   const extraCost = hasPintuExtra ? baseRate : 0;
   // Finishing cat oven harganya 350.000
-  const dualColorCost = isDualColor ? 350000 : 0;
+  const dualColorCost = isCustomColor ? 350000 : 0;
   const totalCost = baseCost + extraCost + dualColorCost;
 
   const formatRupiah = (num: number) => {
@@ -92,28 +94,34 @@ export default function PriceCalculator({
   };
 
   const getColorLabel = () => {
-    if (colorMode === "1_warna") {
-      return `1 Warna Solid (${primaryColorObj.name})`;
-    }
+    let label = "";
     if (colorMode === "2_warna") {
-      return `Kombinasi 2 Warna Atas-Bawah (${primaryColorObj.name} Atas + ${secondaryColorObj.name} Bawah)`;
+      label = `Kombinasi 2 Warna Atas-Bawah (${primaryColorObj.name} Atas + ${secondaryColorObj.name} Bawah)`;
+    } else {
+      label = `1 Warna Solid (${primaryColorObj.name})`;
     }
-    return `Warna ${primaryColorObj.name} + List Strip ${
-      stripStyle === "1_garis" ? "1 Garis" : "2 Garis"
-    } (${stripColorObj.name})`;
+    if (hasStrip || colorMode === "strip_warna") {
+      label += ` + List Strip ${stripStyle === "1_garis" ? "1 Garis" : "2 Garis"} (${stripColorObj.name})`;
+    }
+    return label;
   };
+
+  const selectedWarranty =
+    selectedProduct?.warrantyInfo ||
+    (selectedProduct?.name?.includes("SUPER") ? "Garansi 5 Tahun" : "Bergaransi");
 
   const generateWhatsAppMessage = () => {
     const text = `Halo Admin ${settings.companyName}, saya mau estimasi & pemesanan pintu harmonika:
 - Ukuran: Lebar ${width} m x Tinggi ${height} m (Luas: ${area.toFixed(2)} m²)
 - Tipe Varian: ${selectedProduct?.name} (Daun: ${selectedProduct?.daunThickness})
+- Jaminan Garansi: ${selectedWarranty}
 - Spesifikasi Rangka: ${selectedProduct?.frameSpec || selectedProduct?.unpSize}
 - Galaran: ${selectedProduct?.galaran || "-"} | Silangan: ${selectedProduct?.silangan || selectedProduct?.stripThickness || "-"}
 - Rel / Cakak / Pipa: ${selectedProduct?.relBesar || "-"} / ${selectedProduct?.cakakTiang || "-"} / ${selectedProduct?.pipaKotak || "-"}
 - Model Bukaan: ${getBukaanLabel()}
 - Skema Cat Oven: ${getColorLabel()}
 - Opsi Pintu Extra (Bukaan Intip): ${hasPintuExtra ? `Ya (+${formatRupiah(baseRate)} mengikuti harga dasar)` : "Tidak"}
-- Opsi Finishing Cat Kombinasi/Strip: ${isDualColor ? "Ya (+Rp 350.000)" : "Tidak"}
+- Opsi Finishing Cat Kombinasi/Strip: ${isCustomColor ? "Ya (+Rp 350.000)" : "Tidak"}
 - Perkiraan Estimasi Web: ${formatRupiah(totalCost)}
 
 Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jadwal survey lokasi gratis dan penawaran resminya. Terima kasih!`;
@@ -183,6 +191,8 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
           onHasPintuExtraChange={setHasPintuExtra}
           colorMode={colorMode}
           onColorModeChange={setColorMode}
+          hasStrip={hasStrip}
+          onHasStripChange={setHasStrip}
           primaryColorId={primaryColorId}
           onPrimaryColorChange={setPrimaryColorId}
           secondaryColorId={secondaryColorId}
@@ -276,13 +286,26 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
                         : "bg-black/40 border-maroon-900 text-rose-200 hover:bg-maroon-950/50"
                     }`}
                   >
-                    <div className="flex justify-between items-center mb-1">
+                    <div className="flex justify-between items-center mb-1 gap-1">
                       <span className="font-extrabold text-xs sm:text-sm text-white line-clamp-1">
                         {p.name}
                       </span>
-                      {isSelected && (
-                        <Check className="w-4 h-4 text-amber-400 shrink-0 ml-1" />
-                      )}
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {p.warrantyInfo?.includes("5") || p.name.includes("SUPER") ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 via-yellow-500/25 to-amber-500/20 text-amber-300 border border-amber-400/50 shadow-xs">
+                            <ShieldCheck className="w-3 h-3 text-amber-400 fill-amber-400/20" />
+                            {p.warrantyInfo || "Garansi 5 Tahun"}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full bg-gradient-to-r from-slate-400/20 to-slate-200/20 text-slate-200 border border-slate-300/40 shadow-xs">
+                            <ShieldCheck className="w-3 h-3 text-slate-300" />
+                            {p.warrantyInfo || "Bergaransi"}
+                          </span>
+                        )}
+                        {isSelected && (
+                          <Check className="w-4 h-4 text-amber-400 shrink-0" />
+                        )}
+                      </div>
                     </div>
                     {/* Ringkas sesuai Gambar 4: TEBAL DAUN ROL & SPESIFIKASI RANGKA */}
                     <div className="text-[11px] sm:text-xs text-rose-200">
@@ -333,18 +356,18 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
             <label className="flex items-center space-x-3 bg-black/40 border border-maroon-900 p-3 sm:p-3.5 rounded-2xl cursor-pointer hover:bg-maroon-950/50 transition-colors active:scale-98">
               <input
                 type="checkbox"
-                checked={isDualColor}
-                onChange={(e) => handleDualColorToggle(e.target.checked)}
+                checked={isCustomColor}
+                onChange={(e) => handleCustomColorToggle(e.target.checked)}
                 className="w-4 h-4 rounded text-red-600 focus:ring-amber-400 bg-maroon-950 border-maroon-700 shrink-0"
               />
               <div className="text-xs">
                 <span className="font-bold text-white block">
-                  Finishing Cat Oven Kombinasi Atas-Bawah / Strip List (+Rp 350.000)
+                  Finishing Cat Oven Khusus (Kombinasi 2 Warna / List Strip Aksen) (+Rp 350.000)
                 </span>
                 <span className="text-rose-200/80 text-[11px] sm:text-xs">
-                  {isDualColor
+                  {isCustomColor
                     ? `✓ Aktif di Visualizer: ${getColorLabel()} (+Rp 350.000)`
-                    : "Pilihan cat oven 2 warna (atas-bawah) atau strip aksen 1/2 garis di tengah daun (+Rp 350.000)"}
+                    : "Pilihan cat oven kombinasi 2 warna (atas-bawah) atau strip aksen 1/2 garis di tengah daun (+Rp 350.000)"}
                 </span>
               </div>
             </label>
@@ -379,10 +402,30 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
               </div>
             )}
 
-            <div className="flex justify-between">
+            <div className="flex justify-between items-center">
               <span>Tipe Varian:</span>
               <span className="font-extrabold text-amber-300">
                 {selectedProduct?.name}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center">
+              <span>Jaminan Garansi:</span>
+              <span
+                className={`inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full ${
+                  selectedProduct?.warrantyInfo?.includes("5") || selectedProduct?.name?.includes("SUPER")
+                    ? "text-amber-300 bg-amber-950/80 border border-amber-400/50 shadow-xs"
+                    : "text-slate-200 bg-slate-800/80 border border-slate-300/40 shadow-xs"
+                }`}
+              >
+                <ShieldCheck
+                  className={`w-3.5 h-3.5 ${
+                    selectedProduct?.warrantyInfo?.includes("5") || selectedProduct?.name?.includes("SUPER")
+                      ? "text-amber-400 fill-amber-400/20"
+                      : "text-slate-300"
+                  }`}
+                />
+                {selectedWarranty}
               </span>
             </div>
 
@@ -477,9 +520,9 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
               </div>
             )}
 
-            {isDualColor && (
+            {isCustomColor && (
               <div className="flex justify-between text-amber-300 font-bold bg-maroon-950/70 p-2 rounded-xl border border-amber-500/30">
-                <span>+ Finishing Cat Oven:</span>
+                <span>+ Finishing Cat Oven (Kombinasi / Strip):</span>
                 <span>Rp 350.000</span>
               </div>
             )}

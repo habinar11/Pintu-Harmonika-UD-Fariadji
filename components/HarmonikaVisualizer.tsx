@@ -115,6 +115,8 @@ interface HarmonikaVisualizerProps {
   onHasPintuExtraChange: (hasExtra: boolean) => void;
   colorMode: ColorMode;
   onColorModeChange: (mode: ColorMode) => void;
+  hasStrip?: boolean;
+  onHasStripChange?: (hasStrip: boolean) => void;
   primaryColorId: string;
   onPrimaryColorChange: (colorId: string) => void;
   secondaryColorId: string;
@@ -134,6 +136,8 @@ export default function HarmonikaVisualizer({
   onHasPintuExtraChange,
   colorMode,
   onColorModeChange,
+  hasStrip = false,
+  onHasStripChange,
   primaryColorId,
   onPrimaryColorChange,
   secondaryColorId,
@@ -465,8 +469,8 @@ export default function HarmonikaVisualizer({
           opacity="0.28"
         />
 
-        {/* HORIZONTAL ACCENT STRIP DI TENGAH: 1 GARIS ATAU 2 GARIS */}
-        {colorMode === "strip_warna" && (
+        {/* HORIZONTAL ACCENT STRIP DI TENGAH: 1 GARIS ATAU 2 GARIS (BISA UNTUK 1 WARNA MAUPUN 2 WARNA) */}
+        {(hasStrip || colorMode === "strip_warna") && (
           <g>
             {stripStyle === "1_garis" ? (
               // 1 Garis Strip Horizontal Lebar di Tengah
@@ -1338,41 +1342,51 @@ export default function HarmonikaVisualizer({
               </span>
             </div>
 
-            {/* Color Mode Selection Tabs */}
-            <div className="flex items-center space-x-1.5 bg-black/60 p-1 rounded-xl border border-maroon-800">
-              <button
-                type="button"
-                onClick={() => onColorModeChange("1_warna")}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                  colorMode === "1_warna"
-                    ? "bg-maroon-800 text-white shadow-sm border border-amber-400/40"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                1 Warna Solid
-              </button>
-              <button
-                type="button"
-                onClick={() => onColorModeChange("2_warna")}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                  colorMode === "2_warna"
-                    ? "bg-maroon-800 text-white shadow-sm border border-amber-400/40"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                Kombinasi 2 Warna (Atas - Bawah)
-              </button>
-              <button
-                type="button"
-                onClick={() => onColorModeChange("strip_warna")}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                  colorMode === "strip_warna"
-                    ? "bg-maroon-800 text-white shadow-sm border border-amber-400/40"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                List Strip Aksen Tengah
-              </button>
+            {/* Color Mode Selection & Strip Checkbox */}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center space-x-1.5 bg-black/60 p-1 rounded-xl border border-maroon-800">
+                <button
+                  type="button"
+                  onClick={() => onColorModeChange("1_warna")}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                    colorMode === "1_warna"
+                      ? "bg-maroon-800 text-white shadow-sm border border-amber-400/40"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  1 Warna Solid
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onColorModeChange("2_warna")}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                    colorMode === "2_warna"
+                      ? "bg-maroon-800 text-white shadow-sm border border-amber-400/40"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  Kombinasi 2 Warna (Atas - Bawah)
+                </button>
+              </div>
+
+              {/* Checkbox List Strip Aksen (Bisa untuk 1 warna maupun 2 warna) */}
+              <label className="flex items-center space-x-2 bg-black/60 px-3 py-1.5 rounded-xl border border-maroon-800 cursor-pointer hover:border-amber-400/50 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={Boolean(hasStrip || colorMode === "strip_warna")}
+                  onChange={(e) => {
+                    if (onHasStripChange) {
+                      onHasStripChange(e.target.checked);
+                    } else {
+                      onColorModeChange(e.target.checked ? "strip_warna" : "1_warna");
+                    }
+                  }}
+                  className="w-4 h-4 rounded text-red-600 focus:ring-amber-400 bg-maroon-950 border-maroon-700"
+                />
+                <span className="text-xs font-bold text-amber-300">
+                  + Beri List Strip Aksen
+                </span>
+              </label>
             </div>
           </div>
 
@@ -1445,8 +1459,8 @@ export default function HarmonikaVisualizer({
             </div>
           )}
 
-          {/* STRIP OPTIONS: 1 GARIS ATAU 2 GARIS DI TENGAH */}
-          {colorMode === "strip_warna" && (
+          {/* STRIP OPTIONS: 1 GARIS ATAU 2 GARIS DI TENGAH (MUNCUL JIKA CENTANG STRIP AKTIF) */}
+          {(hasStrip || colorMode === "strip_warna") && (
             <div className="pt-2 border-t border-maroon-900/60 space-y-3 animate-in fade-in duration-200">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-[11px] text-amber-300 font-bold">

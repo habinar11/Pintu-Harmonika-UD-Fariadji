@@ -640,6 +640,7 @@ export default function AdminPage() {
                     name: "",
                     slug: "",
                     badge: "",
+                    warrantyInfo: "Garansi 5 Tahun",
                     daunThickness: "TEBEL 1,0",
                     stripThickness: "2 cm x 4,5 mm",
                     unpSize: "UNP 5 + 19 | UNP 10 | 60x60",
@@ -686,8 +687,19 @@ export default function AdminPage() {
                   </div>
                   <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                     <div>
-                      <div className="flex justify-between items-start mb-1">
-                        <h4 className="font-black text-slate-900 text-base">{p.name}</h4>
+                      <div className="flex justify-between items-start mb-1 gap-2">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-black text-slate-900 text-base">{p.name}</h4>
+                          <span
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                              p.warrantyInfo?.includes("5") || p.name.includes("SUPER")
+                                ? "bg-amber-50 text-amber-900 border-amber-300"
+                                : "bg-slate-100 text-slate-700 border-slate-300"
+                            }`}
+                          >
+                            {p.warrantyInfo || (p.name.includes("SUPER") ? "Garansi 5 Tahun" : "Bergaransi")}
+                          </span>
+                        </div>
                         <span className="text-xs font-extrabold text-emerald-600">
                           {p.priceDisplay}
                         </span>
@@ -1513,6 +1525,21 @@ export default function AdminPage() {
                         })
                       }
                       placeholder="Contoh: Gudang Industri, Ruko Premium, Perbankan"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                      Keterangan Garansi (Emas: "Garansi 5 Tahun" / Silver: "Bergaransi")
+                    </label>
+                    <input
+                      type="text"
+                      value={editingProduct.warrantyInfo || ""}
+                      onChange={(e) =>
+                        setEditingProduct({ ...editingProduct, warrantyInfo: e.target.value })
+                      }
+                      placeholder="Contoh: Garansi 5 Tahun atau Bergaransi"
                       className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"
                     />
                   </div>
