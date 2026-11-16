@@ -123,7 +123,7 @@ export default function PriceCalculator({
 - Jaminan Garansi: ${selectedWarranty}
 - Spesifikasi Rangka: ${selectedProduct?.frameSpec || selectedProduct?.unpSize}
 - Galaran: ${selectedProduct?.galaran || "-"} | Silangan: ${selectedProduct?.silangan || selectedProduct?.stripThickness || "-"}
-- Rel / Cakak / Pipa: ${selectedProduct?.relBesar || "-"} / ${selectedProduct?.cakakTiang || "-"} / ${selectedProduct?.pipaKotak || "-"}
+- Rel / Cagak / Pipa: ${selectedProduct?.relBesar || "-"} / ${selectedProduct?.cagakTiang || selectedProduct?.cakakTiang || "-"} / ${selectedProduct?.pipaKotak || "-"}
 - Model Bukaan: ${getBukaanLabel()}
 - Skema Cat Oven: ${getColorLabel()}
 - Opsi Pintu Extra (Bukaan Intip): ${hasPintuExtra ? `Ya (${safeQuantity} unit @ ${formatRupiah(baseRate)} mengikuti harga dasar)` : "Tidak"}
@@ -539,10 +539,10 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
               </div>
             )}
 
-            {selectedProduct?.cakakTiang && (
+            {(selectedProduct?.cagakTiang || selectedProduct?.cakakTiang) && (
               <div className="flex justify-between text-rose-200/90">
-                <span>Cakak Tiang:</span>
-                <span className="font-medium text-white">{selectedProduct.cakakTiang}</span>
+                <span>Cagak Tiang:</span>
+                <span className="font-medium text-white">{selectedProduct.cagakTiang || selectedProduct.cakakTiang}</span>
               </div>
             )}
 

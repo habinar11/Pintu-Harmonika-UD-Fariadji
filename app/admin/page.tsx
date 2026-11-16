@@ -648,7 +648,7 @@ export default function AdminPage() {
                     galaran: "56 - 25",
                     silangan: "2 cm x 4,5 mm",
                     relBesar: "UNP 5 + 19",
-                    cakakTiang: "UNP 10",
+                    cagakTiang: "UNP 10",
                     pipaKotak: "60 x 60",
                     platTopi: "10 cm",
                     usageRecommendation: "Ruko Komersial Besar, Showroom",
@@ -1468,13 +1468,13 @@ export default function AdminPage() {
 
                   <div>
                     <label className="text-xs font-bold text-slate-700 block mb-1">
-                      Cakak Tiang
+                      Cagak Tiang
                     </label>
                     <input
                       type="text"
-                      value={editingProduct.cakakTiang || ""}
+                      value={editingProduct.cagakTiang || editingProduct.cakakTiang || ""}
                       onChange={(e) =>
-                        setEditingProduct({ ...editingProduct, cakakTiang: e.target.value })
+                        setEditingProduct({ ...editingProduct, cagakTiang: e.target.value, cakakTiang: e.target.value })
                       }
                       placeholder="Contoh: UNP 12"
                       className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"

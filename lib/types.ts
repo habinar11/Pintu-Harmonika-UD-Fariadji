@@ -50,6 +50,7 @@ export interface Product {
   galaran?: string;
   silangan?: string;
   relBesar?: string;
+  cagakTiang?: string;
   cakakTiang?: string;
   pipaKotak?: string;
   platTopi?: string;

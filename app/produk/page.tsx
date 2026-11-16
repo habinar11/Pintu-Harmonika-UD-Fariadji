@@ -48,7 +48,7 @@ export default async function ProductsPage() {
               Tabel Komparasi Varian Pintu Harmonika
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Bandingkan rincian galaran, silangan, rel, cakak tiang, daun rol, dan harga per m² secara transparan.
+              Bandingkan rincian galaran, silangan, rel, cagak tiang, daun rol, dan harga per m² secara transparan.
             </p>
           </div>
 
@@ -61,7 +61,7 @@ export default async function ProductsPage() {
                   <th className="py-3.5 px-3 border-r border-maroon-800 text-center whitespace-nowrap">GALARAN</th>
                   <th className="py-3.5 px-3 border-r border-maroon-800 text-center whitespace-nowrap">SILANGAN</th>
                   <th className="py-3.5 px-3 border-r border-maroon-800 text-center whitespace-nowrap">REL / B. BESAR</th>
-                  <th className="py-3.5 px-3 border-r border-maroon-800 text-center whitespace-nowrap">CAKAK TIANG</th>
+                  <th className="py-3.5 px-3 border-r border-maroon-800 text-center whitespace-nowrap">CAGAK TIANG</th>
                   <th className="py-3.5 px-3 border-r border-maroon-800 text-center whitespace-nowrap">DAUN ROL</th>
                   <th className="py-3.5 px-3 border-r border-maroon-800 text-center whitespace-nowrap">PIPA KOTAK</th>
                   <th className="py-3.5 px-3 border-r border-maroon-800 text-center whitespace-nowrap">PLAT TOPI</th>
@@ -93,7 +93,7 @@ export default async function ProductsPage() {
                       {p.relBesar || "-"}
                     </td>
                     <td className="py-3.5 px-3 text-center text-slate-700 border-r border-slate-200 whitespace-nowrap">
-                      {p.cakakTiang || "-"}
+                      {p.cagakTiang || p.cakakTiang || "-"}
                     </td>
                     <td className="py-3.5 px-3 text-center font-bold text-slate-900 border-r border-slate-200 whitespace-nowrap">
                       {p.daunThickness}
@@ -201,8 +201,8 @@ export default async function ProductsPage() {
                           <span className="font-bold text-slate-900">{product.relBesar || "-"}</span>
                         </div>
                         <div className="flex justify-between border-b border-rose-100 pb-1.5">
-                          <span className="text-slate-500">Cakak Tiang:</span>
-                          <span className="font-bold text-slate-900">{product.cakakTiang || "-"}</span>
+                          <span className="text-slate-500">Cagak Tiang:</span>
+                          <span className="font-bold text-slate-900">{product.cagakTiang || product.cakakTiang || "-"}</span>
                         </div>
                         <div className="flex justify-between border-b border-rose-100 pb-1.5">
                           <span className="text-slate-500">Pipa Kotak:</span>
