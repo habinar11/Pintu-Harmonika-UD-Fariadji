@@ -10,6 +10,8 @@ import {
   Eye,
   Sliders,
   ShieldCheck,
+  User,
+  MapPin,
 } from "lucide-react";
 import { Product, CompanySettings } from "@/lib/types";
 import HarmonikaVisualizer, {
@@ -45,6 +47,10 @@ export default function PriceCalculator({
   const [selectedProductId, setSelectedProductId] = useState<string>(
     products[0]?.id || ""
   );
+
+  // Customer contact states for instant negotiation via WhatsApp
+  const [customerName, setCustomerName] = useState<string>("");
+  const [customerAddress, setCustomerAddress] = useState<string>("");
 
   // Visualizer interactive states
   const [bukaanType, setBukaanType] = useState<BukaanType>("2_bukaan");
@@ -124,23 +130,22 @@ export default function PriceCalculator({
     (selectedProduct?.name?.includes("SUPER") ? "Garansi 5 Tahun" : "Ber-garansi Servis Resmi");
 
   const generateWhatsAppMessage = () => {
-    const text = `Halo Admin ${settings.companyName}, saya mau estimasi & pemesanan pintu harmonika:
-- Ukuran: Lebar ${width} m x Tinggi ${height} m (@ ${areaPerDoor.toFixed(2)} m²/pintu)
-- Jumlah Pintu: ${safeQuantity} Unit (Total Luas: ${totalCalculatedArea.toFixed(2)} m²)
-- Tipe Varian: ${selectedProduct?.name} (Daun: ${selectedProduct?.daunThickness})
-- Jaminan Garansi: ${selectedWarranty}
-- Spesifikasi Rangka: ${selectedProduct?.frameSpec || selectedProduct?.unpSize}
-- Galaran: ${selectedProduct?.galaran || "-"} | Silangan: ${selectedProduct?.silangan || selectedProduct?.stripThickness || "-"}
-- Rel / Cagak / Pipa: ${selectedProduct?.relBesar || "-"} / ${selectedProduct?.cagakTiang || selectedProduct?.cakakTiang || "-"} / ${selectedProduct?.pipaKotak || "-"}
-- Model Bukaan: ${getBukaanLabel()}
-- Skema Cat Oven: ${getColorLabel()}
-- Opsi Pintu Extra: ${hasPintuExtra ? `Ya (${safeQuantity} unit @ ${formatRupiah(baseRate)} mengikuti harga dasar)` : "Tidak"}
-- Opsi Finishing Cat: ${isCustomColor ? `Ya (${safeQuantity} unit @ Rp 350.000)` : "Tidak"}
-- Perkiraan Estimasi Web: ${formatRupiah(totalCost)}
+    const custName = customerName.trim();
+    const custAddr = customerAddress.trim();
 
-Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jadwal survey lokasi gratis (se-Jawa Timur & se-Jawa Tengah) dan penawaran resminya. Terima kasih!`;
+    const lines: string[] = [
+      `Halo Admin ${settings.companyName}, saya mau estimasi & pemesanan pintu harmonika:`,
+      custName ? `- Nama: ${custName}` : `- Nama: -`,
+      custAddr ? `- Alamat: ${custAddr}` : `- Alamat: -`,
+      `- Ukuran: Lebar ${width} m x Tinggi ${height} m`,
+      `- Jumlah: ${safeQuantity} Unit`,
+      `- Volume: ${totalCalculatedArea.toFixed(2)} m²`,
+      `- Varian: ${selectedProduct?.name || "SUPER 1"}`,
+      ``,
+      `Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jadwal survey dan penawaran resminya, apakah bisa nego? Terima kasih!`
+    ];
 
-    return `https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(text)}`;
+    return `https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(lines.join("\n"))}`;
   };
 
   return (
@@ -449,6 +454,48 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
               </span>
             </label>
           </div>
+
+          {/* Form Input Data Nama Customer & Alamat */}
+          <div className="bg-black/40 border border-maroon-900/80 rounded-2xl p-3.5 sm:p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs sm:text-sm font-extrabold text-amber-300 uppercase tracking-wider block">
+                Data Pemesan & Lokasi:
+              </span>
+              <span className="text-[10px] text-rose-300/80 font-mono">
+                Otomatis tercantum di chat WhatsApp
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-bold text-rose-200 mb-1 flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-amber-400" />
+                  Nama Customer:
+                </label>
+                <input
+                  type="text"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  placeholder="Masukkan nama Anda..."
+                  className="w-full bg-maroon-950/80 border border-maroon-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-rose-400/40 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-rose-200 mb-1 flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-amber-400" />
+                  Alamat / Kota:
+                </label>
+                <input
+                  type="text"
+                  value={customerAddress}
+                  onChange={(e) => setCustomerAddress(e.target.value)}
+                  placeholder="Contoh: Madiun / Ngawi / Magetan..."
+                  className="w-full bg-maroon-950/80 border border-maroon-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-rose-400/40 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all"
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Result & Summary Column (5 Cols) */}
@@ -645,7 +692,7 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
             className="mt-2 w-full inline-flex items-center justify-center px-5 py-3.5 sm:py-4 rounded-2xl font-black text-sm text-slate-950 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 hover:from-amber-300 hover:to-amber-200 transition-all shadow-xl shadow-amber-500/20 active:scale-98 border border-amber-200 min-h-[48px]"
           >
             <MessageCircle className="w-4 h-4 mr-2 fill-slate-950 shrink-0" />
-            Kirim Hasil Simulasi ke WhatsApp
+            Negosiasikan Harga via WhatsApp
             <ArrowRight className="w-4 h-4 ml-2 shrink-0" />
           </a>
 

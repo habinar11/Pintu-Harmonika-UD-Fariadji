@@ -31,7 +31,7 @@ export default async function HomePage() {
   const featuredProjects = projects.slice(0, 4);
 
   const waUrl = `https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(
-    `Halo Admin ${settings.companyName}, saya ingin konsultasi gratis dan jadwalkan survey lokasi untuk pemasangan pintu harmonika.`
+    `Halo Admin ${settings.companyName}, saya ingin konsultasi dan jadwalkan survey lokasi untuk pemasangan pintu harmonika.`
   )}`;
 
   return (

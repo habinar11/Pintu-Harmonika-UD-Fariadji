@@ -123,7 +123,7 @@ export default async function ProductsPage() {
         <div className="space-y-12">
           {products.map((product) => {
             const waUrl = `https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(
-              `Halo Admin ${settings.companyName}, saya tertarik dengan varian "${product.name}" (${product.daunThickness}). Mohon info estimasi harga dan jadwal survey lokasi.`
+              `Halo Admin ${settings.companyName}, saya tertarik dengan varian "${product.name}". Mohon info estimasi harga dan jadwal survey lokasi.`
             )}`;
 
             return (
