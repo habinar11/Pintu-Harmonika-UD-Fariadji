@@ -147,12 +147,11 @@ export default function HarmonikaVisualizer({
 }: HarmonikaVisualizerProps) {
   // Pintu Extra 2-step animation state:
   // 0 = Tertutup Rapat (Full Closed)
-  // 1 = Pintu Extra Terbuka (Akses Orang Lewat)
+  // 1 = Pintu Extra Terbuka (Bukaan Geser Celah Intip & Ventilasi dekat Handle)
   // 2 = Full Harmonika Terbuka (Bukaan 92% tumpukan daun tetap ada di samping)
   const [extraStage, setExtraStage] = useState<0 | 1 | 2>(0);
-
-  // When hasPintuExtra is false: 0 = closed, 0.92 = open (tumpukan 92% tetap terlihat di samping)
-  const [openRatio, setOpenRatio] = useState<number>(0);
+  const [extraSlide, setExtraSlide] = useState<number>(0); // 0 (tutup) -> 1 (geser buka celah intip)
+  const [gateOpen, setGateOpen] = useState<number>(0); // 0 (tutup) -> 0.92 (full buka harmonika)
   const [isNightMode, setIsNightMode] = useState<boolean>(true);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
@@ -163,64 +162,89 @@ export default function HarmonikaVisualizer({
   const stripColor =
     STRIP_PRESETS.find((s) => s.id === stripColorId) || STRIP_PRESETS[0];
 
+  // Max open ratio is 0.92 (92%) so the folded stack of slats remains visible on the side
+  const MAX_OPEN_RATIO = 0.92;
+
   // Reset stages when mode or extra changes
   useEffect(() => {
     setExtraStage(0);
-    setOpenRatio(0);
+    setGateOpen(0);
+    setExtraSlide(0);
+    setIsAnimating(false);
   }, [bukaanType, hasPintuExtra]);
 
-  // Max open ratio is 0.92 (92%) so the folded stack of slats remains visible on the side
-  const MAX_OPEN_RATIO = 0.92;
+  // Smooth easing animator using requestAnimationFrame
+  const animateTo = (
+    targetGateOpen: number,
+    targetExtraSlide: number,
+    duration = 650,
+    onComplete?: () => void
+  ) => {
+    setIsAnimating(true);
+    const startGate = gateOpen;
+    const startExtra = extraSlide;
+    const startTime = performance.now();
+
+    const step = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / duration);
+      // Smooth cubic easing (ease-in-out)
+      const ease =
+        progress < 0.5
+          ? 4 * progress * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+      setGateOpen(startGate + (targetGateOpen - startGate) * ease);
+      setExtraSlide(startExtra + (targetExtraSlide - startExtra) * ease);
+
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        setGateOpen(targetGateOpen);
+        setExtraSlide(targetExtraSlide);
+        setIsAnimating(false);
+        onComplete?.();
+      }
+    };
+
+    requestAnimationFrame(step);
+  };
 
   // Toggle animation
   const handleToggleClick = () => {
     if (isAnimating) return;
-    setIsAnimating(true);
 
     if (hasPintuExtra) {
       // 2-step animation sequence for Pintu Extra:
-      // 0 (tertutup) -> 1 (pintu extra buka) -> 2 (full harmonika buka) -> 0 (tertutup rapat)
-      setExtraStage((prev) => {
-        if (prev === 0) return 1;
-        if (prev === 1) return 2;
-        return 0;
-      });
-      setTimeout(() => setIsAnimating(false), 750);
+      // 0 (tertutup) -> 1 (geser buka celah intip) -> 2 (full harmonika buka 92%) -> 0 (tutup rapat)
+      if (extraStage === 0) {
+        setExtraStage(1);
+        animateTo(0, 1, 600);
+      } else if (extraStage === 1) {
+        setExtraStage(2);
+        animateTo(MAX_OPEN_RATIO, 1, 750);
+      } else {
+        setExtraStage(0);
+        animateTo(0, 0, 750);
+      }
     } else {
-      // Standard 1-step toggle: 0 <-> 0.92 (tidak hilang keseluruhan, tumpukan 8% tetap ada)
-      const target = openRatio > 0.4 ? 0 : MAX_OPEN_RATIO;
-      const startVal = openRatio;
-      const startTime = performance.now();
-      const duration = 750;
-
-      const step = (now: number) => {
-        const elapsed = now - startTime;
-        const progress = Math.min(1, elapsed / duration);
-        const ease =
-          progress < 0.5
-            ? 4 * progress * progress * progress
-            : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-
-        setOpenRatio(startVal + (target - startVal) * ease);
-
-        if (progress < 1) {
-          requestAnimationFrame(step);
-        } else {
-          setOpenRatio(target);
-          setIsAnimating(false);
-        }
-      };
-
-      requestAnimationFrame(step);
+      // Standard 1-step toggle: 0 <-> 0.92 (tidak hilang keseluruhan, tumpukan 8% tetap ada di tiang)
+      const target = gateOpen > 0.4 ? 0 : MAX_OPEN_RATIO;
+      animateTo(target, 0, 700);
     }
   };
 
   // Direct stage trigger for extra door
   const setStageDirect = (stage: 0 | 1 | 2) => {
     if (isAnimating) return;
-    setIsAnimating(true);
     setExtraStage(stage);
-    setTimeout(() => setIsAnimating(false), 600);
+    if (stage === 0) {
+      animateTo(0, 0, 600);
+    } else if (stage === 1) {
+      animateTo(0, 1, 600);
+    } else {
+      animateTo(MAX_OPEN_RATIO, 1, 750);
+    }
   };
 
   // Dimensions of portal opening
@@ -229,153 +253,144 @@ export default function HarmonikaVisualizer({
   const portalWidth = 720;
   const portalHeight = 350;
 
-  // Active opening ratio for the main gate
-  const currentGateOpenRatio = hasPintuExtra
-    ? extraStage === 2
-      ? MAX_OPEN_RATIO
-      : 0
-    : openRatio;
-
-  // Extra door swing angle (when stage === 1)
-  const isExtraDoorSwingOpen = hasPintuExtra && extraStage === 1;
-
   // Slat geometry
   const slatCount = bukaanType === "1_bukaan" ? 14 : 16;
   const halfSlat = slatCount / 2;
 
-  // Helper to render Pantograph Scissor Lattice (Silangan Harmonika Baja)
-  const renderScissorLattice = (slatCenters: number[], keyPrefix: string) => {
-    const lines = [];
-    const pins = [];
+  // Helper to render CAGAK (vertical steel UNP uprights) and SILANGAN (scissor lattice)
+  // ONLY visible inside the bukaan extra gap
+  const renderCagakAndSilangan = (
+    gapLeft: number,
+    gapRight: number,
+    keyPrefix: string
+  ) => {
+    const width = gapRight - gapLeft;
+    if (width <= 5) return null;
 
-    const topY1 = portalY + 38;
-    const topY2 = portalY + 98;
-    const midY1 = portalY + portalHeight / 2 - 32;
-    const midY2 = portalY + portalHeight / 2 + 32;
-    const botY1 = portalY + portalHeight - 98;
-    const botY2 = portalY + portalHeight - 38;
+    const topY = portalY + 8;
+    const height = portalHeight - 16;
+    const bottomY = topY + height;
+    const midX = (gapLeft + gapRight) / 2;
 
-    for (let i = 0; i < slatCenters.length - 1; i++) {
-      const x1 = slatCenters[i];
-      const x2 = slatCenters[i + 1];
-      const midX = (x1 + x2) / 2;
+    // Number of cagak based on gap width
+    const cagakPositions =
+      width > 45
+        ? [gapLeft + width * 0.33, gapLeft + width * 0.67]
+        : [midX];
 
-      // Top Cross
-      lines.push(
-        <line
-          key={`${keyPrefix}-top1-${i}`}
-          x1={x1}
-          y1={topY1}
-          x2={x2}
-          y2={topY2}
-          stroke="#fcd34d"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          opacity="0.85"
-        />,
-        <line
-          key={`${keyPrefix}-top2-${i}`}
-          x1={x1}
-          y1={topY2}
-          x2={x2}
-          y2={topY1}
-          stroke="#fcd34d"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          opacity="0.85"
-        />
-      );
-      pins.push(
-        <circle
-          key={`${keyPrefix}-toppin-${i}`}
-          cx={midX}
-          cy={(topY1 + topY2) / 2}
-          r="2.2"
-          fill="#f59e0b"
-          stroke="#78350f"
-          strokeWidth="0.8"
-        />
-      );
-
-      // Mid Cross
-      lines.push(
-        <line
-          key={`${keyPrefix}-mid1-${i}`}
-          x1={x1}
-          y1={midY1}
-          x2={x2}
-          y2={midY2}
-          stroke="#fcd34d"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          opacity="0.85"
-        />,
-        <line
-          key={`${keyPrefix}-mid2-${i}`}
-          x1={x1}
-          y1={midY2}
-          x2={x2}
-          y2={midY1}
-          stroke="#fcd34d"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          opacity="0.85"
-        />
-      );
-      pins.push(
-        <circle
-          key={`${keyPrefix}-midpin-${i}`}
-          cx={midX}
-          cy={(midY1 + midY2) / 2}
-          r="2.2"
-          fill="#f59e0b"
-          stroke="#78350f"
-          strokeWidth="0.8"
-        />
-      );
-
-      // Bottom Cross
-      lines.push(
-        <line
-          key={`${keyPrefix}-bot1-${i}`}
-          x1={x1}
-          y1={botY1}
-          x2={x2}
-          y2={botY2}
-          stroke="#fcd34d"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          opacity="0.85"
-        />,
-        <line
-          key={`${keyPrefix}-bot2-${i}`}
-          x1={x1}
-          y1={botY2}
-          x2={x2}
-          y2={botY1}
-          stroke="#fcd34d"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          opacity="0.85"
-        />
-      );
-      pins.push(
-        <circle
-          key={`${keyPrefix}-botpin-${i}`}
-          cx={midX}
-          cy={(botY1 + botY2) / 2}
-          r="2.2"
-          fill="#f59e0b"
-          stroke="#78350f"
-          strokeWidth="0.8"
-        />
-      );
-    }
+    // Pantograph scissor lattice (Silang-silang baja)
+    // 3 tiers of X crosses
+    const tiers = [
+      { y1: topY + 24, y2: topY + 104 },
+      { y1: topY + 116, y2: topY + 204 },
+      { y1: topY + 216, y2: topY + 296 },
+    ];
 
     return (
-      <g>
-        {lines}
-        {pins}
+      <g key={keyPrefix}>
+        {/* Dark interior cavity background with subtle transparency */}
+        <rect
+          x={gapLeft}
+          y={topY}
+          width={width}
+          height={height}
+          fill="#090d16"
+          opacity="0.85"
+        />
+
+        {/* Vertical CAGAK (Baja UNP Uprights) */}
+        {cagakPositions.map((cx, idx) => (
+          <g key={`${keyPrefix}-cagak-${idx}`}>
+            <rect
+              x={cx - 4.5}
+              y={topY}
+              width="9"
+              height={height}
+              fill="url(#lockPillarGrad)"
+              stroke="#334155"
+              strokeWidth="0.8"
+              rx="1.5"
+            />
+            {/* Center specular highlight */}
+            <line
+              x1={cx}
+              y1={topY}
+              x2={cx}
+              y2={bottomY}
+              stroke="#cbd5e1"
+              strokeWidth="1.2"
+              opacity="0.85"
+            />
+          </g>
+        ))}
+
+        {/* Silang-Silang Pantograph Scissor Lattice (Baja Galvanis/Silver) */}
+        {tiers.map((tier, tIdx) => (
+          <g key={`${keyPrefix}-tier-${tIdx}`}>
+            {/* Left-to-Right diagonal bar */}
+            <line
+              x1={gapLeft + 3}
+              y1={tier.y1}
+              x2={gapRight - 3}
+              y2={tier.y2}
+              stroke="#f1f5f9"
+              strokeWidth="3"
+              strokeLinecap="round"
+            />
+            <line
+              x1={gapLeft + 3}
+              y1={tier.y1}
+              x2={gapRight - 3}
+              y2={tier.y2}
+              stroke="#475569"
+              strokeWidth="1.2"
+              strokeLinecap="round"
+            />
+
+            {/* Right-to-Left diagonal bar */}
+            <line
+              x1={gapLeft + 3}
+              y1={tier.y2}
+              x2={gapRight - 3}
+              y2={tier.y1}
+              stroke="#f1f5f9"
+              strokeWidth="3"
+              strokeLinecap="round"
+            />
+            <line
+              x1={gapLeft + 3}
+              y1={tier.y2}
+              x2={gapRight - 3}
+              y2={tier.y1}
+              stroke="#475569"
+              strokeWidth="1.2"
+              strokeLinecap="round"
+            />
+
+            {/* Pivot pin in center */}
+            <circle
+              cx={midX}
+              cy={(tier.y1 + tier.y2) / 2}
+              r="2.8"
+              fill="#fbbf24"
+              stroke="#78350f"
+              strokeWidth="0.8"
+            />
+
+            {/* Anchor pins on cagak */}
+            {cagakPositions.map((cx, cIdx) => (
+              <circle
+                key={`pin-${tIdx}-${cIdx}`}
+                cx={cx}
+                cy={(tier.y1 + tier.y2) / 2}
+                r="2.2"
+                fill="#fbbf24"
+                stroke="#78350f"
+                strokeWidth="0.7"
+              />
+            ))}
+          </g>
+        ))}
       </g>
     );
   };
@@ -526,7 +541,7 @@ export default function HarmonikaVisualizer({
               </span>
             </h4>
             <p className="text-[11px] text-rose-300/80">
-              Pilih 1 atau 2 bukaan, opsi Pintu Extra (Bukaan 2x), skema warna atas-bawah, dan strip list aksen tengah.
+              Pilih 1 atau 2 bukaan, opsi Pintu Extra (Bukaan Intip & Ventilasi), skema warna atas-bawah, dan strip list aksen tengah.
             </p>
           </div>
         </div>
@@ -565,14 +580,14 @@ export default function HarmonikaVisualizer({
             onClick={handleToggleClick}
             disabled={isAnimating}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all flex items-center space-x-1.5 shadow-lg min-h-[38px] active:scale-95 ${
-              (hasPintuExtra && extraStage === 2) || (!hasPintuExtra && openRatio > 0.4)
+              (hasPintuExtra && extraStage === 2) || (!hasPintuExtra && gateOpen > 0.4)
                 ? "bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white border border-rose-400"
                 : hasPintuExtra && extraStage === 1
                 ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white border border-emerald-300"
                 : "bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 text-slate-950 hover:brightness-105 border border-amber-200"
             }`}
           >
-            {(hasPintuExtra && extraStage === 2) || (!hasPintuExtra && openRatio > 0.4) ? (
+            {(hasPintuExtra && extraStage === 2) || (!hasPintuExtra && gateOpen > 0.4) ? (
               <>
                 <DoorClosed className="w-4 h-4 shrink-0" />
                 <span>Tutup Pintu</span>
@@ -585,7 +600,7 @@ export default function HarmonikaVisualizer({
             ) : (
               <>
                 <DoorOpen className="w-4 h-4 shrink-0" />
-                <span>{hasPintuExtra ? "Buka Pintu Extra" : "Buka Pintu"}</span>
+                <span>{hasPintuExtra ? "Buka Pintu Extra (Celah Intip)" : "Buka Pintu"}</span>
               </>
             )}
           </button>
@@ -636,7 +651,7 @@ export default function HarmonikaVisualizer({
             />
             <div className="text-xs">
               <span className="font-extrabold text-white flex items-center gap-1.5">
-                Pakai Pintu Extra (Swing Orang Lewat)
+                Pakai Pintu Extra (Bukaan Intip & Ventilasi)
                 <span className="text-[9px] bg-amber-400/20 text-amber-300 px-1.5 py-0.2 rounded font-black border border-amber-400/30">
                   +Rp 250rb
                 </span>
@@ -668,7 +683,7 @@ export default function HarmonikaVisualizer({
                     : "text-slate-400 hover:text-white"
                 }`}
               >
-                2. Extra Buka
+                2. Extra Buka (Celah Intip)
               </button>
               <span className="text-slate-600">›</span>
               <button
@@ -911,7 +926,7 @@ export default function HarmonikaVisualizer({
           {/* ========================================================= */}
           {/* INTERIOR SHOWROOM (Terlihat saat Harmonika / Extra Terbuka) */}
           {/* ========================================================= */}
-          <g opacity={Math.min(1, Math.max(currentGateOpenRatio * 1.5, isExtraDoorSwingOpen ? 0.9 : 0))}>
+          <g opacity={Math.min(1, Math.max(gateOpen * 1.5, extraSlide > 0.05 ? 0.95 : 0))}>
             <rect x={portalX} y={portalY} width={portalWidth} height={portalHeight} fill="#18181b" />
             <ellipse
               cx={portalX + portalWidth / 2}
@@ -987,143 +1002,165 @@ export default function HarmonikaVisualizer({
           {/* CASE A: 2 BUKAAN (BUKAAN TENGAH / KUPU-TARUNG)                 */}
           {/* ------------------------------------------------------------- */}
           {bukaanType === "2_bukaan" && (() => {
-            const halfPortal = portalWidth / 2;
-            const centerPoint = portalX + halfPortal;
-            // When opened: max 92% open, meaning 8% of width remains as visible folded stack!
-            const wingWidth = halfPortal * (1 - currentGateOpenRatio);
-            const slatWidth = wingWidth / halfSlat;
+            const halfPortal = portalWidth / 2; // 360
+            const centerPoint = portalX + halfPortal; // 500
+            
+            // Full gate folding width (leaving 8% stack when full open)
+            const wingWidth = halfPortal * (1 - gateOpen);
 
+            // Extra opening sliding gap flanking center handle
+            // Max gap = 60px on each side of center handle (total 120px)
+            const gapPerSide = hasPintuExtra ? extraSlide * 60 : 0;
+            
+            // Slat counts
+            const slatsPerWing = 7;
+            
+            // Left wing daun width (from portalX to center handle minus gap)
+            const leftDaunWidth = Math.max(10, (wingWidth - 10) - gapPerSide);
+            const leftSlatW = leftDaunWidth / slatsPerWing;
+            
+            // Right wing daun width (from center handle plus gap to right jamb)
+            const rightDaunWidth = Math.max(10, (wingWidth - 10) - gapPerSide);
+            const rightSlatW = rightDaunWidth / slatsPerWing;
+
+            // Centers for left slats
             const leftCenters: number[] = [];
-            for (let i = 0; i < halfSlat; i++) {
-              leftCenters.push(portalX + i * slatWidth + slatWidth / 2);
+            for (let i = 0; i < slatsPerWing; i++) {
+              leftCenters.push(portalX + i * leftSlatW + leftSlatW / 2);
             }
 
+            // Centers for right slats
+            const rightStartX = portalX + portalWidth - rightDaunWidth;
             const rightCenters: number[] = [];
-            for (let i = 0; i < halfSlat; i++) {
-              rightCenters.push(portalX + portalWidth - (halfSlat - i) * slatWidth + slatWidth / 2);
+            for (let i = 0; i < slatsPerWing; i++) {
+              rightCenters.push(rightStartX + i * rightSlatW + rightSlatW / 2);
             }
 
-            // Pintu Extra Dimensions: positioned around center of the gate
-            const extraWidth = 140;
-            const extraHeight = portalHeight - 40;
-            const extraX = centerPoint - extraWidth / 2;
-            const extraY = portalY + 20;
+            // Center lock pillar (with handles and keyhole)
+            const lockPillarW = 20;
+            const centerLockLeft = centerPoint - lockPillarW / 2;
+            const centerLockRight = centerPoint + lockPillarW / 2;
 
             return (
               <g>
-                {/* Sayap Kiri */}
+                {/* 1. Left Extra Gap (Cagak & Silang visible when extraSlide > 0) */}
+                {hasPintuExtra && gapPerSide > 3 && (
+                  renderCagakAndSilangan(
+                    portalX + leftDaunWidth,
+                    centerLockLeft,
+                    "2p-left-extra"
+                  )
+                )}
+
+                {/* 2. Right Extra Gap (Cagak & Silang visible when extraSlide > 0) */}
+                {hasPintuExtra && gapPerSide > 3 && (
+                  renderCagakAndSilangan(
+                    centerLockRight,
+                    rightStartX,
+                    "2p-right-extra"
+                  )
+                )}
+
+                {/* 3. Sayap Kiri (Clean Plat Daun - NO scissor overlay) */}
                 <g>
                   {leftCenters.map((cx, i) =>
-                    renderSingleSlat(cx - slatWidth / 2, slatWidth, `2p-left-${i}`)
+                    renderSingleSlat(cx - leftSlatW / 2, leftSlatW, `2p-left-${i}`)
                   )}
-                  {/* Left Lock Jamb Pillar */}
-                  <rect
-                    x={portalX + wingWidth - 14}
-                    y={portalY + 6}
-                    width="14"
-                    height={portalHeight - 12}
-                    fill="url(#lockPillarGrad)"
-                    stroke="#fbbf24"
-                    strokeWidth="1.2"
-                  />
-                  {/* Chrome Handle */}
-                  <rect x={portalX + wingWidth - 9} y={portalY + portalHeight / 2 - 25} width="4" height="50" fill="#e2e8f0" rx="2" />
-                  {renderScissorLattice(leftCenters, "2p-left")}
+                  {/* Subtle edge shadow where daun slides back */}
+                  {hasPintuExtra && gapPerSide > 3 && (
+                    <line
+                      x1={portalX + leftDaunWidth}
+                      y1={portalY + 8}
+                      x2={portalX + leftDaunWidth}
+                      y2={portalY + portalHeight - 8}
+                      stroke="#0f172a"
+                      strokeWidth="2.5"
+                      opacity="0.6"
+                    />
+                  )}
                 </g>
 
-                {/* Sayap Kanan */}
+                {/* 4. Sayap Kanan (Clean Plat Daun - NO scissor overlay) */}
                 <g>
                   {rightCenters.map((cx, i) =>
-                    renderSingleSlat(cx - slatWidth / 2, slatWidth, `2p-right-${i}`)
+                    renderSingleSlat(cx - rightSlatW / 2, rightSlatW, `2p-right-${i}`)
                   )}
-                  {/* Right Lock Jamb Pillar */}
-                  <rect
-                    x={portalX + portalWidth - wingWidth}
-                    y={portalY + 6}
-                    width="14"
-                    height={portalHeight - 12}
-                    fill="url(#lockPillarGrad)"
-                    stroke="#fbbf24"
-                    strokeWidth="1.2"
-                  />
-                  {/* Chrome Handle & Keyhole */}
-                  <rect x={portalX + portalWidth - wingWidth + 5} y={portalY + portalHeight / 2 - 25} width="4" height="50" fill="#e2e8f0" rx="2" />
-                  <circle cx={portalX + portalWidth - wingWidth + 7} cy={portalY + portalHeight / 2 + 35} r="2.5" fill="#0f172a" stroke="#fbbf24" strokeWidth="0.8" />
-                  {renderScissorLattice(rightCenters, "2p-right")}
+                  {/* Subtle edge shadow where daun slides back */}
+                  {hasPintuExtra && gapPerSide > 3 && (
+                    <line
+                      x1={rightStartX}
+                      y1={portalY + 8}
+                      x2={rightStartX}
+                      y2={portalY + portalHeight - 8}
+                      stroke="#0f172a"
+                      strokeWidth="2.5"
+                      opacity="0.6"
+                    />
+                  )}
                 </g>
 
-                {/* PINTU EXTRA (PASS DOOR ORANG LEWAT) KETIKA AKTIF */}
-                {hasPintuExtra && (
+                {/* 5. Center Lock Pillar & Handles (When gate is not fully opened) */}
+                {gateOpen < 0.85 && (
                   <g>
-                    {/* When gate is closed (openRatio === 0): Pintu Extra is seated in center */}
-                    {currentGateOpenRatio <= 0.05 && (
-                      <g>
-                        {/* Outer Pass Door Frame */}
-                        <rect
-                          x={extraX}
-                          y={extraY}
-                          width={extraWidth}
-                          height={extraHeight}
-                          fill="none"
-                          stroke="#fbbf24"
-                          strokeWidth="2.5"
-                          rx="4"
-                        />
-                        <rect
-                          x={extraX + 2}
-                          y={extraY + 2}
-                          width={extraWidth - 4}
-                          height={extraHeight - 4}
-                          fill="none"
-                          stroke="#000000"
-                          strokeWidth="1.5"
-                        />
-
-                        {isExtraDoorSwingOpen ? (
-                          // STAGE 1: PINTU EXTRA SWING TERBUKA KE SAMPING!
-                          <g>
-                            {/* Pass Opening Hole revealing interior & upper trellis */}
-                            <rect
-                              x={extraX + 4}
-                              y={extraY + 4}
-                              width={extraWidth - 8}
-                              height={extraHeight - 8}
-                              fill="#090d16"
-                              opacity="0.9"
-                            />
-                            {/* Person icon indicator inside pass opening */}
-                            <g transform={`translate(${extraX + extraWidth / 2 - 12}, ${extraY + extraHeight / 2 - 20})`}>
-                              <circle cx="12" cy="8" r="7" fill="#10b981" />
-                              <path d="M4 36 L12 18 L20 36 Z" fill="#10b981" />
-                              <text x="12" y="52" textAnchor="middle" fill="#34d399" fontSize="9" fontWeight="bold">
-                                JALAN ORANG
-                              </text>
-                            </g>
-
-                            {/* Left Swing Leaf (Opened to the Left) */}
-                            <g transform={`translate(${extraX - 25}, ${extraY}) skewY(-8) scale(0.45, 1)`}>
-                              <rect width={extraWidth / 2} height={extraHeight} fill="url(#slatGradPrimary)" stroke="#fbbf24" strokeWidth="2" rx="3" />
-                              <rect x="5" y={extraHeight / 2 - 20} width="6" height="40" fill="#e2e8f0" rx="2" />
-                            </g>
-
-                            {/* Right Swing Leaf (Opened to the Right) */}
-                            <g transform={`translate(${extraX + extraWidth + 5}, ${extraY}) skewY(8) scale(0.45, 1)`}>
-                              <rect width={extraWidth / 2} height={extraHeight} fill="url(#slatGradPrimary)" stroke="#fbbf24" strokeWidth="2" rx="3" />
-                              <rect x={extraWidth / 2 - 11} y={extraHeight / 2 - 20} width="6" height="40" fill="#e2e8f0" rx="2" />
-                            </g>
-                          </g>
-                        ) : (
-                          // STAGE 0: PINTU EXTRA TERTUTUP RAPAT (SEJAJAR PINTU)
-                          <g>
-                            <line x1={centerPoint} y1={extraY} x2={centerPoint} y2={extraY + extraHeight} stroke="#fbbf24" strokeWidth="2" />
-                            {/* Two Chrome Pull Handles in center */}
-                            <rect x={centerPoint - 6} y={extraY + extraHeight / 2 - 20} width="4" height="40" fill="#e2e8f0" rx="1.5" />
-                            <rect x={centerPoint + 2} y={extraY + extraHeight / 2 - 20} width="4" height="40" fill="#e2e8f0" rx="1.5" />
-                            <circle cx={centerPoint + 4} cy={extraY + extraHeight / 2 + 30} r="2.2" fill="#0f172a" stroke="#fbbf24" strokeWidth="0.8" />
-                          </g>
-                        )}
-                      </g>
-                    )}
+                    {/* Left Center Bar */}
+                    <rect
+                      x={centerLockLeft}
+                      y={portalY + 6}
+                      width={lockPillarW / 2}
+                      height={portalHeight - 12}
+                      fill="url(#lockPillarGrad)"
+                      stroke="#475569"
+                      strokeWidth="1"
+                    />
+                    {/* Right Center Bar */}
+                    <rect
+                      x={centerPoint}
+                      y={portalY + 6}
+                      width={lockPillarW / 2}
+                      height={portalHeight - 12}
+                      fill="url(#lockPillarGrad)"
+                      stroke="#475569"
+                      strokeWidth="1"
+                    />
+                    {/* Center Dividing Seam */}
+                    <line
+                      x1={centerPoint}
+                      y1={portalY + 6}
+                      x2={centerPoint}
+                      y2={portalY + portalHeight - 6}
+                      stroke="#0f172a"
+                      strokeWidth="1.5"
+                    />
+                    {/* Chrome Pull Handles */}
+                    <rect
+                      x={centerPoint - 7}
+                      y={portalY + portalHeight / 2 - 25}
+                      width="4.5"
+                      height="50"
+                      fill="#f1f5f9"
+                      stroke="#64748b"
+                      strokeWidth="0.8"
+                      rx="2"
+                    />
+                    <rect
+                      x={centerPoint + 2.5}
+                      y={portalY + portalHeight / 2 - 25}
+                      width="4.5"
+                      height="50"
+                      fill="#f1f5f9"
+                      stroke="#64748b"
+                      strokeWidth="0.8"
+                      rx="2"
+                    />
+                    {/* Brass Keyhole */}
+                    <circle
+                      cx={centerPoint + 5}
+                      cy={portalY + portalHeight / 2 + 35}
+                      r="2.5"
+                      fill="#0f172a"
+                      stroke="#fbbf24"
+                      strokeWidth="0.8"
+                    />
                   </g>
                 )}
               </g>
@@ -1134,78 +1171,87 @@ export default function HarmonikaVisualizer({
           {/* CASE B: 1 BUKAAN (GESER 1 ARAH DORONG KE KIRI)                 */}
           {/* ------------------------------------------------------------- */}
           {bukaanType === "1_bukaan" && (() => {
-            // When opened: max 92% open, meaning 8% of width remains as visible folded stack!
-            const gateWidth = portalWidth * (1 - currentGateOpenRatio);
-            const slatWidth = gateWidth / slatCount;
+            // Full gate folding width (leaving 8% stack when full open)
+            const gateWidth = portalWidth * (1 - gateOpen);
+
+            // Leading lock pillar width at right edge
+            const lockPillarW = 20;
+            const rightLockX = portalX + gateWidth - lockPillarW;
+
+            // Extra opening sliding gap right next to the handle (max 110px)
+            const extraGap = hasPintuExtra ? extraSlide * 110 : 0;
+
+            // Daun width (from left jamb to the extra gap)
+            const mainDaunWidth = Math.max(15, (gateWidth - lockPillarW) - extraGap);
+            const slatCount1P = 14;
+            const slatW = mainDaunWidth / slatCount1P;
 
             const slatCenters: number[] = [];
-            for (let i = 0; i < slatCount; i++) {
-              slatCenters.push(portalX + i * slatWidth + slatWidth / 2);
+            for (let i = 0; i < slatCount1P; i++) {
+              slatCenters.push(portalX + i * slatW + slatW / 2);
             }
-
-            // Pintu extra position on 1_bukaan
-            const extraWidth = 140;
-            const extraHeight = portalHeight - 40;
-            const extraX = portalX + gateWidth * 0.65;
-            const extraY = portalY + 20;
 
             return (
               <g>
-                {slatCenters.map((cx, i) =>
-                  renderSingleSlat(cx - slatWidth / 2, slatWidth, `1p-${i}`)
+                {/* 1. Extra Gap Next to Handle (Cagak & Silang visible when extraSlide > 0) */}
+                {hasPintuExtra && extraGap > 3 && (
+                  renderCagakAndSilangan(
+                    portalX + mainDaunWidth,
+                    rightLockX,
+                    "1p-extra"
+                  )
                 )}
 
-                {/* Leading Lock Jamb Pillar */}
-                <rect
-                  x={portalX + gateWidth - 18}
-                  y={portalY + 6}
-                  width="18"
-                  height={portalHeight - 12}
-                  fill="url(#lockPillarGrad)"
-                  stroke="#fbbf24"
-                  strokeWidth="1.5"
-                />
-                {/* Chrome Handle & Keyhole */}
-                <rect x={portalX + gateWidth - 12} y={portalY + portalHeight / 2 - 25} width="5" height="50" fill="#e2e8f0" rx="2" />
-                <circle cx={portalX + gateWidth - 9} cy={portalY + portalHeight / 2 + 35} r="2.5" fill="#0f172a" stroke="#fbbf24" strokeWidth="0.8" />
-
-                {renderScissorLattice(slatCenters, "1p")}
-
-                {/* PINTU EXTRA KETIKA AKTIF PADA 1 BUKAAN */}
-                {hasPintuExtra && currentGateOpenRatio <= 0.05 && (
-                  <g>
-                    <rect
-                      x={extraX}
-                      y={extraY}
-                      width={extraWidth}
-                      height={extraHeight}
-                      fill="none"
-                      stroke="#fbbf24"
+                {/* 2. Main Gate Daun (Clean Plat Daun - NO scissor overlay) */}
+                <g>
+                  {slatCenters.map((cx, i) =>
+                    renderSingleSlat(cx - slatW / 2, slatW, `1p-${i}`)
+                  )}
+                  {/* Subtle edge shadow where daun slides back */}
+                  {hasPintuExtra && extraGap > 3 && (
+                    <line
+                      x1={portalX + mainDaunWidth}
+                      y1={portalY + 8}
+                      x2={portalX + mainDaunWidth}
+                      y2={portalY + portalHeight - 8}
+                      stroke="#0f172a"
                       strokeWidth="2.5"
-                      rx="4"
+                      opacity="0.6"
                     />
-                    {isExtraDoorSwingOpen ? (
-                      <g>
-                        <rect x={extraX + 4} y={extraY + 4} width={extraWidth - 8} height={extraHeight - 8} fill="#090d16" opacity="0.9" />
-                        <g transform={`translate(${extraX + extraWidth / 2 - 12}, ${extraY + extraHeight / 2 - 20})`}>
-                          <circle cx="12" cy="8" r="7" fill="#10b981" />
-                          <path d="M4 36 L12 18 L20 36 Z" fill="#10b981" />
-                          <text x="12" y="52" textAnchor="middle" fill="#34d399" fontSize="9" fontWeight="bold">
-                            JALAN ORANG
-                          </text>
-                        </g>
-                        <g transform={`translate(${extraX - 25}, ${extraY}) skewY(-8) scale(0.45, 1)`}>
-                          <rect width={extraWidth / 2} height={extraHeight} fill="url(#slatGradPrimary)" stroke="#fbbf24" strokeWidth="2" rx="3" />
-                        </g>
-                      </g>
-                    ) : (
-                      <g>
-                        <line x1={extraX + extraWidth / 2} y1={extraY} x2={extraX + extraWidth / 2} y2={extraY + extraHeight} stroke="#fbbf24" strokeWidth="2" />
-                        <rect x={extraX + extraWidth / 2 - 5} y={extraY + extraHeight / 2 - 20} width="4" height="40" fill="#e2e8f0" rx="1.5" />
-                      </g>
-                    )}
-                  </g>
-                )}
+                  )}
+                </g>
+
+                {/* 3. Leading Lock Jamb Pillar with Chrome Handle */}
+                <g>
+                  <rect
+                    x={rightLockX}
+                    y={portalY + 6}
+                    width={lockPillarW}
+                    height={portalHeight - 12}
+                    fill="url(#lockPillarGrad)"
+                    stroke="#475569"
+                    strokeWidth="1.2"
+                  />
+                  {/* Chrome Handle & Keyhole */}
+                  <rect
+                    x={rightLockX + lockPillarW / 2 - 2.5}
+                    y={portalY + portalHeight / 2 - 25}
+                    width="5"
+                    height="50"
+                    fill="#f1f5f9"
+                    stroke="#64748b"
+                    strokeWidth="0.8"
+                    rx="2"
+                  />
+                  <circle
+                    cx={rightLockX + lockPillarW / 2}
+                    cy={portalY + portalHeight / 2 + 35}
+                    r="2.5"
+                    fill="#0f172a"
+                    stroke="#fbbf24"
+                    strokeWidth="0.8"
+                  />
+                </g>
               </g>
             );
           })()}
@@ -1231,11 +1277,11 @@ export default function HarmonikaVisualizer({
           <span>
             {hasPintuExtra
               ? extraStage === 0
-                ? "Klik 1x: Buka Pintu Extra (Jalan Orang)"
+                ? "Klik 1x: Geser Pintu Extra (Celah Intip & Ventilasi)"
                 : extraStage === 1
-                ? "Klik 2x: Buka Full Harmonika"
+                ? "Klik 2x: Buka Full Harmonika (92%)"
                 : "Klik 3x: Tutup Rapat"
-              : openRatio > 0.4
+              : gateOpen > 0.4
               ? "Klik untuk Tutup Pintu"
               : "Klik untuk Buka Pintu (Tumpukan 92%)"}
           </span>

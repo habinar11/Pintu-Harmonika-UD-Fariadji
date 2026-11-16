@@ -86,7 +86,7 @@ export default function PriceCalculator({
       bukaanType === "1_bukaan"
         ? "Model 1 Bukaan (Geser 1 Arah)"
         : "Model 2 Bukaan (Tengah / Kupu-Tarung)";
-    return hasPintuExtra ? `${base} + Pintu Extra (Orang Lewat)` : base;
+    return hasPintuExtra ? `${base} + Pintu Extra (Bukaan Intip)` : base;
   };
 
   const getColorLabel = () => {
@@ -107,7 +107,7 @@ export default function PriceCalculator({
 - Tipe Pintu: ${selectedProduct?.name} (${selectedProduct?.daunThickness})
 - Model Bukaan: ${getBukaanLabel()}
 - Skema Cat Oven: ${getColorLabel()}
-- Opsi Pintu Extra (Orang Lewat): ${hasPintuExtra ? "Ya (+Rp 250.000)" : "Tidak"}
+- Opsi Pintu Extra (Bukaan Intip): ${hasPintuExtra ? "Ya (+Rp 250.000)" : "Tidak"}
 - Opsi Finishing Kombinasi/Strip: ${isDualColor ? "Ya (+Rp 150.000)" : "Tidak"}
 - Perkiraan Estimasi Web: ${formatRupiah(totalCost)}
 
@@ -313,12 +313,12 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
               />
               <div className="text-xs">
                 <span className="font-bold text-white block">
-                  Pakai Pintu Extra / Pass Door Orang Lewat (+Rp 250.000)
+                  Pakai Pintu Extra / Bukaan Intip Celah Harmonika (+Rp 250.000)
                 </span>
                 <span className="text-rose-200/80 text-[11px] sm:text-xs">
                   {hasPintuExtra
-                    ? "✓ Aktif di Visualizer: Dilengkapi pintu kecil di tengah untuk jalan orang (bisa dianimasikan 2 kali)"
-                    : "Pintu kecil di tengah daun untuk akses keluar masuk orang tanpa perlu membuka seluruh pintu harmonika"}
+                    ? "✓ Aktif di Visualizer: Celah intip geser di dekat handle memperlihatkan cagak & silang pengaman"
+                    : "Bukaan intip geser di dekat handle untuk melihat keluar & sirkulasi udara tanpa membuka seluruh pintu"}
                 </span>
               </div>
             </label>
@@ -410,7 +410,7 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
 
             {hasPintuExtra && (
               <div className="flex justify-between text-amber-300 font-medium">
-                <span>+ Pintu Extra (Orang Lewat):</span>
+                <span>+ Pintu Extra (Bukaan Intip):</span>
                 <span>Rp 250.000</span>
               </div>
             )}
