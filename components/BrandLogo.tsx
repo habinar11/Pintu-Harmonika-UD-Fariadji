@@ -31,25 +31,18 @@ export default function BrandLogo({
                 className="w-full h-full object-contain rounded-full"
               />
             </div>
-            {/* Quality Seal Badge */}
-            <span className="absolute -bottom-1 -right-1 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 text-[9px] sm:text-[10px] font-black px-2 sm:px-2.5 py-0.5 rounded-full shadow-lg border border-amber-300">
-              SNI STEEL
-            </span>
           </div>
 
           {/* Text Details */}
           <div className="space-y-1 min-w-0">
-            <div className="inline-flex items-center space-x-1.5 px-2.5 sm:px-3 py-1 rounded-md bg-amber-400/20 border border-amber-400/40 text-[9px] sm:text-[11px] font-extrabold text-amber-300 uppercase tracking-widest text-center">
-              <span>★ PABRIK RESMI & SPESIALIS PINTU HARMONIKA INDONESIA ★</span>
-            </div>
             <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight drop-shadow-md">
               {companyName}
             </h2>
             <p className="text-[11px] sm:text-sm font-bold text-rose-200 tracking-wide uppercase">
               {tagline}
             </p>
-            <p className="text-[11px] sm:text-xs text-rose-100/70 pt-0.5 leading-relaxed">
-              Plat Baja Roll SNI Tebal Asli • Roda Double Bearing Jepang • Kunci Anti-Linggis
+            <p className="text-[11px] sm:text-xs text-amber-300/90 font-medium pt-0.5 leading-relaxed">
+              Melayani Produksi, Pemasangan, Service dan Konsultasi
             </p>
           </div>
         </div>

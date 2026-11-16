@@ -158,7 +158,7 @@ export default function HarmonikaOpeningPopup({
                         {settings.companyName}
                       </h3>
                       <span className="text-[10px] sm:text-[11px] text-amber-400 font-bold tracking-wide">
-                        STANDAR SNI • DOUBLE BEARING
+                        Bengkel Besi Pintu Harmonika Madiun
                       </span>
                     </div>
                   </div>
@@ -359,21 +359,6 @@ export default function HarmonikaOpeningPopup({
                   </div>
                 </div>
               )}
-            </div>
-
-            {/* Bottom Footer strip of the modal */}
-            <div className="px-6 py-3 bg-black/60 border-t border-maroon-900/60 flex flex-wrap justify-between items-center text-xs text-rose-300/80 gap-2">
-              <div className="flex items-center space-x-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>Pabrikasi Resmi Bergaransi {settings.warrantyYears} Tahun</span>
-              </div>
-              <button
-                type="button"
-                onClick={handleClose}
-                className="hover:text-amber-400 transition-colors font-semibold"
-              >
-                ✕ Tutup Tampilan Ini
-              </button>
             </div>
           </div>
         </div>

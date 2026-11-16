@@ -295,12 +295,17 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
           </div>
 
           {/* Select Product Type */}
-          <div>
-            <label className="text-xs sm:text-sm font-bold text-white block mb-2">
+          <div className="space-y-3">
+            <label className="text-xs sm:text-sm font-bold text-white block">
               Pilih Varian Kualitas & Ketebalan Plat Daun:
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
-              {products.map((p) => {
+
+            {/* Row 1: SUPER 1 & SUPER 2 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+              {(products.filter((p) => p.name.includes("SUPER")).length > 0
+                ? products.filter((p) => p.name.includes("SUPER"))
+                : products.slice(0, 2)
+              ).map((p) => {
                 const isSelected = p.id === selectedProductId;
                 return (
                   <button
@@ -313,31 +318,67 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
                         : "bg-black/40 border-maroon-900 text-rose-200 hover:bg-maroon-950/50"
                     }`}
                   >
-                    <div className="flex justify-between items-center mb-1 gap-1">
-                      <span className="font-extrabold text-xs sm:text-sm text-white line-clamp-1">
-                        {p.name}
-                      </span>
+                    <div className="flex flex-wrap items-center justify-between gap-1 mb-1.5">
                       <div className="flex items-center gap-1.5 shrink-0">
-                        {p.warrantyInfo?.includes("5") || p.name.includes("SUPER") ? (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 via-yellow-500/25 to-amber-500/20 text-amber-300 border border-amber-400/50 shadow-xs">
-                            <ShieldCheck className="w-3 h-3 text-amber-400 fill-amber-400/20" />
-                            {p.warrantyInfo || "Garansi 5 Tahun"}
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full bg-gradient-to-r from-slate-400/20 to-slate-200/20 text-slate-200 border border-slate-300/40 shadow-xs">
-                            <ShieldCheck className="w-3 h-3 text-slate-300" />
-                            {p.warrantyInfo || "Ber-garansi Servis Resmi"}
-                          </span>
-                        )}
+                        <span className="font-black text-xs sm:text-sm text-white whitespace-nowrap">
+                          {p.name}
+                        </span>
                         {isSelected && (
                           <Check className="w-4 h-4 text-amber-400 shrink-0" />
                         )}
                       </div>
+                      <span className="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 via-yellow-500/25 to-amber-500/20 text-amber-300 border border-amber-400/50 shadow-xs whitespace-nowrap shrink-0">
+                        <ShieldCheck className="w-3 h-3 text-amber-400 fill-amber-400/20" />
+                        {p.warrantyInfo || "Garansi 5 Tahun"}
+                      </span>
                     </div>
-                    {/* Ringkas sesuai Gambar 4: TEBAL DAUN ROL & SPESIFIKASI RANGKA */}
-                    <div className="text-[11px] sm:text-xs text-rose-200">
+                    <div className="text-[11px] sm:text-xs text-rose-200 leading-snug">
                       Daun: <span className="text-amber-300 font-bold">{p.daunThickness}</span> • Rangka:{" "}
-                      <span className="text-rose-100 font-semibold">{p.frameSpec || p.unpSize}</span>
+                      <span className="text-rose-100 font-medium">{p.frameSpec || p.unpSize}</span>
+                    </div>
+                    <div className="text-[11px] sm:text-xs font-bold text-emerald-400 mt-1">
+                      {p.priceDisplay}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Row 2: KELAS 1, KELAS 2, KELAS 3 */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
+              {(products.filter((p) => !p.name.includes("SUPER")).length > 0
+                ? products.filter((p) => !p.name.includes("SUPER"))
+                : products.slice(2)
+              ).map((p) => {
+                const isSelected = p.id === selectedProductId;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => setSelectedProductId(p.id)}
+                    className={`text-left p-3 sm:p-3.5 rounded-2xl border transition-all active:scale-98 min-h-[48px] ${
+                      isSelected
+                        ? "bg-maroon-900/90 border-amber-400 ring-2 ring-amber-400/40 text-white shadow-lg"
+                        : "bg-black/40 border-maroon-900 text-rose-200 hover:bg-maroon-950/50"
+                    }`}
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-1 mb-1.5">
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className="font-black text-xs sm:text-sm text-white whitespace-nowrap">
+                          {p.name}
+                        </span>
+                        {isSelected && (
+                          <Check className="w-4 h-4 text-amber-400 shrink-0" />
+                        )}
+                      </div>
+                      <span className="inline-flex items-center gap-1 text-[9.5px] font-black px-1.5 py-0.5 rounded-full bg-gradient-to-r from-slate-400/20 to-slate-200/20 text-slate-200 border border-slate-300/40 shadow-xs whitespace-nowrap shrink-0">
+                        <ShieldCheck className="w-2.5 h-2.5 text-slate-300" />
+                        {p.warrantyInfo || "Ber-garansi Servis Resmi"}
+                      </span>
+                    </div>
+                    <div className="text-[11px] sm:text-xs text-rose-200 leading-snug">
+                      Daun: <span className="text-amber-300 font-bold">{p.daunThickness}</span> • Rangka:{" "}
+                      <span className="text-rose-100 font-medium">{p.frameSpec || p.unpSize}</span>
                     </div>
                     <div className="text-[11px] sm:text-xs font-bold text-emerald-400 mt-1">
                       {p.priceDisplay}
@@ -367,16 +408,9 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
                 onChange={(e) => setHasPintuExtra(e.target.checked)}
                 className="w-4 h-4 rounded text-red-600 focus:ring-amber-400 bg-maroon-950 border-maroon-700 shrink-0"
               />
-              <div className="text-xs">
-                <span className="font-bold text-white block">
-                  Pakai Pintu Extra / Bukaan Intip (+{formatRupiah(baseRate)})
-                </span>
-                <span className="text-rose-200/80 text-[11px] sm:text-xs">
-                  {hasPintuExtra
-                    ? `✓ Aktif di Visualizer: Celah intip 1 tiang geser (Biaya mengikuti harga dasar ${selectedProduct?.name}: +${formatRupiah(baseRate)})`
-                    : `Bukaan intip geser di dekat handle untuk melihat keluar tanpa buka pintu penuh (+${formatRupiah(baseRate)})`}
-                </span>
-              </div>
+              <span className="font-bold text-xs sm:text-sm text-white block">
+                Pakai Pintu Extra / Bukaan Intip (+{formatRupiah(baseRate)})
+              </span>
             </label>
 
             {/* Opsi Cat Duco Oven 2 Warna Atas-Bawah / Strip (Rp 350.000) */}
@@ -387,16 +421,9 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
                 onChange={(e) => handleCustomColorToggle(e.target.checked)}
                 className="w-4 h-4 rounded text-red-600 focus:ring-amber-400 bg-maroon-950 border-maroon-700 shrink-0"
               />
-              <div className="text-xs">
-                <span className="font-bold text-white block">
-                  Finishing Cat Oven Khusus (Kombinasi 2 Warna / List Strip Aksen) (+Rp 350.000)
-                </span>
-                <span className="text-rose-200/80 text-[11px] sm:text-xs">
-                  {isCustomColor
-                    ? `✓ Aktif di Visualizer: ${getColorLabel()} (+Rp 350.000)`
-                    : "Pilihan cat oven kombinasi 2 warna (atas-bawah) atau strip aksen 1/2 garis di tengah daun (+Rp 350.000)"}
-                </span>
-              </div>
+              <span className="font-bold text-xs sm:text-sm text-white block">
+                Finishing Cat Oven Khusus (Kombinasi 2 Warna / List Strip Aksen) (+Rp 350.000)
+              </span>
             </label>
           </div>
         </div>

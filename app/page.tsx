@@ -288,9 +288,9 @@ export default async function HomePage() {
                         <span className="text-slate-500">Tebal Daun:</span>
                         <span className="font-bold text-maroon-900">{p.daunThickness}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-500">Rangka:</span>
-                        <span className="font-medium text-slate-800 truncate max-w-[120px]" title={p.frameSpec || p.unpSize}>
+                      <div className="flex justify-between items-start gap-2">
+                        <span className="text-slate-500 shrink-0">Rangka:</span>
+                        <span className="font-medium text-slate-800 text-right leading-tight">
                           {p.frameSpec || p.unpSize}
                         </span>
                       </div>
@@ -314,43 +314,6 @@ export default async function HomePage() {
               </div>
             );
           })}
-        </div>
-      </section>
-
-      {/* EDUKASI MATERIAL PREVIEW */}
-      <section className="w-full max-w-[1650px] mx-auto px-4 sm:px-8 lg:px-12">
-        <div className="bg-gradient-to-r from-maroon-950 via-[#26040a] to-maroon-950 text-white rounded-3xl p-8 sm:p-12 relative overflow-hidden border border-maroon-800/60 shadow-2xl">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
-            <div className="lg:col-span-8 space-y-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
-                Penting Untuk Diketahui Pembeli
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-white">
-                Kenali Komponen & Kualitas Material Pintu Harmonika
-              </h2>
-              <p className="text-rose-100 text-sm sm:text-base leading-relaxed">
-                Banyak kasus pintu harmonika macet hanya dalam 6 bulan pemakaian karena menggunakan plat strip sisa (afval) dan rel tipis. Pelajari setiap detail material kami agar Anda mendapatkan pintu yang awet hingga 20 tahun ke depan.
-              </p>
-              <div className="pt-2">
-                <Link
-                  href="/material"
-                  className="inline-flex items-center px-5 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 transition-colors shadow-lg shadow-amber-500/20"
-                >
-                  Pelajari Seluk Beluk Material Kami
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
-              </div>
-            </div>
-            <div className="lg:col-span-4 flex justify-center">
-              <div className="bg-maroon-900/80 border border-amber-400/40 p-6 rounded-2xl text-center space-y-3 shadow-xl">
-                <ShieldCheck className="w-12 h-12 text-amber-400 mx-auto" />
-                <h4 className="font-extrabold text-white text-base">Jaminan Anti Plat Banci</h4>
-                <p className="text-xs text-rose-200">
-                  Setiap pemesan berhak menguji ketebalan plat dengan sigmat digital (vernier caliper) saat survey dan pemasangan!
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
