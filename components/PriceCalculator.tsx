@@ -13,8 +13,9 @@ import {
 } from "lucide-react";
 import { Product, CompanySettings } from "@/lib/types";
 import HarmonikaVisualizer, {
-  DoorModel,
+  BukaanType,
   ColorMode,
+  StripStyle,
   COLOR_PRESETS,
   STRIP_PRESETS,
 } from "./HarmonikaVisualizer";
@@ -33,23 +34,16 @@ export default function PriceCalculator({
   );
 
   // Visualizer interactive states
-  const [model, setModel] = useState<DoorModel>("2_pintu");
+  const [bukaanType, setBukaanType] = useState<BukaanType>("2_bukaan");
+  const [hasPintuExtra, setHasPintuExtra] = useState<boolean>(false);
   const [colorMode, setColorMode] = useState<ColorMode>("1_warna");
+  const [stripStyle, setStripStyle] = useState<StripStyle>("1_garis");
   const [primaryColorId, setPrimaryColorId] = useState<string>("maroon");
   const [secondaryColorId, setSecondaryColorId] = useState<string>("black");
   const [stripColorId, setStripColorId] = useState<string>("gold");
 
   // Synchronized options
-  const isSwing = model === "extra_swing";
   const isDualColor = colorMode === "2_warna" || colorMode === "strip_warna";
-
-  const handleSwingToggle = (checked: boolean) => {
-    if (checked) {
-      setModel("extra_swing");
-    } else {
-      setModel("2_pintu");
-    }
-  };
 
   const handleDualColorToggle = (checked: boolean) => {
     if (checked) {
@@ -75,7 +69,7 @@ export default function PriceCalculator({
   const baseRate = selectedProduct ? selectedProduct.pricePerMeter : 600000;
   const baseCost = effectiveArea * baseRate;
 
-  const swingCost = isSwing ? 250000 : 0;
+  const swingCost = hasPintuExtra ? 250000 : 0;
   const dualColorCost = isDualColor ? 150000 : 0;
   const totalCost = baseCost + swingCost + dualColorCost;
 
@@ -87,10 +81,12 @@ export default function PriceCalculator({
     }).format(num);
   };
 
-  const getModelLabel = () => {
-    if (model === "1_pintu") return "Model 1 Pintu (Bukaan 1 Arah)";
-    if (model === "2_pintu") return "Model 2 Pintu (Bukaan Tengah Kupu Tarung)";
-    return "Model Extra Swing (Swing Roda Putar Tembok)";
+  const getBukaanLabel = () => {
+    const base =
+      bukaanType === "1_bukaan"
+        ? "Model 1 Bukaan (Geser 1 Arah)"
+        : "Model 2 Bukaan (Tengah / Kupu-Tarung)";
+    return hasPintuExtra ? `${base} + Pintu Extra (Orang Lewat)` : base;
   };
 
   const getColorLabel = () => {
@@ -98,19 +94,21 @@ export default function PriceCalculator({
       return `1 Warna Solid (${primaryColorObj.name})`;
     }
     if (colorMode === "2_warna") {
-      return `Kombinasi 2 Warna (${primaryColorObj.name} + ${secondaryColorObj.name})`;
+      return `Kombinasi 2 Warna Atas-Bawah (${primaryColorObj.name} Atas + ${secondaryColorObj.name} Bawah)`;
     }
-    return `Warna ${primaryColorObj.name} + Strip List Aksen (${stripColorObj.name})`;
+    return `Warna ${primaryColorObj.name} + List Strip ${
+      stripStyle === "1_garis" ? "1 Garis" : "2 Garis"
+    } (${stripColorObj.name})`;
   };
 
   const generateWhatsAppMessage = () => {
     const text = `Halo Admin ${settings.companyName}, saya mau estimasi & pemesanan pintu harmonika:
 - Ukuran: Lebar ${width} m x Tinggi ${height} m (Luas: ${area.toFixed(2)} m²)
 - Tipe Pintu: ${selectedProduct?.name} (${selectedProduct?.daunThickness})
-- Model Pintu: ${getModelLabel()}
+- Model Bukaan: ${getBukaanLabel()}
 - Skema Cat Oven: ${getColorLabel()}
-- Opsi Sistem Swing Roda: ${isSwing ? "Ya (+Rp 250.000)" : "Tidak"}
-- Opsi Cat Duco Oven Khusus: ${isDualColor ? "Ya (+Rp 150.000)" : "Tidak"}
+- Opsi Pintu Extra (Orang Lewat): ${hasPintuExtra ? "Ya (+Rp 250.000)" : "Tidak"}
+- Opsi Finishing Kombinasi/Strip: ${isDualColor ? "Ya (+Rp 150.000)" : "Tidak"}
 - Perkiraan Estimasi Web: ${formatRupiah(totalCost)}
 
 Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jadwal survey lokasi gratis dan penawaran resminya. Terima kasih!`;
@@ -174,8 +172,10 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
         </div>
 
         <HarmonikaVisualizer
-          model={model}
-          onModelChange={setModel}
+          bukaanType={bukaanType}
+          onBukaanTypeChange={setBukaanType}
+          hasPintuExtra={hasPintuExtra}
+          onHasPintuExtraChange={setHasPintuExtra}
           colorMode={colorMode}
           onColorModeChange={setColorMode}
           primaryColorId={primaryColorId}
@@ -184,6 +184,8 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
           onSecondaryColorChange={setSecondaryColorId}
           stripColorId={stripColorId}
           onStripColorChange={setStripColorId}
+          stripStyle={stripStyle}
+          onStripStyleChange={setStripStyle}
           widthMeters={width}
           heightMeters={height}
         />
@@ -290,7 +292,7 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
             </div>
           </div>
 
-          {/* Extra Options (Swing & Dual Color) */}
+          {/* Extra Options (Pintu Extra & Dual Color) */}
           <div className="space-y-2.5 sm:space-y-3 pt-3 border-t border-maroon-900">
             <div className="flex items-center justify-between">
               <label className="text-[11px] sm:text-xs font-bold uppercase text-amber-300 tracking-wider block">
@@ -301,27 +303,27 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
               </span>
             </div>
 
-            {/* Opsi Roda Swing */}
+            {/* Opsi Pintu Extra */}
             <label className="flex items-center space-x-3 bg-black/40 border border-maroon-900 p-3 sm:p-3.5 rounded-2xl cursor-pointer hover:bg-maroon-950/50 transition-colors active:scale-98">
               <input
                 type="checkbox"
-                checked={isSwing}
-                onChange={(e) => handleSwingToggle(e.target.checked)}
+                checked={hasPintuExtra}
+                onChange={(e) => setHasPintuExtra(e.target.checked)}
                 className="w-4 h-4 rounded text-red-600 focus:ring-amber-400 bg-maroon-950 border-maroon-700 shrink-0"
               />
               <div className="text-xs">
                 <span className="font-bold text-white block">
-                  Sistem Roda Swing Putar Tembok (+Rp 250.000)
+                  Pakai Pintu Extra / Pass Door Orang Lewat (+Rp 250.000)
                 </span>
                 <span className="text-rose-200/80 text-[11px] sm:text-xs">
-                  {model === "extra_swing"
-                    ? "✓ Aktif di Visualizer: Pintu dapat diputar mepet tembok agar bukaan ruko plong 100%"
-                    : "Pintu bisa dilipat memutar mepet tembok agar tidak makan ruang bukaan ruko"}
+                  {hasPintuExtra
+                    ? "✓ Aktif di Visualizer: Dilengkapi pintu kecil di tengah untuk jalan orang (bisa dianimasikan 2 kali)"
+                    : "Pintu kecil di tengah daun untuk akses keluar masuk orang tanpa perlu membuka seluruh pintu harmonika"}
                 </span>
               </div>
             </label>
 
-            {/* Opsi Cat Duco Oven 2 Warna / Strip */}
+            {/* Opsi Cat Duco Oven 2 Warna Atas-Bawah / Strip */}
             <label className="flex items-center space-x-3 bg-black/40 border border-maroon-900 p-3 sm:p-3.5 rounded-2xl cursor-pointer hover:bg-maroon-950/50 transition-colors active:scale-98">
               <input
                 type="checkbox"
@@ -331,12 +333,12 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
               />
               <div className="text-xs">
                 <span className="font-bold text-white block">
-                  Finishing Cat Duco Oven Kombinasi / Strip (+Rp 150.000)
+                  Finishing Cat Oven Kombinasi Atas-Bawah / Strip List (+Rp 150.000)
                 </span>
                 <span className="text-rose-200/80 text-[11px] sm:text-xs">
                   {isDualColor
                     ? `✓ Aktif di Visualizer: ${getColorLabel()}`
-                    : "Kombinasi 2 warna atau tambahan strip list warna aksen untuk tampilan ruko modern"}
+                    : "Pilihan cat oven 2 warna (atas-bawah) atau strip aksen 1/2 garis di tengah daun"}
                 </span>
               </div>
             </label>
@@ -395,35 +397,27 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
             <div className="flex justify-between">
               <span>Model Bukaan:</span>
               <span className="font-bold text-amber-300 text-right max-w-[170px] truncate">
-                {model === "1_pintu"
-                  ? "Model 1 Pintu"
-                  : model === "2_pintu"
-                  ? "Model 2 Pintu"
-                  : "Model Extra Swing"}
+                {getBukaanLabel()}
               </span>
             </div>
 
             <div className="flex justify-between">
               <span>Finishing Warna:</span>
               <span className="font-medium text-rose-200 text-right max-w-[170px] truncate">
-                {colorMode === "1_warna"
-                  ? primaryColorObj.name
-                  : colorMode === "2_warna"
-                  ? `${primaryColorObj.name} + ${secondaryColorObj.name}`
-                  : `${primaryColorObj.name} + Strip ${stripColorObj.name}`}
+                {getColorLabel()}
               </span>
             </div>
 
-            {isSwing && (
+            {hasPintuExtra && (
               <div className="flex justify-between text-amber-300 font-medium">
-                <span>+ Sistem Roda Swing:</span>
+                <span>+ Pintu Extra (Orang Lewat):</span>
                 <span>Rp 250.000</span>
               </div>
             )}
 
             {isDualColor && (
               <div className="flex justify-between text-amber-300 font-medium">
-                <span>+ Cat Oven Kombinasi/Strip:</span>
+                <span>+ Finishing Kombinasi/Strip:</span>
                 <span>Rp 150.000</span>
               </div>
             )}

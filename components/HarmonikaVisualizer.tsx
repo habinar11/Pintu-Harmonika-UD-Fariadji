@@ -13,14 +13,15 @@ import {
   Layers,
   Info,
   ShieldCheck,
-  RotateCcw,
-  Maximize2,
   ChevronRight,
-  Eye,
+  Maximize2,
+  Minimize2,
+  CheckCircle2,
 } from "lucide-react";
 
-export type DoorModel = "1_pintu" | "2_pintu" | "extra_swing";
+export type BukaanType = "1_bukaan" | "2_bukaan";
 export type ColorMode = "1_warna" | "2_warna" | "strip_warna";
+export type StripStyle = "1_garis" | "2_garis";
 
 export interface ColorPreset {
   id: string;
@@ -29,27 +30,24 @@ export interface ColorPreset {
   gradientStart: string;
   gradientEnd: string;
   borderHex: string;
-  badge?: string;
 }
 
 export const COLOR_PRESETS: ColorPreset[] = [
   {
     id: "maroon",
     name: "Merah Marun",
-    hex: "#b91c1c",
-    gradientStart: "#dc2626",
-    gradientEnd: "#7f1d1d",
-    borderHex: "#ef4444",
-    badge: "Sesuai Render Ruko",
+    hex: "#881337",
+    gradientStart: "#9f1239",
+    gradientEnd: "#4c0519",
+    borderHex: "#f43f5e",
   },
   {
-    id: "green",
+    id: "emerald",
     name: "Hijau Harmonika",
     hex: "#15803d",
     gradientStart: "#22c55e",
     gradientEnd: "#14532d",
     borderHex: "#4ade80",
-    badge: "Sesuai Pintu Extra Asli",
   },
   {
     id: "black",
@@ -61,7 +59,7 @@ export const COLOR_PRESETS: ColorPreset[] = [
   },
   {
     id: "silver",
-    name: "Abu-abu Baja / Silver",
+    name: "Abu-abu Baja",
     hex: "#475569",
     gradientStart: "#64748b",
     gradientEnd: "#334155",
@@ -103,16 +101,18 @@ export const COLOR_PRESETS: ColorPreset[] = [
 
 export const STRIP_PRESETS: { id: string; name: string; hex: string }[] = [
   { id: "gold", name: "Gold Metalik", hex: "#fbbf24" },
+  { id: "chrome", name: "Silver Chrome", hex: "#f1f5f9" },
   { id: "orange", name: "Oranye Sporty", hex: "#ea580c" },
   { id: "red", name: "Merah Kontras", hex: "#ef4444" },
-  { id: "chrome", name: "Silver Chrome", hex: "#f1f5f9" },
   { id: "cyan", name: "Biru Cyan", hex: "#06b6d4" },
   { id: "lime", name: "Hijau Neon", hex: "#84cc16" },
 ];
 
 interface HarmonikaVisualizerProps {
-  model: DoorModel;
-  onModelChange: (model: DoorModel) => void;
+  bukaanType: BukaanType;
+  onBukaanTypeChange: (type: BukaanType) => void;
+  hasPintuExtra: boolean;
+  onHasPintuExtraChange: (hasExtra: boolean) => void;
   colorMode: ColorMode;
   onColorModeChange: (mode: ColorMode) => void;
   primaryColorId: string;
@@ -121,13 +121,17 @@ interface HarmonikaVisualizerProps {
   onSecondaryColorChange: (colorId: string) => void;
   stripColorId: string;
   onStripColorChange: (stripId: string) => void;
+  stripStyle: StripStyle;
+  onStripStyleChange: (style: StripStyle) => void;
   widthMeters: number;
   heightMeters: number;
 }
 
 export default function HarmonikaVisualizer({
-  model,
-  onModelChange,
+  bukaanType,
+  onBukaanTypeChange,
+  hasPintuExtra,
+  onHasPintuExtraChange,
   colorMode,
   onColorModeChange,
   primaryColorId,
@@ -136,16 +140,18 @@ export default function HarmonikaVisualizer({
   onSecondaryColorChange,
   stripColorId,
   onStripColorChange,
+  stripStyle,
+  onStripStyleChange,
   widthMeters,
   heightMeters,
 }: HarmonikaVisualizerProps) {
   // Pintu Extra 2-step animation state:
-  // 0 = Full Closed (Tertutup Rapat)
-  // 1 = Pintu Extra Open (Pintu kecil di tengah terbuka ke samping untuk orang lewat)
-  // 2 = Full Harmonika Open (Seluruh pintu harmonika melipat ke tepi samping)
+  // 0 = Tertutup Rapat (Full Closed)
+  // 1 = Pintu Extra Terbuka (Akses Orang Lewat)
+  // 2 = Full Harmonika Terbuka (Bukaan 92% tumpukan daun tetap ada di samping)
   const [extraStage, setExtraStage] = useState<0 | 1 | 2>(0);
 
-  // Standard open ratio for Model 1 Pintu and 2 Pintu: 0 (closed) to 1 (full open)
+  // When hasPintuExtra is false: 0 = closed, 0.92 = open (tumpukan 92% tetap terlihat di samping)
   const [openRatio, setOpenRatio] = useState<number>(0);
   const [isNightMode, setIsNightMode] = useState<boolean>(true);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
@@ -153,154 +159,425 @@ export default function HarmonikaVisualizer({
   const primaryColor =
     COLOR_PRESETS.find((c) => c.id === primaryColorId) || COLOR_PRESETS[0];
   const secondaryColor =
-    COLOR_PRESETS.find((c) => c.id === secondaryColorId) || COLOR_PRESETS[1];
+    COLOR_PRESETS.find((c) => c.id === secondaryColorId) || COLOR_PRESETS[2];
   const stripColor =
     STRIP_PRESETS.find((s) => s.id === stripColorId) || STRIP_PRESETS[0];
 
-  // Auto reset when model changes
+  // Reset stages when mode or extra changes
   useEffect(() => {
     setExtraStage(0);
     setOpenRatio(0);
-  }, [model]);
+  }, [bukaanType, hasPintuExtra]);
 
-  // Main interactive click handler: cycles stages
-  const handleMainActionClick = () => {
+  // Max open ratio is 0.92 (92%) so the folded stack of slats remains visible on the side
+  const MAX_OPEN_RATIO = 0.92;
+
+  // Toggle animation
+  const handleToggleClick = () => {
     if (isAnimating) return;
     setIsAnimating(true);
 
-    if (model === "extra_swing") {
-      // 2-step sequential animation requested:
-      // 0 (closed) -> 1 (pintu extra terbuka) -> 2 (full harmonika terbuka) -> 0 (closed)
+    if (hasPintuExtra) {
+      // 2-step animation sequence for Pintu Extra:
+      // 0 (tertutup) -> 1 (pintu extra buka) -> 2 (full harmonika buka) -> 0 (tertutup rapat)
       setExtraStage((prev) => {
         if (prev === 0) return 1;
         if (prev === 1) return 2;
         return 0;
       });
-      setTimeout(() => setIsAnimating(false), 700);
+      setTimeout(() => setIsAnimating(false), 750);
     } else {
-      // Toggle 0 <-> 1 for 1_pintu and 2_pintu
-      setOpenRatio((prev) => (prev > 0.4 ? 0 : 0.95));
-      setTimeout(() => setIsAnimating(false), 700);
+      // Standard 1-step toggle: 0 <-> 0.92 (tidak hilang keseluruhan, tumpukan 8% tetap ada)
+      const target = openRatio > 0.4 ? 0 : MAX_OPEN_RATIO;
+      const startVal = openRatio;
+      const startTime = performance.now();
+      const duration = 750;
+
+      const step = (now: number) => {
+        const elapsed = now - startTime;
+        const progress = Math.min(1, elapsed / duration);
+        const ease =
+          progress < 0.5
+            ? 4 * progress * progress * progress
+            : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+        setOpenRatio(startVal + (target - startVal) * ease);
+
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          setOpenRatio(target);
+          setIsAnimating(false);
+        }
+      };
+
+      requestAnimationFrame(step);
     }
   };
 
-  // Specific stage selector for extra_swing
-  const setExtraStageDirect = (stage: 0 | 1 | 2) => {
+  // Direct stage trigger for extra door
+  const setStageDirect = (stage: 0 | 1 | 2) => {
     if (isAnimating) return;
     setIsAnimating(true);
     setExtraStage(stage);
     setTimeout(() => setIsAnimating(false), 600);
   };
 
-  // Calculate opening metrics
-  const isCurrentlyExtraOpen = model === "extra_swing" && extraStage === 1;
-  const isCurrentlyFullOpen =
-    model === "extra_swing" ? extraStage === 2 : openRatio > 0.4;
-  const isCurrentlyClosed =
-    model === "extra_swing" ? extraStage === 0 : openRatio <= 0.05;
+  // Dimensions of portal opening
+  const portalX = 140;
+  const portalY = 310;
+  const portalWidth = 720;
+  const portalHeight = 350;
 
-  // Slats count
-  const slatCount = 16;
-  const halfSlat = 8;
+  // Active opening ratio for the main gate
+  const currentGateOpenRatio = hasPintuExtra
+    ? extraStage === 2
+      ? MAX_OPEN_RATIO
+      : 0
+    : openRatio;
 
-  // Render authentic Scissor Lattice (Silangan Harmonika Besi Baja)
-  const renderScissorTrellis = (heightPercent = 100) => {
-    return (
-      <svg
-        className="w-full h-full pointer-events-none opacity-80"
-        preserveAspectRatio="none"
-        viewBox="0 0 100 100"
-      >
-        <path
-          d="M0 15 L25 35 L50 15 L75 35 L100 15 M0 35 L25 15 L50 35 L75 15 L100 35 M0 50 L25 70 L50 50 L75 70 L100 50 M0 70 L25 50 L50 70 L75 50 L100 70 M0 85 L25 100 L50 85 L75 100 L100 85 M0 100 L25 85 L50 100 L75 85 L100 100"
+  // Extra door swing angle (when stage === 1)
+  const isExtraDoorSwingOpen = hasPintuExtra && extraStage === 1;
+
+  // Slat geometry
+  const slatCount = bukaanType === "1_bukaan" ? 14 : 16;
+  const halfSlat = slatCount / 2;
+
+  // Helper to render Pantograph Scissor Lattice (Silangan Harmonika Baja)
+  const renderScissorLattice = (slatCenters: number[], keyPrefix: string) => {
+    const lines = [];
+    const pins = [];
+
+    const topY1 = portalY + 38;
+    const topY2 = portalY + 98;
+    const midY1 = portalY + portalHeight / 2 - 32;
+    const midY2 = portalY + portalHeight / 2 + 32;
+    const botY1 = portalY + portalHeight - 98;
+    const botY2 = portalY + portalHeight - 38;
+
+    for (let i = 0; i < slatCenters.length - 1; i++) {
+      const x1 = slatCenters[i];
+      const x2 = slatCenters[i + 1];
+      const midX = (x1 + x2) / 2;
+
+      // Top Cross
+      lines.push(
+        <line
+          key={`${keyPrefix}-top1-${i}`}
+          x1={x1}
+          y1={topY1}
+          x2={x2}
+          y2={topY2}
           stroke="#fcd34d"
-          strokeWidth="1.8"
+          strokeWidth="2.2"
           strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
+          opacity="0.85"
+        />,
+        <line
+          key={`${keyPrefix}-top2-${i}`}
+          x1={x1}
+          y1={topY2}
+          x2={x2}
+          y2={topY1}
+          stroke="#fcd34d"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          opacity="0.85"
         />
-        {/* Rivet pins */}
-        <circle cx="25" cy="25" r="1.5" fill="#f59e0b" stroke="#78350f" strokeWidth="0.5" />
-        <circle cx="50" cy="25" r="1.5" fill="#f59e0b" stroke="#78350f" strokeWidth="0.5" />
-        <circle cx="75" cy="25" r="1.5" fill="#f59e0b" stroke="#78350f" strokeWidth="0.5" />
-        <circle cx="25" cy="60" r="1.5" fill="#f59e0b" stroke="#78350f" strokeWidth="0.5" />
-        <circle cx="50" cy="60" r="1.5" fill="#f59e0b" stroke="#78350f" strokeWidth="0.5" />
-        <circle cx="75" cy="60" r="1.5" fill="#f59e0b" stroke="#78350f" strokeWidth="0.5" />
-        <circle cx="25" cy="92" r="1.5" fill="#f59e0b" stroke="#78350f" strokeWidth="0.5" />
-        <circle cx="50" cy="92" r="1.5" fill="#f59e0b" stroke="#78350f" strokeWidth="0.5" />
-        <circle cx="75" cy="92" r="1.5" fill="#f59e0b" stroke="#78350f" strokeWidth="0.5" />
-      </svg>
+      );
+      pins.push(
+        <circle
+          key={`${keyPrefix}-toppin-${i}`}
+          cx={midX}
+          cy={(topY1 + topY2) / 2}
+          r="2.2"
+          fill="#f59e0b"
+          stroke="#78350f"
+          strokeWidth="0.8"
+        />
+      );
+
+      // Mid Cross
+      lines.push(
+        <line
+          key={`${keyPrefix}-mid1-${i}`}
+          x1={x1}
+          y1={midY1}
+          x2={x2}
+          y2={midY2}
+          stroke="#fcd34d"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          opacity="0.85"
+        />,
+        <line
+          key={`${keyPrefix}-mid2-${i}`}
+          x1={x1}
+          y1={midY2}
+          x2={x2}
+          y2={midY1}
+          stroke="#fcd34d"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          opacity="0.85"
+        />
+      );
+      pins.push(
+        <circle
+          key={`${keyPrefix}-midpin-${i}`}
+          cx={midX}
+          cy={(midY1 + midY2) / 2}
+          r="2.2"
+          fill="#f59e0b"
+          stroke="#78350f"
+          strokeWidth="0.8"
+        />
+      );
+
+      // Bottom Cross
+      lines.push(
+        <line
+          key={`${keyPrefix}-bot1-${i}`}
+          x1={x1}
+          y1={botY1}
+          x2={x2}
+          y2={botY2}
+          stroke="#fcd34d"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          opacity="0.85"
+        />,
+        <line
+          key={`${keyPrefix}-bot2-${i}`}
+          x1={x1}
+          y1={botY2}
+          x2={x2}
+          y2={botY1}
+          stroke="#fcd34d"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          opacity="0.85"
+        />
+      );
+      pins.push(
+        <circle
+          key={`${keyPrefix}-botpin-${i}`}
+          cx={midX}
+          cy={(botY1 + botY2) / 2}
+          r="2.2"
+          fill="#f59e0b"
+          stroke="#78350f"
+          strokeWidth="0.8"
+        />
+      );
+    }
+
+    return (
+      <g>
+        {lines}
+        {pins}
+      </g>
+    );
+  };
+
+  // Helper to render an individual vertical slat with authentic paint scheme
+  const renderSingleSlat = (
+    x: number,
+    width: number,
+    key: string,
+    isPintuExtraLeaf = false
+  ) => {
+    const slatTop = portalY + 8;
+    const slatH = portalHeight - 16;
+    const midSplitY = slatTop + slatH * 0.52; // Atas-Bawah split line
+
+    return (
+      <g key={key}>
+        {colorMode === "2_warna" ? (
+          // AUTHENTIC 2-WARNA ATAS - BAWAH (BUKAN SELANG-SELING)
+          <g>
+            {/* Bagian Atas: Primary Color */}
+            <rect
+              x={x}
+              y={slatTop}
+              width={width}
+              height={slatH * 0.52}
+              fill="url(#slatGradPrimary)"
+              stroke={primaryColor.borderHex}
+              strokeWidth="0.8"
+              rx="1.5"
+            />
+            {/* Horizontal Divider Belt */}
+            <line
+              x1={x}
+              y1={midSplitY}
+              x2={x + width}
+              y2={midSplitY}
+              stroke="#fbbf24"
+              strokeWidth="2.5"
+            />
+            {/* Bagian Bawah: Secondary Color */}
+            <rect
+              x={x}
+              y={midSplitY}
+              width={width}
+              height={slatH * 0.48}
+              fill="url(#slatGradSecondary)"
+              stroke={secondaryColor.borderHex}
+              strokeWidth="0.8"
+              rx="1.5"
+            />
+          </g>
+        ) : (
+          // 1 WARNA SOLID
+          <rect
+            x={x}
+            y={slatTop}
+            width={width}
+            height={slatH}
+            fill="url(#slatGradPrimary)"
+            stroke={primaryColor.borderHex}
+            strokeWidth="0.8"
+            rx="2"
+          />
+        )}
+
+        {/* Vertical UNP Embossed Stiffener Rib (Center of Slat) */}
+        <rect
+          x={x + width * 0.42}
+          y={slatTop}
+          width={width * 0.16}
+          height={slatH}
+          fill="#000000"
+          opacity="0.28"
+        />
+
+        {/* HORIZONTAL ACCENT STRIP DI TENGAH: 1 GARIS ATAU 2 GARIS */}
+        {colorMode === "strip_warna" && (
+          <g>
+            {stripStyle === "1_garis" ? (
+              // 1 Garis Strip Horizontal Lebar di Tengah
+              <g>
+                <rect
+                  x={x}
+                  y={portalY + portalHeight / 2 - 8}
+                  width={width}
+                  height="16"
+                  fill={stripColor.hex}
+                  stroke="#fbbf24"
+                  strokeWidth="1"
+                />
+                <circle
+                  cx={x + width / 2}
+                  cy={portalY + portalHeight / 2}
+                  r="2"
+                  fill="#ffffff"
+                  stroke="#78350f"
+                  strokeWidth="0.5"
+                />
+              </g>
+            ) : (
+              // 2 Garis Strip Horizontal Sejajar di Tengah
+              <g>
+                <rect
+                  x={x}
+                  y={portalY + portalHeight / 2 - 14}
+                  width={width}
+                  height="8"
+                  fill={stripColor.hex}
+                  stroke="#fbbf24"
+                  strokeWidth="0.8"
+                />
+                <rect
+                  x={x}
+                  y={portalY + portalHeight / 2 + 6}
+                  width={width}
+                  height="8"
+                  fill={stripColor.hex}
+                  stroke="#fbbf24"
+                  strokeWidth="0.8"
+                />
+              </g>
+            )}
+          </g>
+        )}
+
+        {/* Rivets at top, mid, and bottom */}
+        <circle cx={x + width / 2} cy={slatTop + 38} r="2" fill="#fbbf24" stroke="#78350f" strokeWidth="0.6" />
+        <circle cx={x + width / 2} cy={slatTop + slatH / 2} r="2.2" fill="#fbbf24" stroke="#78350f" strokeWidth="0.6" />
+        <circle cx={x + width / 2} cy={slatTop + slatH - 38} r="2" fill="#fbbf24" stroke="#78350f" strokeWidth="0.6" />
+      </g>
     );
   };
 
   return (
-    <div className="bg-gradient-to-b from-[#1c0207] via-[#100104] to-black rounded-3xl border-2 border-maroon-700/70 shadow-2xl overflow-hidden flex flex-col">
-      {/* Studio Header Controls */}
-      <div className="p-4 sm:p-5 bg-black/70 border-b border-maroon-900/80 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center space-x-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center font-black shadow-lg shadow-amber-500/20 shrink-0">
-            <Sparkles className="w-5 h-5" />
+    <div className="bg-gradient-to-b from-slate-950 via-[#140206] to-black rounded-3xl border-2 border-maroon-700/70 shadow-2xl overflow-hidden flex flex-col">
+      {/* Visualizer Top Bar & Studio Controls */}
+      <div className="p-4 sm:p-5 bg-black/60 border-b border-maroon-900/80 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center space-x-2.5">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center font-black shadow-md shadow-amber-500/20">
+            <Sparkles className="w-4 h-4" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h4 className="text-sm sm:text-base font-black text-white">
-                Studio Render Ruko Asli & Pintu Harmonika
-              </h4>
-              <span className="text-[10px] bg-red-950 text-amber-300 px-2 py-0.5 rounded-full border border-amber-400/40 font-bold">
-                ★ FOTO RENDER NYATA
+            <h4 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
+              Studio Visualisasi Ruko Asli & Harmonika
+              <span className="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800/80 font-bold hidden sm:inline-block">
+                Interaktif 3D
               </span>
-            </div>
-            <p className="text-[11px] text-rose-200/80">
-              Simulasi interaktif pada fasad ruko 3D realistis lengkap dengan sistem Pintu Extra (Bukaan 2 Langkah).
+            </h4>
+            <p className="text-[11px] text-rose-300/80">
+              Pilih 1 atau 2 bukaan, opsi Pintu Extra (Bukaan 2x), skema warna atas-bawah, dan strip list aksen tengah.
             </p>
           </div>
         </div>
 
-        {/* Day / Night and Play Actions */}
+        {/* Day/Night and Play Animation Buttons */}
         <div className="flex items-center space-x-2">
-          {/* Day / Night Mode Button */}
+          {/* Day / Night lighting toggle */}
           <button
             type="button"
             onClick={() => setIsNightMode(!isNightMode)}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 border min-h-[40px] shadow-sm active:scale-95 ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 border min-h-[38px] ${
               isNightMode
-                ? "bg-slate-900 text-amber-300 border-amber-400/40 shadow-amber-400/10"
+                ? "bg-slate-900/90 text-amber-300 border-amber-400/40 shadow-sm"
                 : "bg-amber-100 text-slate-900 border-amber-300"
             }`}
-            title="Ubah Suasana Pencahayaan (Siang Alami / Malam dengan Spotlight Sorot)"
+            title="Ubah Suasana Pencahayaan (Siang Alami / Malam dengan Spotlight)"
           >
             {isNightMode ? (
               <>
-                <Moon className="w-4 h-4 text-amber-400" />
-                <span>Malam (Lampu Sorot)</span>
+                <Moon className="w-3.5 h-3.5 text-amber-400" />
+                <span className="hidden sm:inline">Malam (Spotlight)</span>
+                <span className="sm:hidden">Malam</span>
               </>
             ) : (
               <>
-                <Sun className="w-4 h-4 text-amber-600" />
-                <span>Siang Hari</span>
+                <Sun className="w-3.5 h-3.5 text-amber-600" />
+                <span className="hidden sm:inline">Siang Hari</span>
+                <span className="sm:hidden">Siang</span>
               </>
             )}
           </button>
 
-          {/* Master Action Button */}
+          {/* Trigger Door Button */}
           <button
             type="button"
-            onClick={handleMainActionClick}
+            onClick={handleToggleClick}
             disabled={isAnimating}
-            className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center space-x-2 shadow-xl min-h-[40px] active:scale-95 ${
-              isCurrentlyFullOpen
-                ? "bg-gradient-to-r from-red-600 to-maroon-700 hover:from-red-500 hover:to-maroon-600 text-white border border-rose-400"
-                : isCurrentlyExtraOpen
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all flex items-center space-x-1.5 shadow-lg min-h-[38px] active:scale-95 ${
+              (hasPintuExtra && extraStage === 2) || (!hasPintuExtra && openRatio > 0.4)
+                ? "bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white border border-rose-400"
+                : hasPintuExtra && extraStage === 1
                 ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white border border-emerald-300"
                 : "bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 text-slate-950 hover:brightness-105 border border-amber-200"
             }`}
           >
-            {isCurrentlyFullOpen ? (
+            {(hasPintuExtra && extraStage === 2) || (!hasPintuExtra && openRatio > 0.4) ? (
               <>
                 <DoorClosed className="w-4 h-4 shrink-0" />
                 <span>Tutup Pintu</span>
               </>
-            ) : isCurrentlyExtraOpen ? (
+            ) : hasPintuExtra && extraStage === 1 ? (
               <>
                 <Maximize2 className="w-4 h-4 shrink-0" />
                 <span>Buka Full Harmonika</span>
@@ -308,632 +585,675 @@ export default function HarmonikaVisualizer({
             ) : (
               <>
                 <DoorOpen className="w-4 h-4 shrink-0" />
-                <span>{model === "extra_swing" ? "Buka Pintu Extra" : "Buka Pintu"}</span>
+                <span>{hasPintuExtra ? "Buka Pintu Extra" : "Buka Pintu"}</span>
               </>
             )}
           </button>
         </div>
       </div>
 
-      {/* MODEL SELECTOR & STEP BAR */}
+      {/* BASE MODEL TABS (1 BUKAAN ATAU 2 BUKAAN) + CHECKBOX FITUR PINTU EXTRA */}
       <div className="px-4 py-3 bg-black/50 border-b border-maroon-900/60 flex flex-wrap items-center justify-between gap-3">
-        {/* Model Tabs */}
-        <div className="flex items-center space-x-1.5">
-          <button
-            type="button"
-            onClick={() => onModelChange("2_pintu")}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              model === "2_pintu"
-                ? "bg-maroon-800 text-white border border-amber-400/50 shadow-md"
-                : "bg-white/5 text-rose-200 hover:bg-white/10 border border-transparent"
-            }`}
-          >
-            Model 2 Pintu (Bukaan Tengah)
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onModelChange("1_pintu")}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              model === "1_pintu"
-                ? "bg-maroon-800 text-white border border-amber-400/50 shadow-md"
-                : "bg-white/5 text-rose-200 hover:bg-white/10 border border-transparent"
-            }`}
-          >
-            Model 1 Pintu (1 Arah)
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onModelChange("extra_swing")}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 ${
-              model === "extra_swing"
-                ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black border border-amber-200 shadow-lg shadow-amber-500/20"
-                : "bg-white/5 text-rose-200 hover:bg-white/10 border border-transparent"
-            }`}
-          >
-            <span>Model Pintu Extra (Bukaan 2x)</span>
-            <span className="text-[10px] bg-red-950 text-amber-300 px-1.5 py-0.2 rounded-md font-extrabold">
-              Foto 2
-            </span>
-          </button>
+        {/* Step 1: Base Bukaan */}
+        <div className="flex items-center space-x-2">
+          <span className="text-[11px] font-bold text-rose-200 uppercase tracking-wider">
+            Model Bukaan:
+          </span>
+          <div className="flex items-center space-x-1.5 bg-black/60 p-1 rounded-xl border border-maroon-800">
+            <button
+              type="button"
+              onClick={() => onBukaanTypeChange("2_bukaan")}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                bukaanType === "2_bukaan"
+                  ? "bg-maroon-800 text-white shadow-sm border border-amber-400/40"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              2 Bukaan (Tengah / Kupu-Tarung)
+            </button>
+            <button
+              type="button"
+              onClick={() => onBukaanTypeChange("1_bukaan")}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                bukaanType === "1_bukaan"
+                  ? "bg-maroon-800 text-white shadow-sm border border-amber-400/40"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              1 Bukaan (Geser 1 Arah)
+            </button>
+          </div>
         </div>
 
-        {/* Status Pills / Stage Navigator */}
-        {model === "extra_swing" ? (
-          <div className="flex items-center space-x-1 bg-black/60 p-1 rounded-xl border border-maroon-800 text-[11px] font-bold">
-            <button
-              type="button"
-              onClick={() => setExtraStageDirect(0)}
-              className={`px-2.5 py-1 rounded-lg transition-all ${
-                extraStage === 0
-                  ? "bg-maroon-800 text-white shadow-sm"
-                  : "text-slate-400 hover:text-white"
-              }`}
-            >
-              1. Tertutup Rapat
-            </button>
-            <ChevronRight className="w-3 h-3 text-slate-600" />
-            <button
-              type="button"
-              onClick={() => setExtraStageDirect(1)}
-              className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
-                extraStage === 1
-                  ? "bg-emerald-600 text-white font-extrabold shadow-sm"
-                  : "text-slate-400 hover:text-white"
-              }`}
-            >
-              <span>2. Pintu Extra Terbuka</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-ping" />
-            </button>
-            <ChevronRight className="w-3 h-3 text-slate-600" />
-            <button
-              type="button"
-              onClick={() => setExtraStageDirect(2)}
-              className={`px-2.5 py-1 rounded-lg transition-all ${
-                extraStage === 2
-                  ? "bg-amber-400 text-slate-950 font-black shadow-sm"
-                  : "text-slate-400 hover:text-white"
-              }`}
-            >
-              3. Full Harmonika Buka
-            </button>
-          </div>
-        ) : (
-          <div className="text-xs text-rose-200/90 font-medium">
-            Status:{" "}
-            <strong className={isCurrentlyFullOpen ? "text-amber-300" : "text-emerald-400"}>
-              {isCurrentlyFullOpen ? "Terbuka Penuh" : "Tertutup Rapat"}
-            </strong>
-          </div>
-        )}
+        {/* Step 2: Fitur Pintu Extra (Centang Ya / Tidak) */}
+        <div className="flex items-center space-x-3">
+          <label className="flex items-center space-x-2.5 bg-black/60 border border-maroon-800 hover:border-amber-400/60 px-3 py-1.5 rounded-xl cursor-pointer transition-colors active:scale-95">
+            <input
+              type="checkbox"
+              checked={hasPintuExtra}
+              onChange={(e) => onHasPintuExtraChange(e.target.checked)}
+              className="w-4 h-4 rounded text-red-600 focus:ring-amber-400 bg-maroon-950 border-maroon-700"
+            />
+            <div className="text-xs">
+              <span className="font-extrabold text-white flex items-center gap-1.5">
+                Pakai Pintu Extra (Swing Orang Lewat)
+                <span className="text-[9px] bg-amber-400/20 text-amber-300 px-1.5 py-0.2 rounded font-black border border-amber-400/30">
+                  +Rp 250rb
+                </span>
+              </span>
+            </div>
+          </label>
+
+          {/* If Pintu Extra is active, show the 3-step pills */}
+          {hasPintuExtra && (
+            <div className="flex items-center space-x-1 bg-black/60 p-1 rounded-xl border border-maroon-800 text-[10px] font-bold">
+              <button
+                type="button"
+                onClick={() => setStageDirect(0)}
+                className={`px-2 py-0.8 rounded-lg transition-all ${
+                  extraStage === 0
+                    ? "bg-maroon-800 text-white shadow-sm"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                1. Tertutup
+              </button>
+              <span className="text-slate-600">›</span>
+              <button
+                type="button"
+                onClick={() => setStageDirect(1)}
+                className={`px-2 py-0.8 rounded-lg transition-all ${
+                  extraStage === 1
+                    ? "bg-emerald-600 text-white font-black shadow-sm"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                2. Extra Buka
+              </button>
+              <span className="text-slate-600">›</span>
+              <button
+                type="button"
+                onClick={() => setStageDirect(2)}
+                className={`px-2 py-0.8 rounded-lg transition-all ${
+                  extraStage === 2
+                    ? "bg-amber-400 text-slate-950 font-black shadow-sm"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                3. Full Buka (92%)
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* ========================================================================= */}
-      {/* THE PHOTOREALISTIC RUKO STAGE: FULL-BLEED REAL ARCHITECTURAL RENDER STAGE */}
-      {/* ========================================================================= */}
+      {/* CRISP ARCHITECTURAL VECTOR SVG RUKO STAGE */}
       <div
-        className="relative w-full overflow-hidden select-none cursor-pointer group"
-        onClick={handleMainActionClick}
-        title="Klik pintu pada gambar untuk memutar animasi buka / tutup"
+        className="relative w-full overflow-hidden bg-slate-950 cursor-pointer select-none group"
+        onClick={handleToggleClick}
+        title="Klik pintu untuk memutar animasi buka / tutup"
       >
-        {/* Aspect Ratio Box: Exactly 836 x 860 Matching the Render Dimensions */}
-        <div className="relative w-full max-w-[850px] mx-auto" style={{ aspectRatio: "836 / 860" }}>
-          
-          {/* ======================================================== */}
-          {/* LAYER 0: FULL-BLEED DAY / NIGHT BACKGROUND (TIDAK TERPOTONG) */}
-          {/* ======================================================== */}
-          <div
-            className={`absolute inset-0 transition-all duration-700 ${
-              isNightMode
-                ? "bg-gradient-to-b from-[#020510] via-[#0b132a] to-[#120206]"
-                : "bg-gradient-to-b from-[#38bdf8] via-[#7dd3fc] to-[#e0f2fe]"
-            }`}
+        <svg
+          viewBox="0 0 1000 700"
+          className="w-full h-auto max-h-[580px] object-contain drop-shadow-2xl"
+          preserveAspectRatio="xMidYMid meet"
+        >
+          <defs>
+            {/* Sky gradients */}
+            <linearGradient id="skyDay" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#38bdf8" />
+              <stop offset="45%" stopColor="#7dd3fc" />
+              <stop offset="100%" stopColor="#bae6fd" />
+            </linearGradient>
+
+            <linearGradient id="skyNight" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#090d16" />
+              <stop offset="50%" stopColor="#0f172a" />
+              <stop offset="100%" stopColor="#1e1b4b" />
+            </linearGradient>
+
+            {/* Ruko Modern Concrete Facade Gradient */}
+            <linearGradient id="facadeWallDay" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#e2e8f0" />
+              <stop offset="30%" stopColor="#f1f5f9" />
+              <stop offset="70%" stopColor="#e2e8f0" />
+              <stop offset="100%" stopColor="#cbd5e1" />
+            </linearGradient>
+
+            <linearGradient id="facadeWallNight" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#1e293b" />
+              <stop offset="35%" stopColor="#334155" />
+              <stop offset="75%" stopColor="#1e293b" />
+              <stop offset="100%" stopColor="#0f172a" />
+            </linearGradient>
+
+            {/* Architectural Charcoal Cladding for upper storeys */}
+            <linearGradient id="charcoalCladding" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#0f172a" />
+              <stop offset="50%" stopColor="#1e293b" />
+              <stop offset="100%" stopColor="#0f172a" />
+            </linearGradient>
+
+            {/* Fascia / Canopy Gradient */}
+            <linearGradient id="canopyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#475569" />
+              <stop offset="25%" stopColor="#334155" />
+              <stop offset="100%" stopColor="#0f172a" />
+            </linearGradient>
+
+            {/* Warm LED Downlight Spotlights */}
+            <radialGradient id="spotlightL" cx="280" cy="285" r="320" fx="280" fy="285" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#fef08a" stopOpacity="0.45" />
+              <stop offset="40%" stopColor="#f59e0b" stopOpacity="0.18" />
+              <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
+            </radialGradient>
+
+            <radialGradient id="spotlightM" cx="500" cy="285" r="320" fx="500" fy="285" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#fef08a" stopOpacity="0.45" />
+              <stop offset="40%" stopColor="#f59e0b" stopOpacity="0.18" />
+              <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
+            </radialGradient>
+
+            <radialGradient id="spotlightR" cx="720" cy="285" r="320" fx="720" fy="285" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#fef08a" stopOpacity="0.45" />
+              <stop offset="40%" stopColor="#f59e0b" stopOpacity="0.18" />
+              <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
+            </radialGradient>
+
+            {/* Primary Slat Gradient */}
+            <linearGradient id="slatGradPrimary" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor={primaryColor.gradientStart} />
+              <stop offset="35%" stopColor={primaryColor.hex} />
+              <stop offset="70%" stopColor={primaryColor.gradientEnd} />
+              <stop offset="100%" stopColor={primaryColor.gradientStart} />
+            </linearGradient>
+
+            {/* Secondary Slat Gradient for 2-Warna Atas-Bawah */}
+            <linearGradient id="slatGradSecondary" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor={secondaryColor.gradientStart} />
+              <stop offset="35%" stopColor={secondaryColor.hex} />
+              <stop offset="70%" stopColor={secondaryColor.gradientEnd} />
+              <stop offset="100%" stopColor={secondaryColor.gradientStart} />
+            </linearGradient>
+
+            {/* Metallic Steel Guide Rails */}
+            <linearGradient id="steelRail" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#94a3b8" />
+              <stop offset="40%" stopColor="#cbd5e1" />
+              <stop offset="70%" stopColor="#64748b" />
+              <stop offset="100%" stopColor="#334155" />
+            </linearGradient>
+
+            {/* Master Lock Pillar Gradient */}
+            <linearGradient id="lockPillarGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#1e293b" />
+              <stop offset="40%" stopColor="#475569" />
+              <stop offset="80%" stopColor="#334155" />
+              <stop offset="100%" stopColor="#0f172a" />
+            </linearGradient>
+
+            {/* Glass Reflection */}
+            <linearGradient id="glassReflect" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.4" />
+              <stop offset="40%" stopColor="#ffffff" stopOpacity="0.25" />
+              <stop offset="60%" stopColor="#0284c7" stopOpacity="0.3" />
+              <stop offset="100%" stopColor="#0369a1" stopOpacity="0.5" />
+            </linearGradient>
+          </defs>
+
+          {/* 1. SKY BACKGROUND (FULL WIDTH & HEIGHT) */}
+          <rect
+            x="0"
+            y="0"
+            width="1000"
+            height="700"
+            fill={isNightMode ? "url(#skyNight)" : "url(#skyDay)"}
           />
 
-          {/* ======================================================== */}
-          {/* LAYER 1: INTERIOR RUANG RUKO (TERUNGKAP SAAT PINTU TERBUKA) */}
-          {/* Doorway Aperture: Left: 25.72%, Top: 48.37%, Width: 64.35%, Height: 41.28% */}
-          {/* ======================================================== */}
-          <div
-            className="absolute overflow-hidden"
-            style={{
-              left: "25.72%",
-              top: "48.37%",
-              width: "64.35%",
-              height: "41.28%",
-            }}
-          >
-            {/* Realistic Store Interior Perspective */}
-            <div className="relative w-full h-full bg-gradient-to-b from-[#111827] via-[#1f2937] to-[#0f172a] flex flex-col justify-between p-4 shadow-inner">
-              {/* Back Wall with Store Logo & Warm Showroom Lighting */}
-              <div className="w-full flex flex-col items-center justify-center pt-6 space-y-2">
-                <div className="w-10 h-10 rounded-full bg-white/10 border border-amber-400/60 flex items-center justify-center shadow-lg">
-                  <ShieldCheck className="w-6 h-6 text-amber-400" />
-                </div>
-                <div className="text-center">
-                  <div className="text-xs sm:text-sm font-black text-white tracking-widest uppercase">
-                    UD. FARIADJI SHOWROOM
-                  </div>
-                  <div className="text-[10px] text-amber-300 font-bold">
-                    PABRIK RESMI PINTU HARMONIKA SNI
-                  </div>
-                </div>
-                <div className="flex items-center space-x-6 pt-2">
-                  <div className="w-16 h-28 bg-white/5 border border-white/10 rounded-lg shadow-md flex items-end p-2">
-                    <div className="w-full h-8 bg-amber-400/20 rounded" />
-                  </div>
-                  <div className="w-20 h-28 bg-white/5 border border-white/10 rounded-lg shadow-md flex items-end p-2">
-                    <div className="w-full h-12 bg-rose-400/20 rounded" />
-                  </div>
-                  <div className="w-16 h-28 bg-white/5 border border-white/10 rounded-lg shadow-md flex items-end p-2">
-                    <div className="w-full h-8 bg-emerald-400/20 rounded" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Tiled Luxury Floor with Perspective Reflection */}
-              <div
-                className="h-28 w-full bg-gradient-to-t from-slate-900 via-slate-800 to-transparent border-t border-slate-700/60"
-                style={{
-                  backgroundImage:
-                    "repeating-linear-gradient(90deg, transparent, transparent 38px, rgba(255,255,255,0.06) 38px, rgba(255,255,255,0.06) 40px)",
-                }}
-              />
-
-              {/* Warm Ceiling Recessed Spotlights */}
-              <div className="absolute top-0 left-0 right-0 h-14 bg-gradient-to-b from-amber-300/20 via-amber-400/10 to-transparent pointer-events-none" />
-            </div>
-          </div>
-
-          {/* ======================================================== */}
-          {/* LAYER 2: THE INTERACTIVE PINTU HARMONIKA & PINTU EXTRA   */}
-          {/* ======================================================== */}
-          <div
-            className="absolute z-10 overflow-hidden"
-            style={{
-              left: "25.72%",
-              top: "48.37%",
-              width: "64.35%",
-              height: "41.28%",
-            }}
-          >
-            {/* Top Guide Rail (Rel Atas) */}
-            <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-slate-800 via-slate-700 to-slate-900 border-b border-amber-400/40 z-30 shadow-md flex items-center justify-between px-2">
-              <div className="w-2 h-2 rounded-full bg-slate-950" />
-              <div className="h-1 w-full mx-2 bg-slate-950 rounded-full" />
-              <div className="w-2 h-2 rounded-full bg-slate-950" />
-            </div>
-
-            {/* Bottom Track (Rel Bawah Tanam) */}
-            <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-slate-950 via-slate-800 to-slate-700 border-t border-amber-400/40 z-30 shadow-inner flex items-center justify-between px-2">
-              <div className="w-2 h-2 rounded-full bg-slate-950" />
-              <div className="h-1 w-full mx-2 bg-slate-950 rounded-full" />
-              <div className="w-2 h-2 rounded-full bg-slate-950" />
-            </div>
-
-            {/* ---------------------------------------------------- */}
-            {/* CASE A: MODEL EXTRA SWING (PINTU EXTRA SESUAI FOTO 2) */}
-            {/* ---------------------------------------------------- */}
-            {model === "extra_swing" && (
-              <div className="relative w-full h-full pt-4 pb-4">
-                {/* 1. LEFT HARMONIKA WING (Daun Harmonika Sayap Kiri) */}
-                <div
-                  className={`absolute top-4 bottom-4 left-0 w-[38%] transition-all duration-[800ms] cubic-bezier(0.25, 1, 0.5, 1) origin-left flex z-20 ${
-                    extraStage === 2
-                      ? "-translate-x-[85%] scale-x-[0.16] opacity-90 shadow-2xl"
-                      : "translate-x-0 scale-x-100 opacity-100"
-                  }`}
-                >
-                  <div
-                    className="relative w-full h-full flex border-r-2 border-slate-900 shadow-md"
-                    style={{
-                      background: `linear-gradient(90deg, ${primaryColor.gradientStart}, ${primaryColor.hex} 40%, ${primaryColor.gradientEnd})`,
-                    }}
-                  >
-                    {[...Array(6)].map((_, i) => (
-                      <div
-                        key={`left-slat-${i}`}
-                        className="flex-1 h-full border-r border-black/30 relative flex items-center justify-center"
-                        style={{
-                          background:
-                            colorMode === "2_warna" && i % 2 === 1
-                              ? `linear-gradient(90deg, ${secondaryColor.gradientStart}, ${secondaryColor.hex}, ${secondaryColor.gradientEnd})`
-                              : undefined,
-                        }}
-                      >
-                        {/* UNP Profile Rib */}
-                        <div className="w-1.5 h-full bg-black/25 shadow-sm" />
-                        {colorMode === "strip_warna" && (
-                          <div
-                            className="absolute top-0 bottom-0 w-1"
-                            style={{ backgroundColor: stripColor.hex }}
-                          />
-                        )}
-                        {/* Rivets */}
-                        <div className="absolute top-6 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-xs" />
-                        <div className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-xs" />
-                        <div className="absolute bottom-6 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-xs" />
-                      </div>
-                    ))}
-                    {/* Pantograph Trellis */}
-                    <div className="absolute inset-0">{renderScissorTrellis()}</div>
-                  </div>
-                </div>
-
-                {/* 2. CENTER SECTION: PINTU EXTRA (PASS DOOR SESUAI FOTO 2) */}
-                <div
-                  className={`absolute top-4 bottom-4 left-[38%] w-[24%] transition-all duration-[800ms] cubic-bezier(0.25, 1, 0.5, 1) origin-left z-25 flex ${
-                    extraStage === 2
-                      ? "-translate-x-[75%] scale-x-[0.15] opacity-80"
-                      : "translate-x-0 scale-x-100 opacity-100"
-                  }`}
-                >
-                  {/* Pintu Extra Outer Frame (Kusen Pintu Extra Baja) */}
-                  <div className="relative w-full h-full border-2 border-amber-400/80 bg-black/40 shadow-2xl flex overflow-hidden">
-                    
-                    {/* Scissor Lattice Background inside the pass door */}
-                    <div className="absolute inset-0 bg-black/60 z-0">
-                      {renderScissorTrellis()}
-                    </div>
-
-                    {/* LEFT EXTRA DOOR LEAF (Daun Pintu Extra Kiri - Swing Open) */}
-                    <div
-                      className={`relative z-10 w-1/2 h-full border-r border-amber-300 transition-all duration-700 origin-left flex flex-col justify-between shadow-2xl ${
-                        extraStage === 1
-                          ? "-rotate-y-[82%] translate-x-[-15%] scale-x-[0.35] opacity-90 shadow-2xl"
-                          : "rotate-y-0 translate-x-0 scale-x-100 opacity-100"
-                      }`}
-                      style={{
-                        background: `linear-gradient(90deg, ${primaryColor.gradientStart}, ${primaryColor.hex})`,
-                        perspective: "600px",
-                      }}
-                    >
-                      <div className="w-full h-4 bg-black/40 border-b border-amber-400/40" />
-                      {/* Chrome Handle & Master Lock Leaf */}
-                      <div className="w-full flex items-center justify-end pr-1.5">
-                        <div className="w-2.5 h-10 rounded-sm bg-gradient-to-r from-slate-200 to-slate-400 shadow-md border border-slate-500 flex items-center justify-center">
-                          <div className="w-1 h-3 bg-slate-700 rounded-full" />
-                        </div>
-                      </div>
-                      <div className="w-full h-4 bg-black/40 border-t border-amber-400/40" />
-                    </div>
-
-                    {/* RIGHT EXTRA DOOR LEAF (Daun Pintu Extra Kanan - Swing Open) */}
-                    <div
-                      className={`relative z-10 w-1/2 h-full border-l border-amber-300 transition-all duration-700 origin-right flex flex-col justify-between shadow-2xl ${
-                        extraStage === 1
-                          ? "rotate-y-[82%] translate-x-[15%] scale-x-[0.35] opacity-90 shadow-2xl"
-                          : "rotate-y-0 translate-x-0 scale-x-100 opacity-100"
-                      }`}
-                      style={{
-                        background: `linear-gradient(90deg, ${primaryColor.hex}, ${primaryColor.gradientEnd})`,
-                        perspective: "600px",
-                      }}
-                    >
-                      <div className="w-full h-4 bg-black/40 border-b border-amber-400/40" />
-                      {/* Chrome Handle & Keyhole */}
-                      <div className="w-full flex items-center justify-start pl-1.5">
-                        <div className="w-2.5 h-10 rounded-sm bg-gradient-to-r from-slate-200 to-slate-400 shadow-md border border-slate-500 flex flex-col items-center justify-center space-y-1">
-                          <div className="w-1 h-3 bg-slate-700 rounded-full" />
-                          <div className="w-1 h-1 rounded-full bg-slate-900" />
-                        </div>
-                      </div>
-                      <div className="w-full h-4 bg-black/40 border-t border-amber-400/40" />
-                    </div>
-
-                    {/* Status Badge on Pintu Extra */}
-                    {extraStage === 1 && (
-                      <div className="absolute inset-x-2 top-2 z-20 bg-emerald-500/90 text-white text-[9px] font-black text-center py-0.5 rounded shadow-lg animate-pulse">
-                        Akses Orang Lewat Terbuka
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* 3. RIGHT HARMONIKA WING (Daun Harmonika Sayap Kanan) */}
-                <div
-                  className={`absolute top-4 bottom-4 right-0 w-[38%] transition-all duration-[800ms] cubic-bezier(0.25, 1, 0.5, 1) origin-right flex z-20 ${
-                    extraStage === 2
-                      ? "translate-x-[85%] scale-x-[0.16] opacity-90 shadow-2xl"
-                      : "translate-x-0 scale-x-100 opacity-100"
-                  }`}
-                >
-                  <div
-                    className="relative w-full h-full flex border-l-2 border-slate-900 shadow-md"
-                    style={{
-                      background: `linear-gradient(90deg, ${primaryColor.gradientEnd}, ${primaryColor.hex} 60%, ${primaryColor.gradientStart})`,
-                    }}
-                  >
-                    {[...Array(6)].map((_, i) => (
-                      <div
-                        key={`right-slat-${i}`}
-                        className="flex-1 h-full border-r border-black/30 relative flex items-center justify-center"
-                        style={{
-                          background:
-                            colorMode === "2_warna" && i % 2 === 0
-                              ? `linear-gradient(90deg, ${secondaryColor.gradientStart}, ${secondaryColor.hex}, ${secondaryColor.gradientEnd})`
-                              : undefined,
-                        }}
-                      >
-                        {/* UNP Profile Rib */}
-                        <div className="w-1.5 h-full bg-black/25 shadow-sm" />
-                        {colorMode === "strip_warna" && (
-                          <div
-                            className="absolute top-0 bottom-0 w-1"
-                            style={{ backgroundColor: stripColor.hex }}
-                          />
-                        )}
-                        {/* Rivets */}
-                        <div className="absolute top-6 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-xs" />
-                        <div className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-xs" />
-                        <div className="absolute bottom-6 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-xs" />
-                      </div>
-                    ))}
-                    {/* Pantograph Trellis */}
-                    <div className="absolute inset-0">{renderScissorTrellis()}</div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ---------------------------------------------------- */}
-            {/* CASE B: MODEL 2 PINTU (BUKAAN TENGAH STANDAR RUKO)   */}
-            {/* ---------------------------------------------------- */}
-            {model === "2_pintu" && (
-              <div className="relative w-full h-full pt-4 pb-4 flex">
-                {/* Sayap Kiri */}
-                <div
-                  className={`w-1/2 h-full transition-all duration-[800ms] cubic-bezier(0.25, 1, 0.5, 1) origin-left flex border-r border-amber-400/80 ${
-                    openRatio > 0.4
-                      ? "-translate-x-[85%] scale-x-[0.16] opacity-90 shadow-2xl"
-                      : "translate-x-0 scale-x-100 opacity-100"
-                  }`}
-                >
-                  <div
-                    className="relative w-full h-full flex shadow-md"
-                    style={{
-                      background: `linear-gradient(90deg, ${primaryColor.gradientStart}, ${primaryColor.hex} 40%, ${primaryColor.gradientEnd})`,
-                    }}
-                  >
-                    {[...Array(halfSlat)].map((_, i) => (
-                      <div
-                        key={`2p-left-${i}`}
-                        className="flex-1 h-full border-r border-black/30 relative flex items-center justify-center"
-                        style={{
-                          background:
-                            colorMode === "2_warna" && i % 2 === 1
-                              ? `linear-gradient(90deg, ${secondaryColor.gradientStart}, ${secondaryColor.hex}, ${secondaryColor.gradientEnd})`
-                              : undefined,
-                        }}
-                      >
-                        <div className="w-1.5 h-full bg-black/25 shadow-sm" />
-                        {colorMode === "strip_warna" && (
-                          <div
-                            className="absolute top-0 bottom-0 w-1"
-                            style={{ backgroundColor: stripColor.hex }}
-                          />
-                        )}
-                        <div className="absolute top-6 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-xs" />
-                        <div className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-xs" />
-                        <div className="absolute bottom-6 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-xs" />
-                      </div>
-                    ))}
-                    {/* Chrome Handle on Center Jamb */}
-                    <div className="w-4 h-full bg-slate-900 border-l border-amber-400 flex items-center justify-center shrink-0">
-                      <div className="w-1.5 h-10 bg-slate-200 rounded shadow-sm" />
-                    </div>
-                    <div className="absolute inset-0">{renderScissorTrellis()}</div>
-                  </div>
-                </div>
-
-                {/* Sayap Kanan */}
-                <div
-                  className={`w-1/2 h-full transition-all duration-[800ms] cubic-bezier(0.25, 1, 0.5, 1) origin-right flex border-l border-amber-400/80 ${
-                    openRatio > 0.4
-                      ? "translate-x-[85%] scale-x-[0.16] opacity-90 shadow-2xl"
-                      : "translate-x-0 scale-x-100 opacity-100"
-                  }`}
-                >
-                  <div
-                    className="relative w-full h-full flex shadow-md"
-                    style={{
-                      background: `linear-gradient(90deg, ${primaryColor.gradientEnd}, ${primaryColor.hex} 60%, ${primaryColor.gradientStart})`,
-                    }}
-                  >
-                    {/* Chrome Handle on Center Jamb */}
-                    <div className="w-4 h-full bg-slate-900 border-r border-amber-400 flex items-center justify-center shrink-0">
-                      <div className="w-1.5 h-10 bg-slate-200 rounded shadow-sm" />
-                    </div>
-                    {[...Array(halfSlat)].map((_, i) => (
-                      <div
-                        key={`2p-right-${i}`}
-                        className="flex-1 h-full border-r border-black/30 relative flex items-center justify-center"
-                        style={{
-                          background:
-                            colorMode === "2_warna" && i % 2 === 0
-                              ? `linear-gradient(90deg, ${secondaryColor.gradientStart}, ${secondaryColor.hex}, ${secondaryColor.gradientEnd})`
-                              : undefined,
-                        }}
-                      >
-                        <div className="w-1.5 h-full bg-black/25 shadow-sm" />
-                        {colorMode === "strip_warna" && (
-                          <div
-                            className="absolute top-0 bottom-0 w-1"
-                            style={{ backgroundColor: stripColor.hex }}
-                          />
-                        )}
-                        <div className="absolute top-6 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-xs" />
-                        <div className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-xs" />
-                        <div className="absolute bottom-6 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-xs" />
-                      </div>
-                    ))}
-                    <div className="absolute inset-0">{renderScissorTrellis()}</div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ---------------------------------------------------- */}
-            {/* CASE C: MODEL 1 PINTU (BUKAAN 1 ARAH DORONG)        */}
-            {/* ---------------------------------------------------- */}
-            {model === "1_pintu" && (
-              <div className="relative w-full h-full pt-4 pb-4">
-                <div
-                  className={`w-full h-full transition-all duration-[850ms] cubic-bezier(0.25, 1, 0.5, 1) origin-left flex ${
-                    openRatio > 0.4
-                      ? "-translate-x-[88%] scale-x-[0.14] opacity-90 shadow-2xl"
-                      : "translate-x-0 scale-x-100 opacity-100"
-                  }`}
-                >
-                  <div
-                    className="relative w-full h-full flex shadow-md"
-                    style={{
-                      background: `linear-gradient(90deg, ${primaryColor.gradientStart}, ${primaryColor.hex} 40%, ${primaryColor.gradientEnd})`,
-                    }}
-                  >
-                    {[...Array(14)].map((_, i) => (
-                      <div
-                        key={`1p-slat-${i}`}
-                        className="flex-1 h-full border-r border-black/30 relative flex items-center justify-center"
-                        style={{
-                          background:
-                            colorMode === "2_warna" && i % 2 === 1
-                              ? `linear-gradient(90deg, ${secondaryColor.gradientStart}, ${secondaryColor.hex}, ${secondaryColor.gradientEnd})`
-                              : undefined,
-                        }}
-                      >
-                        <div className="w-1.5 h-full bg-black/25 shadow-sm" />
-                        {colorMode === "strip_warna" && (
-                          <div
-                            className="absolute top-0 bottom-0 w-1"
-                            style={{ backgroundColor: stripColor.hex }}
-                          />
-                        )}
-                        <div className="absolute top-6 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-xs" />
-                        <div className="absolute top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-xs" />
-                        <div className="absolute bottom-6 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-xs" />
-                      </div>
-                    ))}
-                    {/* Master Lock Jamb */}
-                    <div className="w-5 h-full bg-slate-900 border-l border-amber-400 flex items-center justify-center shrink-0">
-                      <div className="w-2 h-12 bg-slate-200 rounded shadow-md flex items-center justify-center">
-                        <div className="w-1 h-4 bg-slate-800 rounded-full" />
-                      </div>
-                    </div>
-                    <div className="absolute inset-0">{renderScissorTrellis()}</div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* ======================================================== */}
-          {/* LAYER 3: PHOTOREALISTIC RUKO BUILDING FACADE (CUTOUT)    */}
-          {/* ======================================================== */}
-          <img
-            src="/images/ruko-facade-cutout.png"
-            alt="Fasad Ruko Modern UD. Fariadji"
-            className="absolute inset-0 w-full h-full object-cover pointer-events-none z-30 drop-shadow-xl"
-          />
-
-          {/* ======================================================== */}
-          {/* LAYER 4: FULL-BLEED REALISTIC LIGHTING & SPOTLIGHTS     */}
-          {/* ======================================================== */}
-          {isNightMode ? (
-            <div className="absolute inset-0 pointer-events-none z-40 transition-opacity duration-700 opacity-100">
-              {/* Deep Night Mood Vignette */}
-              <div className="absolute inset-0 bg-black/40" />
-
-              {/* Realistic Spotlight Beams from Canopy Downlights onto Doorway */}
-              {/* Left Spotlight */}
-              <div
-                className="absolute w-56 h-80 pointer-events-none opacity-80"
-                style={{
-                  left: "26%",
-                  top: "43%",
-                  background:
-                    "radial-gradient(ellipse at 50% 0%, rgba(254, 240, 138, 0.55) 0%, rgba(245, 158, 11, 0.22) 40%, transparent 75%)",
-                }}
-              />
-
-              {/* Center Spotlight */}
-              <div
-                className="absolute w-64 h-84 pointer-events-none opacity-85"
-                style={{
-                  left: "48%",
-                  top: "43%",
-                  background:
-                    "radial-gradient(ellipse at 50% 0%, rgba(254, 240, 138, 0.6) 0%, rgba(245, 158, 11, 0.25) 40%, transparent 75%)",
-                }}
-              />
-
-              {/* Right Spotlight */}
-              <div
-                className="absolute w-56 h-80 pointer-events-none opacity-80"
-                style={{
-                  left: "70%",
-                  top: "43%",
-                  background:
-                    "radial-gradient(ellipse at 50% 0%, rgba(254, 240, 138, 0.55) 0%, rgba(245, 158, 11, 0.22) 40%, transparent 75%)",
-                }}
-              />
-
-              {/* Pillar Sconce Lamp Glows */}
-              <div
-                className="absolute w-24 h-24 rounded-full pointer-events-none"
-                style={{
-                  left: "17%",
-                  top: "49%",
-                  background:
-                    "radial-gradient(circle, rgba(254, 240, 138, 0.7) 0%, rgba(245, 158, 11, 0.3) 50%, transparent 75%)",
-                }}
-              />
-              <div
-                className="absolute w-24 h-24 rounded-full pointer-events-none"
-                style={{
-                  left: "89%",
-                  top: "54%",
-                  background:
-                    "radial-gradient(circle, rgba(254, 240, 138, 0.7) 0%, rgba(245, 158, 11, 0.3) 50%, transparent 75%)",
-                }}
-              />
-            </div>
-          ) : (
-            /* Day Mode: Subtle Sunlight Glint across Facade */
-            <div className="absolute inset-0 pointer-events-none z-40 transition-opacity duration-700 opacity-100 bg-gradient-to-tr from-transparent via-amber-100/10 to-amber-200/20" />
+          {/* Stars in Night Mode */}
+          {isNightMode && (
+            <g opacity="0.6">
+              <circle cx="80" cy="40" r="1.2" fill="#ffffff" />
+              <circle cx="160" cy="25" r="1.5" fill="#fef08a" />
+              <circle cx="280" cy="50" r="1" fill="#ffffff" />
+              <circle cx="450" cy="30" r="1.3" fill="#ffffff" />
+              <circle cx="620" cy="20" r="1.5" fill="#ffffff" />
+              <circle cx="780" cy="45" r="1.2" fill="#fef08a" />
+              <circle cx="910" cy="35" r="1.4" fill="#ffffff" />
+            </g>
           )}
 
-          {/* Click to open badge indicator */}
-          <div className="absolute bottom-4 left-4 z-45 bg-black/80 backdrop-blur-sm border border-amber-400/50 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-2xl flex items-center space-x-2 pointer-events-none">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-            <span>
-              {model === "extra_swing"
-                ? extraStage === 0
-                  ? "Klik untuk Buka Pintu Extra (Kecil)"
-                  : extraStage === 1
-                  ? "Klik lagi untuk Buka Full Harmonika"
-                  : "Klik untuk Tutup Pintu Rapat"
-                : openRatio > 0.4
-                ? "Klik untuk Tutup Pintu"
-                : "Klik untuk Buka Pintu"}
-            </span>
-          </div>
+          {/* 2. RUKO MAIN STRUCTURE (2-STOREY MODERN SHOPHOUSE) */}
+          <rect
+            x="60"
+            y="50"
+            width="880"
+            height="620"
+            fill={isNightMode ? "url(#facadeWallNight)" : "url(#facadeWallDay)"}
+            rx="8"
+          />
+
+          {/* Left & Right Pillar Shadows for 3D Depth */}
+          <rect x="60" y="50" width="35" height="620" fill="#000000" opacity={isNightMode ? 0.45 : 0.2} />
+          <rect x="905" y="50" width="35" height="620" fill="#000000" opacity={isNightMode ? 0.45 : 0.25} />
+
+          {/* Upper Floor Modern Cladding & Windows */}
+          <rect x="95" y="65" width="810" height="180" fill="url(#charcoalCladding)" rx="6" />
+
+          {/* Window 1 */}
+          <g transform="translate(130, 85)">
+            <rect width="210" height="140" fill="#090d16" stroke="#475569" strokeWidth="4" rx="4" />
+            <rect width="210" height="140" fill="url(#glassReflect)" />
+            <line x1="105" y1="0" x2="105" y2="140" stroke="#334155" strokeWidth="3" />
+            <line x1="0" y1="70" x2="210" y2="70" stroke="#334155" strokeWidth="2" />
+            <rect x="10" y="10" width="190" height="120" fill="#fbbf24" opacity={isNightMode ? 0.2 : 0.05} />
+          </g>
+
+          {/* Window 2 */}
+          <g transform="translate(395, 85)">
+            <rect width="210" height="140" fill="#090d16" stroke="#475569" strokeWidth="4" rx="4" />
+            <rect width="210" height="140" fill="url(#glassReflect)" />
+            <line x1="105" y1="0" x2="105" y2="140" stroke="#334155" strokeWidth="3" />
+            <line x1="0" y1="70" x2="210" y2="70" stroke="#334155" strokeWidth="2" />
+            <rect x="10" y="10" width="190" height="120" fill="#fbbf24" opacity={isNightMode ? 0.22 : 0.05} />
+          </g>
+
+          {/* Window 3 */}
+          <g transform="translate(660, 85)">
+            <rect width="210" height="140" fill="#090d16" stroke="#475569" strokeWidth="4" rx="4" />
+            <rect width="210" height="140" fill="url(#glassReflect)" />
+            <line x1="105" y1="0" x2="105" y2="140" stroke="#334155" strokeWidth="3" />
+            <line x1="0" y1="70" x2="210" y2="70" stroke="#334155" strokeWidth="2" />
+            <rect x="10" y="10" width="190" height="120" fill="#fbbf24" opacity={isNightMode ? 0.2 : 0.05} />
+          </g>
+
+          {/* 3. STOREFRONT CANOPY & SIGNAGE FASCIA */}
+          <g transform="translate(80, 248)">
+            <rect width="840" height="42" fill="url(#canopyGrad)" stroke="#1e293b" strokeWidth="3" rx="4" />
+            <line x1="0" y1="2" x2="840" y2="2" stroke="#94a3b8" strokeWidth="1.5" />
+            <rect x="260" y="6" width="320" height="30" fill="#18181b" stroke="#f59e0b" strokeWidth="1.5" rx="3" />
+            <text
+              x="420"
+              y="26"
+              textAnchor="middle"
+              fill="#fbbf24"
+              fontSize="13"
+              fontWeight="900"
+              fontFamily="sans-serif"
+              letterSpacing="3.5"
+            >
+              UD. FARIADJI PINTU HARMONIKA
+            </text>
+            {/* Recessed Warm LED Fixtures */}
+            <circle cx="200" cy="39" r="4.5" fill="#fef08a" stroke="#475569" strokeWidth="1" />
+            <circle cx="420" cy="39" r="4.5" fill="#fef08a" stroke="#475569" strokeWidth="1" />
+            <circle cx="640" cy="39" r="4.5" fill="#fef08a" stroke="#475569" strokeWidth="1" />
+          </g>
+
+          {/* Canopy Drop Shadow */}
+          <rect x="80" y="290" width="840" height="18" fill="#000000" opacity={isNightMode ? 0.6 : 0.35} />
+
+          {/* 4. GROUND FLOOR PORTAL OPENING */}
+          <rect
+            x={portalX - 22}
+            y={portalY - 14}
+            width={portalWidth + 44}
+            height={portalHeight + 28}
+            fill={isNightMode ? "#1e293b" : "#475569"}
+            stroke="#0f172a"
+            strokeWidth="3"
+            rx="4"
+          />
+
+          {/* Interior Opening Cavity */}
+          <rect x={portalX} y={portalY} width={portalWidth} height={portalHeight} fill="#090d16" />
+
+          {/* ========================================================= */}
+          {/* INTERIOR SHOWROOM (Terlihat saat Harmonika / Extra Terbuka) */}
+          {/* ========================================================= */}
+          <g opacity={Math.min(1, Math.max(currentGateOpenRatio * 1.5, isExtraDoorSwingOpen ? 0.9 : 0))}>
+            <rect x={portalX} y={portalY} width={portalWidth} height={portalHeight} fill="#18181b" />
+            <ellipse
+              cx={portalX + portalWidth / 2}
+              cy={portalY + 50}
+              rx={portalWidth * 0.45}
+              ry="45"
+              fill="#fef08a"
+              opacity="0.25"
+            />
+
+            {/* Left Showroom Shelf */}
+            <g transform={`translate(${portalX + 40}, ${portalY + 80})`}>
+              <rect width="180" height="230" fill="#27272a" stroke="#3f3f46" strokeWidth="2" rx="4" />
+              <line x1="10" y1="70" x2="170" y2="70" stroke="#52525b" strokeWidth="2" />
+              <line x1="10" y1="140" x2="170" y2="140" stroke="#52525b" strokeWidth="2" />
+              <rect x="25" y="30" width="35" height="38" fill="#f59e0b" rx="2" />
+              <rect x="75" y="25" width="40" height="43" fill="#0284c7" rx="2" />
+              <rect x="125" y="35" width="30" height="33" fill="#10b981" rx="2" />
+              <rect x="30" y="95" width="45" height="42" fill="#be123c" rx="2" />
+              <rect x="95" y="100" width="55" height="37" fill="#6366f1" rx="2" />
+            </g>
+
+            {/* Center Reception Desk with Sign */}
+            <g transform={`translate(${portalX + 260}, ${portalY + 160})`}>
+              <rect width="200" height="150" fill="#27272a" stroke="#3f3f46" strokeWidth="2" rx="6" />
+              <rect x="10" y="10" width="180" height="25" fill="#3f3f46" rx="3" />
+              <text
+                x="100"
+                y="27"
+                textAnchor="middle"
+                fill="#fde047"
+                fontSize="11"
+                fontWeight="bold"
+                letterSpacing="1"
+              >
+                UD. FARIADJI SHOWROOM
+              </text>
+              <rect x="75" y="60" width="50" height="35" fill="#090d16" stroke="#94a3b8" strokeWidth="2" rx="2" />
+              <line x1="100" y1="95" x2="100" y2="115" stroke="#94a3b8" strokeWidth="4" />
+              <line x1="85" y1="115" x2="115" y2="115" stroke="#94a3b8" strokeWidth="3" />
+            </g>
+
+            {/* Right Shelf */}
+            <g transform={`translate(${portalX + 500}, ${portalY + 80})`}>
+              <rect width="180" height="230" fill="#27272a" stroke="#3f3f46" strokeWidth="2" rx="4" />
+              <line x1="10" y1="70" x2="170" y2="70" stroke="#52525b" strokeWidth="2" />
+              <line x1="10" y1="140" x2="170" y2="140" stroke="#52525b" strokeWidth="2" />
+              <rect x="25" y="30" width="40" height="38" fill="#e11d48" rx="2" />
+              <rect x="80" y="25" width="45" height="43" fill="#d97706" rx="2" />
+              <rect x="135" y="32" width="30" height="36" fill="#0d9488" rx="2" />
+              <rect x="40" y="95" width="50" height="42" fill="#4338ca" rx="2" />
+              <rect x="110" y="98" width="45" height="39" fill="#15803d" rx="2" />
+            </g>
+
+            {/* Tiled floor */}
+            <rect x={portalX} y={portalY + portalHeight - 40} width={portalWidth} height="40" fill="#334155" opacity="0.8" />
+          </g>
+
+          {/* 5. TOP AND BOTTOM RAILS */}
+          {/* Top Guide Rail with roller slot */}
+          <rect x={portalX} y={portalY - 2} width={portalWidth} height="18" fill="url(#steelRail)" stroke="#1e293b" strokeWidth="1.5" />
+          <line x1={portalX} y1={portalY + 6} x2={portalX + portalWidth} y2={portalY + 6} stroke="#0f172a" strokeWidth="2.5" />
+
+          {/* Bottom Embedded Track */}
+          <rect x={portalX} y={portalY + portalHeight - 16} width={portalWidth} height="16" fill="url(#steelRail)" stroke="#1e293b" strokeWidth="1.5" />
+          <line x1={portalX} y1={portalY + portalHeight - 8} x2={portalX + portalWidth} y2={portalY + portalHeight - 8} stroke="#0f172a" strokeWidth="2.5" />
+
+          {/* ============================================================== */}
+          {/* 6. DYNAMIC FOLDING GATE SLATS & PINTU EXTRA                    */}
+          {/* ============================================================== */}
+
+          {/* ------------------------------------------------------------- */}
+          {/* CASE A: 2 BUKAAN (BUKAAN TENGAH / KUPU-TARUNG)                 */}
+          {/* ------------------------------------------------------------- */}
+          {bukaanType === "2_bukaan" && (() => {
+            const halfPortal = portalWidth / 2;
+            const centerPoint = portalX + halfPortal;
+            // When opened: max 92% open, meaning 8% of width remains as visible folded stack!
+            const wingWidth = halfPortal * (1 - currentGateOpenRatio);
+            const slatWidth = wingWidth / halfSlat;
+
+            const leftCenters: number[] = [];
+            for (let i = 0; i < halfSlat; i++) {
+              leftCenters.push(portalX + i * slatWidth + slatWidth / 2);
+            }
+
+            const rightCenters: number[] = [];
+            for (let i = 0; i < halfSlat; i++) {
+              rightCenters.push(portalX + portalWidth - (halfSlat - i) * slatWidth + slatWidth / 2);
+            }
+
+            // Pintu Extra Dimensions: positioned around center of the gate
+            const extraWidth = 140;
+            const extraHeight = portalHeight - 40;
+            const extraX = centerPoint - extraWidth / 2;
+            const extraY = portalY + 20;
+
+            return (
+              <g>
+                {/* Sayap Kiri */}
+                <g>
+                  {leftCenters.map((cx, i) =>
+                    renderSingleSlat(cx - slatWidth / 2, slatWidth, `2p-left-${i}`)
+                  )}
+                  {/* Left Lock Jamb Pillar */}
+                  <rect
+                    x={portalX + wingWidth - 14}
+                    y={portalY + 6}
+                    width="14"
+                    height={portalHeight - 12}
+                    fill="url(#lockPillarGrad)"
+                    stroke="#fbbf24"
+                    strokeWidth="1.2"
+                  />
+                  {/* Chrome Handle */}
+                  <rect x={portalX + wingWidth - 9} y={portalY + portalHeight / 2 - 25} width="4" height="50" fill="#e2e8f0" rx="2" />
+                  {renderScissorLattice(leftCenters, "2p-left")}
+                </g>
+
+                {/* Sayap Kanan */}
+                <g>
+                  {rightCenters.map((cx, i) =>
+                    renderSingleSlat(cx - slatWidth / 2, slatWidth, `2p-right-${i}`)
+                  )}
+                  {/* Right Lock Jamb Pillar */}
+                  <rect
+                    x={portalX + portalWidth - wingWidth}
+                    y={portalY + 6}
+                    width="14"
+                    height={portalHeight - 12}
+                    fill="url(#lockPillarGrad)"
+                    stroke="#fbbf24"
+                    strokeWidth="1.2"
+                  />
+                  {/* Chrome Handle & Keyhole */}
+                  <rect x={portalX + portalWidth - wingWidth + 5} y={portalY + portalHeight / 2 - 25} width="4" height="50" fill="#e2e8f0" rx="2" />
+                  <circle cx={portalX + portalWidth - wingWidth + 7} cy={portalY + portalHeight / 2 + 35} r="2.5" fill="#0f172a" stroke="#fbbf24" strokeWidth="0.8" />
+                  {renderScissorLattice(rightCenters, "2p-right")}
+                </g>
+
+                {/* PINTU EXTRA (PASS DOOR ORANG LEWAT) KETIKA AKTIF */}
+                {hasPintuExtra && (
+                  <g>
+                    {/* When gate is closed (openRatio === 0): Pintu Extra is seated in center */}
+                    {currentGateOpenRatio <= 0.05 && (
+                      <g>
+                        {/* Outer Pass Door Frame */}
+                        <rect
+                          x={extraX}
+                          y={extraY}
+                          width={extraWidth}
+                          height={extraHeight}
+                          fill="none"
+                          stroke="#fbbf24"
+                          strokeWidth="2.5"
+                          rx="4"
+                        />
+                        <rect
+                          x={extraX + 2}
+                          y={extraY + 2}
+                          width={extraWidth - 4}
+                          height={extraHeight - 4}
+                          fill="none"
+                          stroke="#000000"
+                          strokeWidth="1.5"
+                        />
+
+                        {isExtraDoorSwingOpen ? (
+                          // STAGE 1: PINTU EXTRA SWING TERBUKA KE SAMPING!
+                          <g>
+                            {/* Pass Opening Hole revealing interior & upper trellis */}
+                            <rect
+                              x={extraX + 4}
+                              y={extraY + 4}
+                              width={extraWidth - 8}
+                              height={extraHeight - 8}
+                              fill="#090d16"
+                              opacity="0.9"
+                            />
+                            {/* Person icon indicator inside pass opening */}
+                            <g transform={`translate(${extraX + extraWidth / 2 - 12}, ${extraY + extraHeight / 2 - 20})`}>
+                              <circle cx="12" cy="8" r="7" fill="#10b981" />
+                              <path d="M4 36 L12 18 L20 36 Z" fill="#10b981" />
+                              <text x="12" y="52" textAnchor="middle" fill="#34d399" fontSize="9" fontWeight="bold">
+                                JALAN ORANG
+                              </text>
+                            </g>
+
+                            {/* Left Swing Leaf (Opened to the Left) */}
+                            <g transform={`translate(${extraX - 25}, ${extraY}) skewY(-8) scale(0.45, 1)`}>
+                              <rect width={extraWidth / 2} height={extraHeight} fill="url(#slatGradPrimary)" stroke="#fbbf24" strokeWidth="2" rx="3" />
+                              <rect x="5" y={extraHeight / 2 - 20} width="6" height="40" fill="#e2e8f0" rx="2" />
+                            </g>
+
+                            {/* Right Swing Leaf (Opened to the Right) */}
+                            <g transform={`translate(${extraX + extraWidth + 5}, ${extraY}) skewY(8) scale(0.45, 1)`}>
+                              <rect width={extraWidth / 2} height={extraHeight} fill="url(#slatGradPrimary)" stroke="#fbbf24" strokeWidth="2" rx="3" />
+                              <rect x={extraWidth / 2 - 11} y={extraHeight / 2 - 20} width="6" height="40" fill="#e2e8f0" rx="2" />
+                            </g>
+                          </g>
+                        ) : (
+                          // STAGE 0: PINTU EXTRA TERTUTUP RAPAT (SEJAJAR PINTU)
+                          <g>
+                            <line x1={centerPoint} y1={extraY} x2={centerPoint} y2={extraY + extraHeight} stroke="#fbbf24" strokeWidth="2" />
+                            {/* Two Chrome Pull Handles in center */}
+                            <rect x={centerPoint - 6} y={extraY + extraHeight / 2 - 20} width="4" height="40" fill="#e2e8f0" rx="1.5" />
+                            <rect x={centerPoint + 2} y={extraY + extraHeight / 2 - 20} width="4" height="40" fill="#e2e8f0" rx="1.5" />
+                            <circle cx={centerPoint + 4} cy={extraY + extraHeight / 2 + 30} r="2.2" fill="#0f172a" stroke="#fbbf24" strokeWidth="0.8" />
+                          </g>
+                        )}
+                      </g>
+                    )}
+                  </g>
+                )}
+              </g>
+            );
+          })()}
+
+          {/* ------------------------------------------------------------- */}
+          {/* CASE B: 1 BUKAAN (GESER 1 ARAH DORONG KE KIRI)                 */}
+          {/* ------------------------------------------------------------- */}
+          {bukaanType === "1_bukaan" && (() => {
+            // When opened: max 92% open, meaning 8% of width remains as visible folded stack!
+            const gateWidth = portalWidth * (1 - currentGateOpenRatio);
+            const slatWidth = gateWidth / slatCount;
+
+            const slatCenters: number[] = [];
+            for (let i = 0; i < slatCount; i++) {
+              slatCenters.push(portalX + i * slatWidth + slatWidth / 2);
+            }
+
+            // Pintu extra position on 1_bukaan
+            const extraWidth = 140;
+            const extraHeight = portalHeight - 40;
+            const extraX = portalX + gateWidth * 0.65;
+            const extraY = portalY + 20;
+
+            return (
+              <g>
+                {slatCenters.map((cx, i) =>
+                  renderSingleSlat(cx - slatWidth / 2, slatWidth, `1p-${i}`)
+                )}
+
+                {/* Leading Lock Jamb Pillar */}
+                <rect
+                  x={portalX + gateWidth - 18}
+                  y={portalY + 6}
+                  width="18"
+                  height={portalHeight - 12}
+                  fill="url(#lockPillarGrad)"
+                  stroke="#fbbf24"
+                  strokeWidth="1.5"
+                />
+                {/* Chrome Handle & Keyhole */}
+                <rect x={portalX + gateWidth - 12} y={portalY + portalHeight / 2 - 25} width="5" height="50" fill="#e2e8f0" rx="2" />
+                <circle cx={portalX + gateWidth - 9} cy={portalY + portalHeight / 2 + 35} r="2.5" fill="#0f172a" stroke="#fbbf24" strokeWidth="0.8" />
+
+                {renderScissorLattice(slatCenters, "1p")}
+
+                {/* PINTU EXTRA KETIKA AKTIF PADA 1 BUKAAN */}
+                {hasPintuExtra && currentGateOpenRatio <= 0.05 && (
+                  <g>
+                    <rect
+                      x={extraX}
+                      y={extraY}
+                      width={extraWidth}
+                      height={extraHeight}
+                      fill="none"
+                      stroke="#fbbf24"
+                      strokeWidth="2.5"
+                      rx="4"
+                    />
+                    {isExtraDoorSwingOpen ? (
+                      <g>
+                        <rect x={extraX + 4} y={extraY + 4} width={extraWidth - 8} height={extraHeight - 8} fill="#090d16" opacity="0.9" />
+                        <g transform={`translate(${extraX + extraWidth / 2 - 12}, ${extraY + extraHeight / 2 - 20})`}>
+                          <circle cx="12" cy="8" r="7" fill="#10b981" />
+                          <path d="M4 36 L12 18 L20 36 Z" fill="#10b981" />
+                          <text x="12" y="52" textAnchor="middle" fill="#34d399" fontSize="9" fontWeight="bold">
+                            JALAN ORANG
+                          </text>
+                        </g>
+                        <g transform={`translate(${extraX - 25}, ${extraY}) skewY(-8) scale(0.45, 1)`}>
+                          <rect width={extraWidth / 2} height={extraHeight} fill="url(#slatGradPrimary)" stroke="#fbbf24" strokeWidth="2" rx="3" />
+                        </g>
+                      </g>
+                    ) : (
+                      <g>
+                        <line x1={extraX + extraWidth / 2} y1={extraY} x2={extraX + extraWidth / 2} y2={extraY + extraHeight} stroke="#fbbf24" strokeWidth="2" />
+                        <rect x={extraX + extraWidth / 2 - 5} y={extraY + extraHeight / 2 - 20} width="4" height="40" fill="#e2e8f0" rx="1.5" />
+                      </g>
+                    )}
+                  </g>
+                )}
+              </g>
+            );
+          })()}
+
+          {/* 7. NIGHT MODE REALISTIC SPOTLIGHT OVERLAYS */}
+          {isNightMode && (
+            <g pointerEvents="none">
+              <rect x="0" y="0" width="1000" height="700" fill="#000000" opacity="0.25" />
+              <rect x="120" y="280" width="320" height="400" fill="url(#spotlightL)" />
+              <rect x="340" y="280" width="320" height="400" fill="url(#spotlightM)" />
+              <rect x="560" y="280" width="320" height="400" fill="url(#spotlightR)" />
+            </g>
+          )}
+
+          {/* 8. PAVEMENT & STREET GROUND */}
+          <rect x="0" y="660" width="1000" height="40" fill={isNightMode ? "#0f172a" : "#334155"} />
+          <line x1="0" y1="662" x2="1000" y2="662" stroke="#64748b" strokeWidth="2" />
+        </svg>
+
+        {/* Click helper badge */}
+        <div className="absolute bottom-3 left-4 z-20 bg-black/85 backdrop-blur-sm border border-amber-400/50 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-xl flex items-center space-x-2">
+          <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+          <span>
+            {hasPintuExtra
+              ? extraStage === 0
+                ? "Klik 1x: Buka Pintu Extra (Jalan Orang)"
+                : extraStage === 1
+                ? "Klik 2x: Buka Full Harmonika"
+                : "Klik 3x: Tutup Rapat"
+              : openRatio > 0.4
+              ? "Klik untuk Tutup Pintu"
+              : "Klik untuk Buka Pintu (Tumpukan 92%)"}
+          </span>
         </div>
       </div>
 
       {/* ========================================================================= */}
-      {/* STUDIO CUSTOMIZATION TOOLBAR (WARNA, LIST STRIP, & KONTROL BUKAAN)        */}
+      {/* STUDIO TOOLBAR (WARNA, LIST STRIP, & KONTROL BUKAAN)                      */}
       {/* ========================================================================= */}
       <div className="p-4 sm:p-6 bg-[#160207] border-t border-maroon-900/80 space-y-5">
         
-        {/* ROW 1: SKEMA WARNA & PILIHAN WARNA */}
+        {/* SKEMA WARNA: 1 WARNA / 2 WARNA ATAS-BAWAH / LIST STRIP TENGAH */}
         <div className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center space-x-2">
               <Palette className="w-4 h-4 text-amber-400" />
               <span className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider">
-                Pilihan Warna Cat Duco Oven:
+                Skema Cat Oven Duco:
               </span>
             </div>
 
@@ -944,7 +1264,7 @@ export default function HarmonikaVisualizer({
                 onClick={() => onColorModeChange("1_warna")}
                 className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
                   colorMode === "1_warna"
-                    ? "bg-maroon-800 text-white shadow-sm"
+                    ? "bg-maroon-800 text-white shadow-sm border border-amber-400/40"
                     : "text-slate-400 hover:text-white"
                 }`}
               >
@@ -955,30 +1275,30 @@ export default function HarmonikaVisualizer({
                 onClick={() => onColorModeChange("2_warna")}
                 className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
                   colorMode === "2_warna"
-                    ? "bg-maroon-800 text-white shadow-sm"
+                    ? "bg-maroon-800 text-white shadow-sm border border-amber-400/40"
                     : "text-slate-400 hover:text-white"
                 }`}
               >
-                Kombinasi 2 Warna
+                Kombinasi 2 Warna (Atas - Bawah)
               </button>
               <button
                 type="button"
                 onClick={() => onColorModeChange("strip_warna")}
                 className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
                   colorMode === "strip_warna"
-                    ? "bg-maroon-800 text-white shadow-sm"
+                    ? "bg-maroon-800 text-white shadow-sm border border-amber-400/40"
                     : "text-slate-400 hover:text-white"
                 }`}
               >
-                List Strip Aksen
+                List Strip Aksen Tengah
               </button>
             </div>
           </div>
 
-          {/* Color Presets Palette */}
+          {/* Color 1: Primary Color */}
           <div>
             <div className="text-[11px] text-rose-200/90 font-medium mb-1.5">
-              {colorMode === "2_warna" ? "Warna Utama (Daun Harmonika):" : "Warna Cat Oven:"}
+              {colorMode === "2_warna" ? "Warna Bagian Atas:" : "Warna Cat Oven Pilihan:"}
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2">
               {COLOR_PRESETS.map((color) => {
@@ -998,27 +1318,23 @@ export default function HarmonikaVisualizer({
                       className="w-5 h-5 rounded-full shrink-0 shadow-md border border-white/40"
                       style={{ backgroundColor: color.hex }}
                     />
-                    <div className="min-w-0 flex-1">
-                      <span className="text-[11px] font-bold block truncate text-white">
-                        {color.name}
-                      </span>
-                      {color.badge && (
-                        <span className="text-[8px] text-amber-300 font-extrabold block truncate">
-                          {color.badge}
-                        </span>
-                      )}
-                    </div>
+                    <span className="text-[11px] font-bold block truncate text-white">
+                      {color.name}
+                    </span>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Secondary Color Picker when 2_warna is active */}
+          {/* Color 2: Secondary Color for 2-WARNA ATAS-BAWAH */}
           {colorMode === "2_warna" && (
             <div className="pt-2 border-t border-maroon-900/60 animate-in fade-in duration-200">
-              <div className="text-[11px] text-amber-300 font-bold mb-1.5">
-                Warna Sekunder (Kombinasi Daun Berselang-Seling):
+              <div className="text-[11px] text-amber-300 font-bold mb-1.5 flex items-center justify-between">
+                <span>Warna Bagian Bawah (Kombinasi Atas - Bawah):</span>
+                <span className="text-[10px] text-rose-300 font-normal">
+                  * Garis pemisah horizontal di tengah daun
+                </span>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2">
                 {COLOR_PRESETS.map((color) => {
@@ -1048,52 +1364,85 @@ export default function HarmonikaVisualizer({
             </div>
           )}
 
-          {/* Strip Color Picker when strip_warna is active */}
+          {/* STRIP OPTIONS: 1 GARIS ATAU 2 GARIS DI TENGAH */}
           {colorMode === "strip_warna" && (
-            <div className="pt-2 border-t border-maroon-900/60 animate-in fade-in duration-200">
-              <div className="text-[11px] text-amber-300 font-bold mb-1.5">
-                Warna Strip List Aksen:
+            <div className="pt-2 border-t border-maroon-900/60 space-y-3 animate-in fade-in duration-200">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-[11px] text-amber-300 font-bold">
+                  Bentuk Strip List di Tengah:
+                </span>
+                <div className="flex items-center space-x-1.5 bg-black/60 p-1 rounded-xl border border-maroon-800">
+                  <button
+                    type="button"
+                    onClick={() => onStripStyleChange("1_garis")}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                      stripStyle === "1_garis"
+                        ? "bg-maroon-800 text-white shadow-sm border border-amber-400/40"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    1 Garis Strip Tengah
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onStripStyleChange("2_garis")}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                      stripStyle === "2_garis"
+                        ? "bg-maroon-800 text-white shadow-sm border border-amber-400/40"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    2 Garis Strip Tengah (Sejajar)
+                  </button>
+                </div>
               </div>
-              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                {STRIP_PRESETS.map((strip) => {
-                  const isSelected = stripColorId === strip.id;
-                  return (
-                    <button
-                      key={`strip-${strip.id}`}
-                      type="button"
-                      onClick={() => onStripColorChange(strip.id)}
-                      className={`flex items-center space-x-2 p-2 rounded-xl border transition-all text-left min-h-[40px] active:scale-95 ${
-                        isSelected
-                          ? "bg-maroon-900/90 border-amber-400 ring-2 ring-amber-400/40 text-white shadow-lg"
-                          : "bg-black/40 border-maroon-900 text-rose-200/80 hover:bg-black/60"
-                      }`}
-                    >
-                      <span
-                        className="w-4 h-4 rounded-full shrink-0 shadow-sm border border-white/40"
-                        style={{ backgroundColor: strip.hex }}
-                      />
-                      <span className="text-[10px] font-bold block truncate text-white">
-                        {strip.name}
-                      </span>
-                    </button>
-                  );
-                })}
+
+              {/* Strip Color Palette */}
+              <div>
+                <div className="text-[11px] text-rose-200/90 font-medium mb-1.5">
+                  Warna Strip List Aksen:
+                </div>
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                  {STRIP_PRESETS.map((strip) => {
+                    const isSelected = stripColorId === strip.id;
+                    return (
+                      <button
+                        key={`strip-${strip.id}`}
+                        type="button"
+                        onClick={() => onStripColorChange(strip.id)}
+                        className={`flex items-center space-x-2 p-2 rounded-xl border transition-all text-left min-h-[40px] active:scale-95 ${
+                          isSelected
+                            ? "bg-maroon-900/90 border-amber-400 ring-2 ring-amber-400/40 text-white shadow-lg"
+                            : "bg-black/40 border-maroon-900 text-rose-200/80 hover:bg-black/60"
+                        }`}
+                      >
+                        <span
+                          className="w-4 h-4 rounded-full shrink-0 shadow-sm border border-white/40"
+                          style={{ backgroundColor: strip.hex }}
+                        />
+                        <span className="text-[10px] font-bold block truncate text-white">
+                          {strip.name}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           )}
         </div>
 
-        {/* BOTTOM NOTE & SPECIFICATION BADGE */}
+        {/* BOTTOM NOTE */}
         <div className="pt-3 border-t border-maroon-900/80 flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs text-rose-200/80 gap-2">
           <div className="flex items-center space-x-2">
             <Info className="w-4 h-4 text-amber-400 shrink-0" />
             <span>
-              Dimensi opening saat ini: <strong className="text-white">{widthMeters} m × {heightMeters} m</strong> (Disesuaikan otomatis dengan kalkulator).
+              Dimensi opening: <strong className="text-white">{widthMeters} m × {heightMeters} m</strong>. Tumpukan lipatan daun saat dibuka tetap terlihat 8% di samping (tidak hilang 100%).
             </span>
           </div>
 
           <div className="text-[11px] text-amber-300 font-bold">
-            ✓ Finishing Cat Duco Oven 3 Lapisan Anti Korosi
+            ✓ Double Bearing Jepang • Garansi Servis 5 Tahun
           </div>
         </div>
       </div>
