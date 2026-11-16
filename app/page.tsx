@@ -247,7 +247,7 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 sm:gap-6">
           {products.map((p) => {
             const productWaUrl = `https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(
               `Halo Admin ${settings.companyName}, saya tertarik memesan "${p.name}". Mohon informasi harga dan jadwal survey.`
@@ -289,12 +289,14 @@ export default async function HomePage() {
                         <span className="font-bold text-maroon-900">{p.daunThickness}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-500">Plat Strip:</span>
-                        <span className="font-medium text-slate-800">{p.stripThickness}</span>
+                        <span className="text-slate-500">Rangka:</span>
+                        <span className="font-medium text-slate-800 truncate max-w-[120px]" title={p.frameSpec || p.unpSize}>
+                          {p.frameSpec || p.unpSize}
+                        </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-500">Tiang UNP:</span>
-                        <span className="font-medium text-slate-800">{p.unpSize}</span>
+                        <span className="text-slate-500">Silangan:</span>
+                        <span className="font-medium text-slate-800">{p.silangan || p.stripThickness}</span>
                       </div>
                     </div>
                   </div>
@@ -306,7 +308,7 @@ export default async function HomePage() {
                     className="w-full inline-flex items-center justify-center py-2.5 sm:py-3 px-4 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-maroon-800 active:scale-98 transition-colors min-h-[44px]"
                   >
                     <MessageCircle className="w-3.5 h-3.5 mr-2 shrink-0" />
-                    Pesan Tipe Ini
+                    Pesan Varian Ini
                   </a>
                 </div>
               </div>

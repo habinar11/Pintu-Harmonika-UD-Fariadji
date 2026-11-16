@@ -639,16 +639,23 @@ export default function AdminPage() {
                     id: "",
                     name: "",
                     slug: "",
-                    category: "Medium",
                     badge: "",
-                    daunThickness: "1.0 mm SNI",
-                    stripThickness: "5.0 mm x 21 mm",
-                    unpSize: "UNP 5",
-                    bearingType: "Double Bearing Sealed Japan",
-                    lockType: "Silinder Kuningan Magnet Anti-Linggis",
-                    finishing: "Meni Primer + Cat Duco Oven",
-                    pricePerMeter: 650000,
-                    priceDisplay: "Rp 650.000 / m²",
+                    daunThickness: "TEBEL 1,0",
+                    stripThickness: "2 cm x 4,5 mm",
+                    unpSize: "UNP 5 + 19 | UNP 10 | 60x60",
+                    frameSpec: "UNP 5 + 19 | UNP 10 | 60x60",
+                    galaran: "56 - 25",
+                    silangan: "2 cm x 4,5 mm",
+                    relBesar: "UNP 5 + 19",
+                    cakakTiang: "UNP 10",
+                    pipaKotak: "60 x 60",
+                    platTopi: "10 cm",
+                    usageRecommendation: "Ruko Komersial Besar, Showroom",
+                    bearingType: "Double Bearing 6204 Asli (Anti Macet)",
+                    lockType: "Silinder Kuningan Extra Safety + Kupingan Gembok Baja",
+                    finishing: "Cat Dasar Meni Epoxy + Finishing Oven Duco Gloss/Matte",
+                    pricePerMeter: 1400000,
+                    priceDisplay: "Rp 1.400.000 / m²",
                     description: "",
                     features: ["Baja murni SNI", "Roda ringan", "Garansi servis"],
                     image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80",
@@ -672,7 +679,7 @@ export default function AdminPage() {
                   <div className="relative h-44 bg-slate-100">
                     <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
                     {p.badge && (
-                      <span className="absolute top-3 left-3 bg-blue-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
+                      <span className="absolute top-3 left-3 bg-maroon-800 text-white text-[11px] font-bold px-2 py-0.5 rounded-full border border-amber-400/30">
                         {p.badge}
                       </span>
                     )}
@@ -680,12 +687,11 @@ export default function AdminPage() {
                   <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                     <div>
                       <div className="flex justify-between items-start mb-1">
-                        <span className="text-xs font-bold text-blue-600">{p.category}</span>
+                        <h4 className="font-black text-slate-900 text-base">{p.name}</h4>
                         <span className="text-xs font-extrabold text-emerald-600">
                           {p.priceDisplay}
                         </span>
                       </div>
-                      <h4 className="font-extrabold text-slate-900 text-base mb-1">{p.name}</h4>
                       <p className="text-xs text-slate-500 line-clamp-2">{p.description}</p>
 
                       <div className="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-600 space-y-1">
@@ -693,8 +699,18 @@ export default function AdminPage() {
                           <strong>Tebal Daun:</strong> {p.daunThickness}
                         </div>
                         <div>
-                          <strong>Plat Silangan:</strong> {p.stripThickness}
+                          <strong>Rangka:</strong> {p.frameSpec || p.unpSize}
                         </div>
+                        {p.silangan && (
+                          <div>
+                            <strong>Silangan:</strong> {p.silangan}
+                          </div>
+                        )}
+                        {p.usageRecommendation && (
+                          <div className="text-[11px] text-slate-500 line-clamp-1">
+                            <strong>Rekomendasi:</strong> {p.usageRecommendation}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -1338,7 +1354,7 @@ export default function AdminPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="sm:col-span-2">
                     <label className="text-xs font-bold text-slate-700 block mb-1">
-                      Nama Produk *
+                      Nama Produk / Varian *
                     </label>
                     <input
                       type="text"
@@ -1347,30 +1363,158 @@ export default function AdminPage() {
                       onChange={(e) =>
                         setEditingProduct({ ...editingProduct, name: e.target.value })
                       }
-                      placeholder="Contoh: Pintu Harmonika Tipe Super Heavy"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Contoh: SUPER 1, SUPER 2, KELAS 1..."
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-bold"
                     />
                   </div>
 
                   <div>
                     <label className="text-xs font-bold text-slate-700 block mb-1">
-                      Kategori Varian
+                      Tebal Daun Rol *
                     </label>
-                    <select
-                      value={editingProduct.category}
+                    <input
+                      type="text"
+                      required
+                      value={editingProduct.daunThickness}
+                      onChange={(e) =>
+                        setEditingProduct({ ...editingProduct, daunThickness: e.target.value })
+                      }
+                      placeholder="Contoh: TEBEL 1,2 atau 1.2 mm"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                      Spesifikasi Rangka *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editingProduct.frameSpec || editingProduct.unpSize || ""}
                       onChange={(e) =>
                         setEditingProduct({
                           ...editingProduct,
-                          category: e.target.value as any,
+                          frameSpec: e.target.value,
+                          unpSize: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white"
-                    >
-                      <option value="Ekonomis">Ekonomis</option>
-                      <option value="Standar">Standar</option>
-                      <option value="Medium">Medium</option>
-                      <option value="Super Heavy">Super Heavy</option>
-                    </select>
+                      placeholder="Contoh: UNP 6,5 + 19 | UNP 12 | 60x60"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                      Plat Silangan *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editingProduct.silangan || editingProduct.stripThickness}
+                      onChange={(e) =>
+                        setEditingProduct({
+                          ...editingProduct,
+                          stripThickness: e.target.value,
+                          silangan: e.target.value,
+                        })
+                      }
+                      placeholder="Contoh: 2 cm x 4,5 mm"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                      Galaran
+                    </label>
+                    <input
+                      type="text"
+                      value={editingProduct.galaran || ""}
+                      onChange={(e) =>
+                        setEditingProduct({ ...editingProduct, galaran: e.target.value })
+                      }
+                      placeholder="Contoh: 58 - 25"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                      Rel / B. Besar
+                    </label>
+                    <input
+                      type="text"
+                      value={editingProduct.relBesar || ""}
+                      onChange={(e) =>
+                        setEditingProduct({ ...editingProduct, relBesar: e.target.value })
+                      }
+                      placeholder="Contoh: UNP 6,5 + 19"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                      Cakak Tiang
+                    </label>
+                    <input
+                      type="text"
+                      value={editingProduct.cakakTiang || ""}
+                      onChange={(e) =>
+                        setEditingProduct({ ...editingProduct, cakakTiang: e.target.value })
+                      }
+                      placeholder="Contoh: UNP 12"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                      Pipa Kotak
+                    </label>
+                    <input
+                      type="text"
+                      value={editingProduct.pipaKotak || ""}
+                      onChange={(e) =>
+                        setEditingProduct({ ...editingProduct, pipaKotak: e.target.value })
+                      }
+                      placeholder="Contoh: 60 x 60"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                      Plat Topi
+                    </label>
+                    <input
+                      type="text"
+                      value={editingProduct.platTopi || ""}
+                      onChange={(e) =>
+                        setEditingProduct({ ...editingProduct, platTopi: e.target.value })
+                      }
+                      placeholder="Contoh: 10 cm"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                      Rekomendasi Penggunaan
+                    </label>
+                    <input
+                      type="text"
+                      value={editingProduct.usageRecommendation || ""}
+                      onChange={(e) =>
+                        setEditingProduct({
+                          ...editingProduct,
+                          usageRecommendation: e.target.value,
+                        })
+                      }
+                      placeholder="Contoh: Gudang Industri, Ruko Premium, Perbankan"
+                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"
+                    />
                   </div>
 
                   <div>
@@ -1390,56 +1534,6 @@ export default function AdminPage() {
 
                   <div>
                     <label className="text-xs font-bold text-slate-700 block mb-1">
-                      Tebal Daun *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={editingProduct.daunThickness}
-                      onChange={(e) =>
-                        setEditingProduct({ ...editingProduct, daunThickness: e.target.value })
-                      }
-                      placeholder="Contoh: 1.2 mm - 1.5 mm"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1">
-                      Plat Silangan *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={editingProduct.stripThickness}
-                      onChange={(e) =>
-                        setEditingProduct({
-                          ...editingProduct,
-                          stripThickness: e.target.value,
-                        })
-                      }
-                      placeholder="Contoh: 5.5 mm x 24 mm"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1">
-                      Tiang UNP
-                    </label>
-                    <input
-                      type="text"
-                      value={editingProduct.unpSize}
-                      onChange={(e) =>
-                        setEditingProduct({ ...editingProduct, unpSize: e.target.value })
-                      }
-                      placeholder="Contoh: UNP 6.5 Tebal"
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1">
                       Roda Bearing
                     </label>
                     <input
@@ -1448,7 +1542,7 @@ export default function AdminPage() {
                       onChange={(e) =>
                         setEditingProduct({ ...editingProduct, bearingType: e.target.value })
                       }
-                      placeholder="Double Bearing Sealed Japan"
+                      placeholder="Double Bearing 6204 Asli"
                       className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm"
                     />
                   </div>

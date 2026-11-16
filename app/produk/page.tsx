@@ -37,12 +37,93 @@ export default async function ProductsPage() {
         </div>
       </div>
 
+      {/* TABEL PERBANDINGAN LENGKAP VARIAN (GAMBAR 5 & 6) */}
+      <div className="w-full max-w-[1650px] mx-auto px-4 sm:px-8 lg:px-12">
+        <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-lg p-6 sm:p-8">
+          <div className="mb-6">
+            <span className="text-xs font-bold text-maroon-700 uppercase tracking-wider block">
+              Daftar Spesifikasi & Rekomendasi Penggunaan
+            </span>
+            <h2 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight mt-1">
+              Tabel Komparasi Varian Pintu Harmonika
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Bandingkan rincian galaran, silangan, rel, cakak tiang, daun rol, dan harga per m² secara transparan.
+            </p>
+          </div>
+
+          <div className="overflow-x-auto rounded-2xl border border-maroon-900/20">
+            <table className="w-full text-left text-xs sm:text-sm border-collapse">
+              <thead>
+                <tr className="bg-maroon-900 text-white font-bold text-xs uppercase tracking-wider">
+                  <th className="py-3.5 px-3 text-center border-r border-maroon-800">NO</th>
+                  <th className="py-3.5 px-4 border-r border-maroon-800 whitespace-nowrap">VARIAN KUALITAS</th>
+                  <th className="py-3.5 px-3 border-r border-maroon-800 text-center whitespace-nowrap">GALARAN</th>
+                  <th className="py-3.5 px-3 border-r border-maroon-800 text-center whitespace-nowrap">SILANGAN</th>
+                  <th className="py-3.5 px-3 border-r border-maroon-800 text-center whitespace-nowrap">REL / B. BESAR</th>
+                  <th className="py-3.5 px-3 border-r border-maroon-800 text-center whitespace-nowrap">CAKAK TIANG</th>
+                  <th className="py-3.5 px-3 border-r border-maroon-800 text-center whitespace-nowrap">DAUN ROL</th>
+                  <th className="py-3.5 px-3 border-r border-maroon-800 text-center whitespace-nowrap">PIPA KOTAK</th>
+                  <th className="py-3.5 px-3 border-r border-maroon-800 text-center whitespace-nowrap">PLAT TOPI</th>
+                  <th className="py-3.5 px-4 border-r border-maroon-800">REKOMENDASI PENGGUNAAN</th>
+                  <th className="py-3.5 px-4 text-right whitespace-nowrap">HARGA / M²</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200">
+                {products.map((p, idx) => (
+                  <tr
+                    key={p.id}
+                    className={`hover:bg-rose-50/60 transition-colors ${
+                      idx % 2 === 1 ? "bg-slate-50/70" : "bg-white"
+                    }`}
+                  >
+                    <td className="py-3.5 px-3 text-center font-bold text-slate-500 border-r border-slate-200">
+                      {idx + 1}
+                    </td>
+                    <td className="py-3.5 px-4 font-black text-maroon-900 border-r border-slate-200 whitespace-nowrap">
+                      {p.name}
+                    </td>
+                    <td className="py-3.5 px-3 text-center text-slate-700 border-r border-slate-200 whitespace-nowrap">
+                      {p.galaran || "-"}
+                    </td>
+                    <td className="py-3.5 px-3 text-center text-slate-700 border-r border-slate-200 whitespace-nowrap">
+                      {p.silangan || p.stripThickness}
+                    </td>
+                    <td className="py-3.5 px-3 text-center text-slate-700 border-r border-slate-200 whitespace-nowrap">
+                      {p.relBesar || "-"}
+                    </td>
+                    <td className="py-3.5 px-3 text-center text-slate-700 border-r border-slate-200 whitespace-nowrap">
+                      {p.cakakTiang || "-"}
+                    </td>
+                    <td className="py-3.5 px-3 text-center font-bold text-slate-900 border-r border-slate-200 whitespace-nowrap">
+                      {p.daunThickness}
+                    </td>
+                    <td className="py-3.5 px-3 text-center text-slate-700 border-r border-slate-200 whitespace-nowrap">
+                      {p.pipaKotak || "-"}
+                    </td>
+                    <td className="py-3.5 px-3 text-center text-slate-700 border-r border-slate-200 whitespace-nowrap">
+                      {p.platTopi || "10 cm"}
+                    </td>
+                    <td className="py-3.5 px-4 text-slate-600 border-r border-slate-200 text-xs leading-relaxed min-w-[220px]">
+                      {p.usageRecommendation || p.description}
+                    </td>
+                    <td className="py-3.5 px-4 text-right font-black text-slate-900 whitespace-nowrap">
+                      {p.priceDisplay}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       {/* Product List */}
       <div className="w-full max-w-[1650px] mx-auto px-4 sm:px-8 lg:px-12">
         <div className="space-y-12">
           {products.map((product) => {
             const waUrl = `https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(
-              `Halo Admin ${settings.companyName}, saya tertarik dengan produk "${product.name}" (${product.daunThickness}). Mohon info estimasi harga dan jadwal survey lokasi.`
+              `Halo Admin ${settings.companyName}, saya tertarik dengan varian "${product.name}" (${product.daunThickness}). Mohon info estimasi harga dan jadwal survey lokasi.`
             )}`;
 
             return (
@@ -79,7 +160,7 @@ export default async function ProductsPage() {
                 <div className="lg:col-span-7 p-6 sm:p-10 flex flex-col justify-between space-y-6">
                   <div>
                     <div className="flex items-center space-x-2 text-xs font-bold text-maroon-700 uppercase tracking-wider mb-1">
-                      <span>Tipe: {product.category}</span>
+                      <span>Varian Pintu Harmonika</span>
                       {product.isPopular && (
                         <span className="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md">
                           Paling Banyak Dipilih
@@ -96,20 +177,40 @@ export default async function ProductsPage() {
                     {/* Specification Table */}
                     <div className="bg-rose-50/40 rounded-2xl p-5 border border-rose-100 mb-6">
                       <h4 className="text-xs font-bold text-maroon-900 uppercase tracking-wider mb-3">
-                        Rincian Spesifikasi Material:
+                        Rincian Spesifikasi Material Lengkap:
                       </h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2.5 gap-x-4 text-xs">
                         <div className="flex justify-between border-b border-rose-100 pb-1.5">
-                          <span className="text-slate-500">Tebal Daun:</span>
+                          <span className="text-slate-500">Tebal Daun Rol:</span>
                           <span className="font-bold text-slate-900">{product.daunThickness}</span>
                         </div>
                         <div className="flex justify-between border-b border-rose-100 pb-1.5">
-                          <span className="text-slate-500">Plat Silangan:</span>
-                          <span className="font-bold text-slate-900">{product.stripThickness}</span>
+                          <span className="text-slate-500">Spesifikasi Rangka:</span>
+                          <span className="font-bold text-slate-900">{product.frameSpec || product.unpSize}</span>
                         </div>
                         <div className="flex justify-between border-b border-rose-100 pb-1.5">
-                          <span className="text-slate-500">Tiang UNP:</span>
-                          <span className="font-bold text-slate-900">{product.unpSize}</span>
+                          <span className="text-slate-500">Galaran:</span>
+                          <span className="font-bold text-slate-900">{product.galaran || "-"}</span>
+                        </div>
+                        <div className="flex justify-between border-b border-rose-100 pb-1.5">
+                          <span className="text-slate-500">Plat Silangan:</span>
+                          <span className="font-bold text-slate-900">{product.silangan || product.stripThickness}</span>
+                        </div>
+                        <div className="flex justify-between border-b border-rose-100 pb-1.5">
+                          <span className="text-slate-500">Rel / B. Besar:</span>
+                          <span className="font-bold text-slate-900">{product.relBesar || "-"}</span>
+                        </div>
+                        <div className="flex justify-between border-b border-rose-100 pb-1.5">
+                          <span className="text-slate-500">Cakak Tiang:</span>
+                          <span className="font-bold text-slate-900">{product.cakakTiang || "-"}</span>
+                        </div>
+                        <div className="flex justify-between border-b border-rose-100 pb-1.5">
+                          <span className="text-slate-500">Pipa Kotak:</span>
+                          <span className="font-bold text-slate-900">{product.pipaKotak || "-"}</span>
+                        </div>
+                        <div className="flex justify-between border-b border-rose-100 pb-1.5">
+                          <span className="text-slate-500">Plat Topi:</span>
+                          <span className="font-bold text-slate-900">{product.platTopi || "10 cm"}</span>
                         </div>
                         <div className="flex justify-between border-b border-rose-100 pb-1.5">
                           <span className="text-slate-500">Roda Bearing:</span>
@@ -119,11 +220,13 @@ export default async function ProductsPage() {
                           <span className="text-slate-500">Sistem Kunci:</span>
                           <span className="font-bold text-slate-900">{product.lockType}</span>
                         </div>
-                        <div className="flex justify-between border-b border-rose-100 pb-1.5">
-                          <span className="text-slate-500">Finishing:</span>
-                          <span className="font-bold text-slate-900">{product.finishing}</span>
-                        </div>
                       </div>
+                      {product.usageRecommendation && (
+                        <div className="mt-3 pt-2 text-xs text-slate-700">
+                          <span className="font-bold text-maroon-900">Rekomendasi Penggunaan: </span>
+                          <span>{product.usageRecommendation}</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Key features bullets */}

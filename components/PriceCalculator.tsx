@@ -66,12 +66,14 @@ export default function PriceCalculator({
   const area = Math.max(0, width * height);
   const effectiveArea = area < 7 && area > 0 ? 7 : area;
 
-  const baseRate = selectedProduct ? selectedProduct.pricePerMeter : 600000;
+  const baseRate = selectedProduct ? selectedProduct.pricePerMeter : 1200000;
   const baseCost = effectiveArea * baseRate;
 
-  const swingCost = hasPintuExtra ? 250000 : 0;
-  const dualColorCost = isDualColor ? 150000 : 0;
-  const totalCost = baseCost + swingCost + dualColorCost;
+  // Harga extra mengikuti harga dasarnya
+  const extraCost = hasPintuExtra ? baseRate : 0;
+  // Finishing cat oven harganya 350.000
+  const dualColorCost = isDualColor ? 350000 : 0;
+  const totalCost = baseCost + extraCost + dualColorCost;
 
   const formatRupiah = (num: number) => {
     return new Intl.NumberFormat("id-ID", {
@@ -104,11 +106,14 @@ export default function PriceCalculator({
   const generateWhatsAppMessage = () => {
     const text = `Halo Admin ${settings.companyName}, saya mau estimasi & pemesanan pintu harmonika:
 - Ukuran: Lebar ${width} m x Tinggi ${height} m (Luas: ${area.toFixed(2)} m²)
-- Tipe Pintu: ${selectedProduct?.name} (${selectedProduct?.daunThickness})
+- Tipe Varian: ${selectedProduct?.name} (Daun: ${selectedProduct?.daunThickness})
+- Spesifikasi Rangka: ${selectedProduct?.frameSpec || selectedProduct?.unpSize}
+- Galaran: ${selectedProduct?.galaran || "-"} | Silangan: ${selectedProduct?.silangan || selectedProduct?.stripThickness || "-"}
+- Rel / Cakak / Pipa: ${selectedProduct?.relBesar || "-"} / ${selectedProduct?.cakakTiang || "-"} / ${selectedProduct?.pipaKotak || "-"}
 - Model Bukaan: ${getBukaanLabel()}
 - Skema Cat Oven: ${getColorLabel()}
-- Opsi Pintu Extra (Bukaan Intip): ${hasPintuExtra ? "Ya (+Rp 250.000)" : "Tidak"}
-- Opsi Finishing Kombinasi/Strip: ${isDualColor ? "Ya (+Rp 150.000)" : "Tidak"}
+- Opsi Pintu Extra (Bukaan Intip): ${hasPintuExtra ? `Ya (+${formatRupiah(baseRate)} mengikuti harga dasar)` : "Tidak"}
+- Opsi Finishing Cat Kombinasi/Strip: ${isDualColor ? "Ya (+Rp 350.000)" : "Tidak"}
 - Perkiraan Estimasi Web: ${formatRupiah(totalCost)}
 
 Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jadwal survey lokasi gratis dan penawaran resminya. Terima kasih!`;
@@ -255,9 +260,9 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
           {/* Select Product Type */}
           <div>
             <label className="text-xs sm:text-sm font-bold text-white block mb-2">
-              Pilih Tipe Ketebalan Plat Daun & Silangan:
+              Pilih Varian Kualitas & Ketebalan Plat Daun:
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
               {products.map((p) => {
                 const isSelected = p.id === selectedProductId;
                 return (
@@ -279,11 +284,12 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
                         <Check className="w-4 h-4 text-amber-400 shrink-0 ml-1" />
                       )}
                     </div>
+                    {/* Ringkas sesuai Gambar 4: TEBAL DAUN ROL & SPESIFIKASI RANGKA */}
                     <div className="text-[11px] sm:text-xs text-rose-200">
-                      Daun: <span className="text-amber-300 font-bold">{p.daunThickness}</span> • Silangan:{" "}
-                      <span className="text-rose-100 font-semibold">{p.stripThickness}</span>
+                      Daun: <span className="text-amber-300 font-bold">{p.daunThickness}</span> • Rangka:{" "}
+                      <span className="text-rose-100 font-semibold">{p.frameSpec || p.unpSize}</span>
                     </div>
-                    <div className="text-[11px] sm:text-xs font-bold text-emerald-400 mt-0.5">
+                    <div className="text-[11px] sm:text-xs font-bold text-emerald-400 mt-1">
                       {p.priceDisplay}
                     </div>
                   </button>
@@ -303,7 +309,7 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
               </span>
             </div>
 
-            {/* Opsi Pintu Extra */}
+            {/* Opsi Pintu Extra (Harga mengikuti harga dasar) */}
             <label className="flex items-center space-x-3 bg-black/40 border border-maroon-900 p-3 sm:p-3.5 rounded-2xl cursor-pointer hover:bg-maroon-950/50 transition-colors active:scale-98">
               <input
                 type="checkbox"
@@ -313,17 +319,17 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
               />
               <div className="text-xs">
                 <span className="font-bold text-white block">
-                  Pakai Pintu Extra / Bukaan Intip Celah Harmonika (+Rp 250.000)
+                  Pakai Pintu Extra / Bukaan Intip (+{formatRupiah(baseRate)})
                 </span>
                 <span className="text-rose-200/80 text-[11px] sm:text-xs">
                   {hasPintuExtra
-                    ? "✓ Aktif di Visualizer: Celah intip geser di dekat handle memperlihatkan cagak & silang pengaman"
-                    : "Bukaan intip geser di dekat handle untuk melihat keluar & sirkulasi udara tanpa membuka seluruh pintu"}
+                    ? `✓ Aktif di Visualizer: Celah intip 1 tiang geser (Biaya mengikuti harga dasar ${selectedProduct?.name}: +${formatRupiah(baseRate)})`
+                    : `Bukaan intip geser di dekat handle untuk melihat keluar tanpa buka pintu penuh (+${formatRupiah(baseRate)})`}
                 </span>
               </div>
             </label>
 
-            {/* Opsi Cat Duco Oven 2 Warna Atas-Bawah / Strip */}
+            {/* Opsi Cat Duco Oven 2 Warna Atas-Bawah / Strip (Rp 350.000) */}
             <label className="flex items-center space-x-3 bg-black/40 border border-maroon-900 p-3 sm:p-3.5 rounded-2xl cursor-pointer hover:bg-maroon-950/50 transition-colors active:scale-98">
               <input
                 type="checkbox"
@@ -333,12 +339,12 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
               />
               <div className="text-xs">
                 <span className="font-bold text-white block">
-                  Finishing Cat Oven Kombinasi Atas-Bawah / Strip List (+Rp 150.000)
+                  Finishing Cat Oven Kombinasi Atas-Bawah / Strip List (+Rp 350.000)
                 </span>
                 <span className="text-rose-200/80 text-[11px] sm:text-xs">
                   {isDualColor
-                    ? `✓ Aktif di Visualizer: ${getColorLabel()}`
-                    : "Pilihan cat oven 2 warna (atas-bawah) atau strip aksen 1/2 garis di tengah daun"}
+                    ? `✓ Aktif di Visualizer: ${getColorLabel()} (+Rp 350.000)`
+                    : "Pilihan cat oven 2 warna (atas-bawah) atau strip aksen 1/2 garis di tengah daun (+Rp 350.000)"}
                 </span>
               </div>
             </label>
@@ -359,7 +365,7 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
             </p>
           </div>
 
-          <div className="space-y-2.5 text-xs text-rose-100 pb-4 border-b border-maroon-800">
+          <div className="space-y-2 text-xs text-rose-100 pb-4 border-b border-maroon-800">
             <div className="flex justify-between">
               <span>Dimensi Opening:</span>
               <span className="font-bold text-white">
@@ -374,27 +380,83 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
             )}
 
             <div className="flex justify-between">
-              <span>Tipe Harmonika:</span>
-              <span className="font-semibold text-white line-clamp-1 max-w-[180px] text-right">
+              <span>Tipe Varian:</span>
+              <span className="font-extrabold text-amber-300">
                 {selectedProduct?.name}
               </span>
             </div>
 
             <div className="flex justify-between">
-              <span>Ketebalan Daun:</span>
-              <span className="font-semibold text-amber-300">
+              <span>Harga Dasar / m²:</span>
+              <span className="font-semibold text-emerald-400">
+                {formatRupiah(baseRate)} / m²
+              </span>
+            </div>
+
+            <div className="flex justify-between">
+              <span>Tebal Daun Rol:</span>
+              <span className="font-semibold text-white">
                 {selectedProduct?.daunThickness}
               </span>
             </div>
 
             <div className="flex justify-between">
-              <span>Plat Silangan:</span>
-              <span className="font-semibold text-white">
-                {selectedProduct?.stripThickness}
+              <span>Spesifikasi Rangka:</span>
+              <span className="font-medium text-white text-right max-w-[200px]">
+                {selectedProduct?.frameSpec || selectedProduct?.unpSize}
               </span>
             </div>
 
-            <div className="flex justify-between">
+            {selectedProduct?.galaran && (
+              <div className="flex justify-between text-rose-200/90">
+                <span>Galaran:</span>
+                <span className="font-medium text-white">{selectedProduct.galaran}</span>
+              </div>
+            )}
+
+            {selectedProduct?.silangan && (
+              <div className="flex justify-between text-rose-200/90">
+                <span>Plat Silangan:</span>
+                <span className="font-medium text-white">{selectedProduct.silangan}</span>
+              </div>
+            )}
+
+            {selectedProduct?.relBesar && (
+              <div className="flex justify-between text-rose-200/90">
+                <span>Rel / B. Besar:</span>
+                <span className="font-medium text-white">{selectedProduct.relBesar}</span>
+              </div>
+            )}
+
+            {selectedProduct?.cakakTiang && (
+              <div className="flex justify-between text-rose-200/90">
+                <span>Cakak Tiang:</span>
+                <span className="font-medium text-white">{selectedProduct.cakakTiang}</span>
+              </div>
+            )}
+
+            {selectedProduct?.pipaKotak && (
+              <div className="flex justify-between text-rose-200/90">
+                <span>Pipa Kotak:</span>
+                <span className="font-medium text-white">{selectedProduct.pipaKotak}</span>
+              </div>
+            )}
+
+            {selectedProduct?.platTopi && (
+              <div className="flex justify-between text-rose-200/90">
+                <span>Plat Topi:</span>
+                <span className="font-medium text-white">{selectedProduct.platTopi}</span>
+              </div>
+            )}
+
+            {selectedProduct?.usageRecommendation && (
+              <div className="text-[11px] text-amber-200/90 pt-1 border-t border-maroon-800/60">
+                <span className="block text-slate-400 text-[10px] uppercase font-bold">Rekomendasi:</span>
+                <span>{selectedProduct.usageRecommendation}</span>
+              </div>
+            )}
+
+            <div className="flex justify-between pt-1 border-t border-maroon-800/60">
               <span>Model Bukaan:</span>
               <span className="font-bold text-amber-300 text-right max-w-[170px] truncate">
                 {getBukaanLabel()}
@@ -409,16 +471,16 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
             </div>
 
             {hasPintuExtra && (
-              <div className="flex justify-between text-amber-300 font-medium">
-                <span>+ Pintu Extra (Bukaan Intip):</span>
-                <span>Rp 250.000</span>
+              <div className="flex justify-between text-amber-300 font-bold bg-maroon-950/70 p-2 rounded-xl border border-amber-500/30">
+                <span>+ Pintu Extra (Harga Dasar):</span>
+                <span>{formatRupiah(baseRate)}</span>
               </div>
             )}
 
             {isDualColor && (
-              <div className="flex justify-between text-amber-300 font-medium">
-                <span>+ Finishing Kombinasi/Strip:</span>
-                <span>Rp 150.000</span>
+              <div className="flex justify-between text-amber-300 font-bold bg-maroon-950/70 p-2 rounded-xl border border-amber-500/30">
+                <span>+ Finishing Cat Oven:</span>
+                <span>Rp 350.000</span>
               </div>
             )}
           </div>
