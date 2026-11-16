@@ -420,13 +420,10 @@ export default function PriceCalculator({
 
           {/* Extra Options (Pintu Extra & Dual Color) */}
           <div className="space-y-2.5 sm:space-y-3 pt-3 border-t border-maroon-900">
-            <div className="flex items-center justify-between">
+            <div>
               <label className="text-[11px] sm:text-xs font-bold uppercase text-amber-300 tracking-wider block">
                 Opsi Tambahan Terintegrasi:
               </label>
-              <span className="text-[10px] text-rose-300/80">
-                Terkoneksi langsung dengan visualizer di atas
-              </span>
             </div>
 
             {/* Opsi Pintu Extra (Harga mengikuti harga dasar) */}
@@ -458,12 +455,9 @@ export default function PriceCalculator({
 
           {/* Form Input Data Nama Customer & Alamat */}
           <div className="bg-black/40 border border-maroon-900/80 rounded-2xl p-3.5 sm:p-4 space-y-3">
-            <div className="flex items-center justify-between">
+            <div>
               <span className="text-xs sm:text-sm font-extrabold text-amber-300 uppercase tracking-wider block">
                 Data Pemesan & Lokasi:
-              </span>
-              <span className="text-[10px] text-rose-300/80 font-mono">
-                Otomatis tercantum di chat WhatsApp
               </span>
             </div>
 

@@ -1410,18 +1410,18 @@ export default function HarmonikaVisualizer({
           <line x1="0" y1="462" x2="1200" y2="462" stroke="#475569" strokeWidth="1" strokeDasharray="30 15" />
         </svg>
 
-        {/* Click helper badge */}
-        <div className="absolute bottom-3 left-4 z-20 bg-black/85 backdrop-blur-sm border border-amber-400/50 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-xl flex items-center space-x-2">
-          <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+        {/* Click helper badge (ditempatkan di area langit/awan atas dengan ukuran ringkas agar tidak menutupi pintu di HP) */}
+        <div className="absolute top-2 left-2.5 sm:top-3 sm:left-4 z-20 bg-black/80 backdrop-blur-sm border border-amber-400/40 text-amber-200 sm:text-white px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-xs font-semibold sm:font-bold shadow-md flex items-center space-x-1.5 pointer-events-none">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping shrink-0" />
           <span>
             {hasPintuExtra
               ? extraStage === 0
-                ? "Klik 1x: Geser Pintu Extra"
+                ? "Klik: Geser Pintu Extra"
                 : extraStage === 1
-                ? "Klik 2x: Buka Full Harmonika"
-                : "Klik 3x: Tutup Rapat"
+                ? "Klik: Buka Full"
+                : "Klik: Tutup Rapat"
               : gateOpen > 0.4
-              ? "Klik untuk Tutup Pintu"
+              ? "Klik: Tutup Pintu"
               : "Klik untuk Buka Pintu"}
           </span>
         </div>
