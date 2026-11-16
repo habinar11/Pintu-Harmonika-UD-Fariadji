@@ -155,7 +155,21 @@ export default function HarmonikaVisualizer({
   const [extraStage, setExtraStage] = useState<0 | 1 | 2>(0);
   const [extraSlide, setExtraSlide] = useState<number>(0); // 0 (tutup) -> 1 (geser buka celah intip)
   const [gateOpen, setGateOpen] = useState<number>(0); // 0 (tutup) -> 0.92 (full buka harmonika)
-  const [isNightMode, setIsNightMode] = useState<boolean>(true);
+  
+  // Mode Siang / Malam default mengikuti jam lokal (Malam: 18:00 - 06:00, Siang: 06:00 - 18:00)
+  const [isNightMode, setIsNightMode] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const currentHour = new Date().getHours();
+      return currentHour >= 18 || currentHour < 6;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const currentHour = new Date().getHours();
+    setIsNightMode(currentHour >= 18 || currentHour < 6);
+  }, []);
+
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   const primaryColor =
@@ -240,11 +254,11 @@ export default function HarmonikaVisualizer({
     }
   };
 
-  // Dimensions of portal opening
-  const portalX = 140;
-  const portalY = 310;
-  const portalWidth = 720;
-  const portalHeight = 350;
+  // Dimensions of portal opening for Center Shophouse (UD. Fariadji)
+  const portalX = 435;
+  const portalY = 232;
+  const portalWidth = 330;
+  const portalHeight = 202;
 
   // Slat geometry
   const slatCount = bukaanType === "1_bukaan" ? 14 : 16;
@@ -260,16 +274,17 @@ export default function HarmonikaVisualizer({
     const width = gapRight - gapLeft;
     if (width <= 4) return null;
 
-    const topY = portalY + 8;
-    const height = portalHeight - 16;
+    const topY = portalY + 6;
+    const height = portalHeight - 12;
     const bottomY = topY + height;
     const midX = (gapLeft + gapRight) / 2;
 
-    // 3 tiers of X crosses
+    // 3 tiers of X crosses dynamically scaled
+    const tierH = (height - 24) / 3;
     const tiers = [
-      { y1: topY + 24, y2: topY + 104 },
-      { y1: topY + 116, y2: topY + 204 },
-      { y1: topY + 216, y2: topY + 296 },
+      { y1: topY + 6, y2: topY + 6 + tierH },
+      { y1: topY + 12 + tierH, y2: topY + 12 + tierH * 2 },
+      { y1: topY + 18 + tierH * 2, y2: topY + 18 + tierH * 3 },
     ];
 
     return (
@@ -286,9 +301,9 @@ export default function HarmonikaVisualizer({
 
         {/* 1 Vertical CAGAK (Tiang Baja UNP) in the center of the gap */}
         <rect
-          x={midX - 4}
+          x={midX - 3}
           y={topY}
-          width="8"
+          width="6"
           height={height}
           fill="url(#lockPillarGrad)"
           stroke="#334155"
@@ -302,7 +317,7 @@ export default function HarmonikaVisualizer({
           x2={midX}
           y2={bottomY}
           stroke="#cbd5e1"
-          strokeWidth="1.2"
+          strokeWidth="1"
           opacity="0.85"
         />
 
@@ -316,7 +331,7 @@ export default function HarmonikaVisualizer({
               x2={gapRight - 2}
               y2={tier.y2}
               stroke="#f1f5f9"
-              strokeWidth="2.8"
+              strokeWidth="2.2"
               strokeLinecap="round"
             />
             <line
@@ -325,7 +340,7 @@ export default function HarmonikaVisualizer({
               x2={gapRight - 2}
               y2={tier.y2}
               stroke="#475569"
-              strokeWidth="1"
+              strokeWidth="0.8"
               strokeLinecap="round"
             />
 
@@ -336,7 +351,7 @@ export default function HarmonikaVisualizer({
               x2={gapRight - 2}
               y2={tier.y1}
               stroke="#f1f5f9"
-              strokeWidth="2.8"
+              strokeWidth="2.2"
               strokeLinecap="round"
             />
             <line
@@ -345,7 +360,7 @@ export default function HarmonikaVisualizer({
               x2={gapRight - 2}
               y2={tier.y1}
               stroke="#475569"
-              strokeWidth="1"
+              strokeWidth="0.8"
               strokeLinecap="round"
             />
 
@@ -353,28 +368,28 @@ export default function HarmonikaVisualizer({
             <circle
               cx={midX}
               cy={(tier.y1 + tier.y2) / 2}
-              r="2.6"
+              r="2"
               fill="#fbbf24"
               stroke="#78350f"
-              strokeWidth="0.8"
+              strokeWidth="0.6"
             />
 
             {/* Side pins */}
             <circle
-              cx={gapLeft + 3}
+              cx={gapLeft + 2}
               cy={(tier.y1 + tier.y2) / 2}
-              r="2"
+              r="1.6"
               fill="#fbbf24"
               stroke="#78350f"
-              strokeWidth="0.6"
+              strokeWidth="0.5"
             />
             <circle
-              cx={gapRight - 3}
+              cx={gapRight - 2}
               cy={(tier.y1 + tier.y2) / 2}
-              r="2"
+              r="1.6"
               fill="#fbbf24"
               stroke="#78350f"
-              strokeWidth="0.6"
+              strokeWidth="0.5"
             />
           </g>
         ))}
@@ -389,8 +404,8 @@ export default function HarmonikaVisualizer({
     key: string,
     isPintuExtraLeaf = false
   ) => {
-    const slatTop = portalY + 8;
-    const slatH = portalHeight - 16;
+    const slatTop = portalY + 6;
+    const slatH = portalHeight - 12;
     const midSplitY = slatTop + slatH * 0.52; // Atas-Bawah split line
 
     return (
@@ -416,7 +431,7 @@ export default function HarmonikaVisualizer({
               x2={x + width}
               y2={midSplitY}
               stroke="#fbbf24"
-              strokeWidth="2.5"
+              strokeWidth="2"
             />
             {/* Bagian Bawah: Secondary Color */}
             <rect
@@ -440,7 +455,7 @@ export default function HarmonikaVisualizer({
             fill="url(#slatGradPrimary)"
             stroke={primaryColor.borderHex}
             strokeWidth="0.8"
-            rx="2"
+            rx="1.5"
           />
         )}
 
@@ -448,34 +463,34 @@ export default function HarmonikaVisualizer({
         <rect
           x={x + width * 0.42}
           y={slatTop}
-          width={width * 0.16}
+          width={Math.max(2, width * 0.16)}
           height={slatH}
           fill="#000000"
           opacity="0.28"
         />
 
-        {/* HORIZONTAL ACCENT STRIP DI TENGAH: 1 GARIS ATAU 2 GARIS (BISA UNTUK 1 WARNA MAUPUN 2 WARNA) */}
+        {/* HORIZONTAL ACCENT STRIP DI TENGAH: 1 GARIS ATAU 2 GARIS */}
         {(hasStrip || colorMode === "strip_warna") && (
           <g>
             {stripStyle === "1_garis" ? (
-              // 1 Garis Strip Horizontal Lebar di Tengah
+              // 1 Garis Strip Horizontal di Tengah
               <g>
                 <rect
                   x={x}
-                  y={portalY + portalHeight / 2 - 8}
+                  y={portalY + portalHeight / 2 - 5}
                   width={width}
-                  height="16"
+                  height="10"
                   fill={stripColor.hex}
                   stroke="#fbbf24"
-                  strokeWidth="1"
+                  strokeWidth="0.8"
                 />
                 <circle
                   cx={x + width / 2}
                   cy={portalY + portalHeight / 2}
-                  r="2"
+                  r="1.5"
                   fill="#ffffff"
                   stroke="#78350f"
-                  strokeWidth="0.5"
+                  strokeWidth="0.4"
                 />
               </g>
             ) : (
@@ -483,21 +498,21 @@ export default function HarmonikaVisualizer({
               <g>
                 <rect
                   x={x}
-                  y={portalY + portalHeight / 2 - 14}
+                  y={portalY + portalHeight / 2 - 8}
                   width={width}
-                  height="8"
+                  height="5"
                   fill={stripColor.hex}
                   stroke="#fbbf24"
-                  strokeWidth="0.8"
+                  strokeWidth="0.6"
                 />
                 <rect
                   x={x}
-                  y={portalY + portalHeight / 2 + 6}
+                  y={portalY + portalHeight / 2 + 3}
                   width={width}
-                  height="8"
+                  height="5"
                   fill={stripColor.hex}
                   stroke="#fbbf24"
-                  strokeWidth="0.8"
+                  strokeWidth="0.6"
                 />
               </g>
             )}
@@ -505,9 +520,9 @@ export default function HarmonikaVisualizer({
         )}
 
         {/* Rivets at top, mid, and bottom */}
-        <circle cx={x + width / 2} cy={slatTop + 38} r="2" fill="#fbbf24" stroke="#78350f" strokeWidth="0.6" />
-        <circle cx={x + width / 2} cy={slatTop + slatH / 2} r="2.2" fill="#fbbf24" stroke="#78350f" strokeWidth="0.6" />
-        <circle cx={x + width / 2} cy={slatTop + slatH - 38} r="2" fill="#fbbf24" stroke="#78350f" strokeWidth="0.6" />
+        <circle cx={x + width / 2} cy={slatTop + 16} r="1.5" fill="#fbbf24" stroke="#78350f" strokeWidth="0.5" />
+        <circle cx={x + width / 2} cy={slatTop + slatH / 2} r="1.8" fill="#fbbf24" stroke="#78350f" strokeWidth="0.5" />
+        <circle cx={x + width / 2} cy={slatTop + slatH - 16} r="1.5" fill="#fbbf24" stroke="#78350f" strokeWidth="0.5" />
       </g>
     );
   };
@@ -646,7 +661,7 @@ export default function HarmonikaVisualizer({
         title="Klik pintu untuk memutar animasi buka / tutup"
       >
         <svg
-          viewBox="0 0 1000 700"
+          viewBox="0 0 1200 480"
           className="w-full h-auto block drop-shadow-2xl"
           preserveAspectRatio="xMidYMid meet"
         >
@@ -693,22 +708,22 @@ export default function HarmonikaVisualizer({
               <stop offset="100%" stopColor="#0f172a" />
             </linearGradient>
 
-            {/* Warm LED Downlight Spotlights */}
-            <radialGradient id="spotlightL" cx="280" cy="285" r="320" fx="280" fy="285" gradientUnits="userSpaceOnUse">
+            {/* Warm LED Downlight Spotlights for 3-Shop Commercial Row */}
+            <radialGradient id="spotlightCenter" cx="600" cy="220" r="280" fx="600" fy="220" gradientUnits="userSpaceOnUse">
               <stop offset="0%" stopColor="#fef08a" stopOpacity="0.45" />
-              <stop offset="40%" stopColor="#f59e0b" stopOpacity="0.18" />
+              <stop offset="45%" stopColor="#f59e0b" stopOpacity="0.2" />
               <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
             </radialGradient>
 
-            <radialGradient id="spotlightM" cx="500" cy="285" r="320" fx="500" fy="285" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#fef08a" stopOpacity="0.45" />
-              <stop offset="40%" stopColor="#f59e0b" stopOpacity="0.18" />
+            <radialGradient id="spotlightLeft" cx="200" cy="220" r="220" fx="200" fy="220" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#fef08a" stopOpacity="0.3" />
+              <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.1" />
               <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
             </radialGradient>
 
-            <radialGradient id="spotlightR" cx="720" cy="285" r="320" fx="720" fy="285" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#fef08a" stopOpacity="0.45" />
-              <stop offset="40%" stopColor="#f59e0b" stopOpacity="0.18" />
+            <radialGradient id="spotlightRight" cx="1000" cy="220" r="220" fx="1000" fy="220" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#fef08a" stopOpacity="0.3" />
+              <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.1" />
               <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
             </radialGradient>
 
@@ -753,108 +768,295 @@ export default function HarmonikaVisualizer({
             </linearGradient>
           </defs>
 
-          {/* 1. SKY BACKGROUND (FULL WIDTH & HEIGHT) */}
+          {/* 1. SKY BACKGROUND (FULL WIDTH 1200 x 480) */}
           <rect
             x="0"
             y="0"
-            width="1000"
-            height="700"
+            width="1200"
+            height="480"
             fill={isNightMode ? "url(#skyNight)" : "url(#skyDay)"}
           />
 
           {/* Stars in Night Mode */}
           {isNightMode && (
             <g opacity="0.6">
-              <circle cx="80" cy="40" r="1.2" fill="#ffffff" />
-              <circle cx="160" cy="25" r="1.5" fill="#fef08a" />
-              <circle cx="280" cy="50" r="1" fill="#ffffff" />
-              <circle cx="450" cy="30" r="1.3" fill="#ffffff" />
-              <circle cx="620" cy="20" r="1.5" fill="#ffffff" />
-              <circle cx="780" cy="45" r="1.2" fill="#fef08a" />
-              <circle cx="910" cy="35" r="1.4" fill="#ffffff" />
+              <circle cx="60" cy="30" r="1.2" fill="#ffffff" />
+              <circle cx="160" cy="20" r="1.5" fill="#fef08a" />
+              <circle cx="280" cy="40" r="1" fill="#ffffff" />
+              <circle cx="390" cy="18" r="1.2" fill="#ffffff" />
+              <circle cx="510" cy="35" r="1.4" fill="#ffffff" />
+              <circle cx="680" cy="16" r="1.5" fill="#ffffff" />
+              <circle cx="820" cy="38" r="1.2" fill="#fef08a" />
+              <circle cx="950" cy="22" r="1.4" fill="#ffffff" />
+              <circle cx="1080" cy="35" r="1.2" fill="#fef08a" />
+              <circle cx="1160" cy="25" r="1.3" fill="#ffffff" />
             </g>
           )}
 
-          {/* 2. RUKO MAIN STRUCTURE (2-STOREY MODERN SHOPHOUSE) */}
+          {/* ============================================================== */}
+          {/* TOKO 1: SEBELAH KIRI (STATIC SHOPHOUSE - TIDAK BERANIMASI)       */}
+          {/* ============================================================== */}
+          <g>
+            {/* Toko 1 Main Structure */}
+            <rect
+              x="25"
+              y="70"
+              width="350"
+              height="370"
+              fill={isNightMode ? "url(#facadeWallNight)" : "url(#facadeWallDay)"}
+              rx="6"
+            />
+            {/* Side shadows for depth */}
+            <rect x="25" y="70" width="18" height="370" fill="#000000" opacity={isNightMode ? 0.4 : 0.15} />
+            <rect x="357" y="70" width="18" height="370" fill="#000000" opacity={isNightMode ? 0.4 : 0.15} />
+
+            {/* Upper floor modern cladding & windows */}
+            <rect x="45" y="85" width="310" height="105" fill="url(#charcoalCladding)" rx="4" />
+            {/* Window 1 */}
+            <g transform="translate(60, 95)">
+              <rect width="130" height="85" fill="#090d16" stroke="#475569" strokeWidth="2.5" rx="3" />
+              <rect width="130" height="85" fill="url(#glassReflect)" />
+              <line x1="65" y1="0" x2="65" y2="85" stroke="#334155" strokeWidth="2" />
+              <line x1="0" y1="42" x2="130" y2="42" stroke="#334155" strokeWidth="1.5" />
+              <rect x="6" y="6" width="118" height="73" fill="#fbbf24" opacity={isNightMode ? 0.2 : 0.04} />
+            </g>
+            {/* Window 2 */}
+            <g transform="translate(205, 95)">
+              <rect width="130" height="85" fill="#090d16" stroke="#475569" strokeWidth="2.5" rx="3" />
+              <rect width="130" height="85" fill="url(#glassReflect)" />
+              <line x1="65" y1="0" x2="65" y2="85" stroke="#334155" strokeWidth="2" />
+              <line x1="0" y1="42" x2="130" y2="42" stroke="#334155" strokeWidth="1.5" />
+              <rect x="6" y="6" width="118" height="73" fill="#fbbf24" opacity={isNightMode ? 0.2 : 0.04} />
+            </g>
+
+            {/* Storefront Canopy & Signage */}
+            <g transform="translate(35, 196)">
+              <rect width="330" height="26" fill="url(#canopyGrad)" stroke="#1e293b" strokeWidth="2" rx="3" />
+              <rect x="65" y="4" width="200" height="18" fill="#18181b" stroke="#64748b" strokeWidth="1" rx="2" />
+              <text
+                x="165"
+                y="16"
+                textAnchor="middle"
+                fill="#cbd5e1"
+                fontSize="9"
+                fontWeight="800"
+                fontFamily="sans-serif"
+                letterSpacing="1.5"
+              >
+                KAFE &amp; COFFEE ROASTERY
+              </text>
+              <circle cx="50" cy="24" r="3" fill="#fef08a" stroke="#475569" strokeWidth="0.8" />
+              <circle cx="280" cy="24" r="3" fill="#fef08a" stroke="#475569" strokeWidth="0.8" />
+            </g>
+            <rect x="35" y="222" width="330" height="10" fill="#000000" opacity={isNightMode ? 0.5 : 0.25} />
+
+            {/* Ground Floor Portal Frame */}
+            <rect x="45" y="226" width="310" height="214" fill={isNightMode ? "#1e293b" : "#475569"} stroke="#0f172a" strokeWidth="2" rx="3" />
+            <rect x="55" y="232" width="290" height="202" fill="#090d16" />
+
+            {/* Static Closed Harmonika Door (Slate Charcoal Gray) */}
+            <rect x="55" y="230" width="290" height="10" fill="url(#steelRail)" stroke="#1e293b" strokeWidth="1" />
+            <rect x="55" y="424" width="290" height="10" fill="url(#steelRail)" stroke="#1e293b" strokeWidth="1" />
+            {Array.from({ length: 14 }).map((_, i) => {
+              const slatW = 290 / 14;
+              const sx = 55 + i * slatW;
+              return (
+                <g key={`static-left-${i}`}>
+                  <rect x={sx} y={238} width={slatW} height={190} fill="#334155" stroke="#1e293b" strokeWidth="0.8" rx="1.5" />
+                  <rect x={sx + slatW * 0.42} y={238} width={slatW * 0.16} height={190} fill="#0f172a" opacity="0.3" />
+                  <circle cx={sx + slatW / 2} cy={252} r="1.4" fill="#94a3b8" />
+                  <circle cx={sx + slatW / 2} cy={333} r="1.6" fill="#94a3b8" />
+                  <circle cx={sx + slatW / 2} cy={414} r="1.4" fill="#94a3b8" />
+                </g>
+              );
+            })}
+            {/* Center Lock Pillar & Handle for Toko 1 */}
+            <rect x={55 + 145 - 5} y={236} width="10" height="194" fill="url(#lockPillarGrad)" stroke="#475569" strokeWidth="0.8" />
+            <rect x={55 + 145 - 2} y={318} width="3.5" height="32" fill="#f1f5f9" stroke="#64748b" strokeWidth="0.6" rx="1" />
+            <circle cx={55 + 145} cy={356} r="1.8" fill="#0f172a" stroke="#fbbf24" strokeWidth="0.6" />
+          </g>
+
+          {/* ============================================================== */}
+          {/* TOKO 3: SEBELAH KANAN (STATIC SHOPHOUSE - TIDAK BERANIMASI)      */}
+          {/* ============================================================== */}
+          <g>
+            {/* Toko 3 Main Structure */}
+            <rect
+              x="825"
+              y="70"
+              width="350"
+              height="370"
+              fill={isNightMode ? "url(#facadeWallNight)" : "url(#facadeWallDay)"}
+              rx="6"
+            />
+            {/* Side shadows for depth */}
+            <rect x="825" y="70" width="18" height="370" fill="#000000" opacity={isNightMode ? 0.4 : 0.15} />
+            <rect x="1157" y="70" width="18" height="370" fill="#000000" opacity={isNightMode ? 0.4 : 0.15} />
+
+            {/* Upper floor modern cladding & windows */}
+            <rect x="845" y="85" width="310" height="105" fill="url(#charcoalCladding)" rx="4" />
+            {/* Window 1 */}
+            <g transform="translate(860, 95)">
+              <rect width="130" height="85" fill="#090d16" stroke="#475569" strokeWidth="2.5" rx="3" />
+              <rect width="130" height="85" fill="url(#glassReflect)" />
+              <line x1="65" y1="0" x2="65" y2="85" stroke="#334155" strokeWidth="2" />
+              <line x1="0" y1="42" x2="130" y2="42" stroke="#334155" strokeWidth="1.5" />
+              <rect x="6" y="6" width="118" height="73" fill="#fbbf24" opacity={isNightMode ? 0.2 : 0.04} />
+            </g>
+            {/* Window 2 */}
+            <g transform="translate(1005, 95)">
+              <rect width="130" height="85" fill="#090d16" stroke="#475569" strokeWidth="2.5" rx="3" />
+              <rect width="130" height="85" fill="url(#glassReflect)" />
+              <line x1="65" y1="0" x2="65" y2="85" stroke="#334155" strokeWidth="2" />
+              <line x1="0" y1="42" x2="130" y2="42" stroke="#334155" strokeWidth="1.5" />
+              <rect x="6" y="6" width="118" height="73" fill="#fbbf24" opacity={isNightMode ? 0.2 : 0.04} />
+            </g>
+
+            {/* Storefront Canopy & Signage */}
+            <g transform="translate(835, 196)">
+              <rect width="330" height="26" fill="url(#canopyGrad)" stroke="#1e293b" strokeWidth="2" rx="3" />
+              <rect x="65" y="4" width="200" height="18" fill="#18181b" stroke="#64748b" strokeWidth="1" rx="2" />
+              <text
+                x="165"
+                y="16"
+                textAnchor="middle"
+                fill="#cbd5e1"
+                fontSize="9"
+                fontWeight="800"
+                fontFamily="sans-serif"
+                letterSpacing="1.5"
+              >
+                APOTEK &amp; KLINIK UTAMA
+              </text>
+              <circle cx="50" cy="24" r="3" fill="#fef08a" stroke="#475569" strokeWidth="0.8" />
+              <circle cx="280" cy="24" r="3" fill="#fef08a" stroke="#475569" strokeWidth="0.8" />
+            </g>
+            <rect x="835" y="222" width="330" height="10" fill="#000000" opacity={isNightMode ? 0.5 : 0.25} />
+
+            {/* Ground Floor Portal Frame */}
+            <rect x="845" y="226" width="310" height="214" fill={isNightMode ? "#1e293b" : "#475569"} stroke="#0f172a" strokeWidth="2" rx="3" />
+            <rect x="855" y="232" width="290" height="202" fill="#090d16" />
+
+            {/* Static Closed Harmonika Door (Deep Teal Green) */}
+            <rect x="855" y="230" width="290" height="10" fill="url(#steelRail)" stroke="#1e293b" strokeWidth="1" />
+            <rect x="855" y="424" width="290" height="10" fill="url(#steelRail)" stroke="#1e293b" strokeWidth="1" />
+            {Array.from({ length: 14 }).map((_, i) => {
+              const slatW = 290 / 14;
+              const sx = 855 + i * slatW;
+              return (
+                <g key={`static-right-${i}`}>
+                  <rect x={sx} y={238} width={slatW} height={190} fill="#164e63" stroke="#0f172a" strokeWidth="0.8" rx="1.5" />
+                  <rect x={sx + slatW * 0.42} y={238} width={slatW * 0.16} height={190} fill="#000000" opacity="0.25" />
+                  <circle cx={sx + slatW / 2} cy={252} r="1.4" fill="#94a3b8" />
+                  <circle cx={sx + slatW / 2} cy={333} r="1.6" fill="#94a3b8" />
+                  <circle cx={sx + slatW / 2} cy={414} r="1.4" fill="#94a3b8" />
+                </g>
+              );
+            })}
+            {/* Center Lock Pillar & Handle for Toko 3 */}
+            <rect x={855 + 145 - 5} y={236} width="10" height="194" fill="url(#lockPillarGrad)" stroke="#475569" strokeWidth="0.8" />
+            <rect x={855 + 145 - 2} y={318} width="3.5" height="32" fill="#f1f5f9" stroke="#64748b" strokeWidth="0.6" rx="1" />
+            <circle cx={855 + 145} cy={356} r="1.8" fill="#0f172a" stroke="#fbbf24" strokeWidth="0.6" />
+          </g>
+
+          {/* ============================================================== */}
+          {/* SIDEWALK GREENERY & PLANTERS (BETWEEN SHOPS)                    */}
+          {/* ============================================================== */}
+          {/* Planter 1 between Toko 1 & Toko 2 */}
+          <g>
+            <rect x="382" y="415" width="12" height="25" fill="#1e293b" stroke="#475569" strokeWidth="1" rx="2" />
+            <circle cx="388" cy="408" r="10" fill="#15803d" />
+            <circle cx="388" cy="404" r="8" fill="#22c55e" opacity="0.8" />
+          </g>
+          {/* Planter 2 between Toko 2 & Toko 3 */}
+          <g>
+            <rect x="806" y="415" width="12" height="25" fill="#1e293b" stroke="#475569" strokeWidth="1" rx="2" />
+            <circle cx="812" cy="408" r="10" fill="#15803d" />
+            <circle cx="812" cy="404" r="8" fill="#22c55e" opacity="0.8" />
+          </g>
+
+          {/* ============================================================== */}
+          {/* TOKO 2: TENGAH (UD. FARIADJI PINTU HARMONIKA - FLAGSHIP ANIMASI) */}
+          {/* ============================================================== */}
+          {/* Main Structure for Toko Tengah (Taller & Prominent) */}
           <rect
-            x="60"
-            y="50"
-            width="880"
-            height="620"
+            x="400"
+            y="48"
+            width="400"
+            height="392"
             fill={isNightMode ? "url(#facadeWallNight)" : "url(#facadeWallDay)"}
-            rx="8"
+            rx="6"
           />
+          {/* Left & Right Pillar Shadows */}
+          <rect x="400" y="48" width="15" height="392" fill="#000000" opacity={isNightMode ? 0.45 : 0.2} />
+          <rect x="785" y="48" width="15" height="392" fill="#000000" opacity={isNightMode ? 0.45 : 0.25} />
 
-          {/* Left & Right Pillar Shadows for 3D Depth */}
-          <rect x="60" y="50" width="35" height="620" fill="#000000" opacity={isNightMode ? 0.45 : 0.2} />
-          <rect x="905" y="50" width="35" height="620" fill="#000000" opacity={isNightMode ? 0.45 : 0.25} />
-
-          {/* Upper Floor Modern Cladding & Windows */}
-          <rect x="95" y="65" width="810" height="180" fill="url(#charcoalCladding)" rx="6" />
+          {/* Upper Floor Modern Cladding & 3 Windows */}
+          <rect x="415" y="62" width="370" height="126" fill="url(#charcoalCladding)" rx="5" />
 
           {/* Window 1 */}
-          <g transform="translate(130, 85)">
-            <rect width="210" height="140" fill="#090d16" stroke="#475569" strokeWidth="4" rx="4" />
-            <rect width="210" height="140" fill="url(#glassReflect)" />
-            <line x1="105" y1="0" x2="105" y2="140" stroke="#334155" strokeWidth="3" />
-            <line x1="0" y1="70" x2="210" y2="70" stroke="#334155" strokeWidth="2" />
-            <rect x="10" y="10" width="190" height="120" fill="#fbbf24" opacity={isNightMode ? 0.2 : 0.05} />
+          <g transform="translate(428, 72)">
+            <rect width="104" height="96" fill="#090d16" stroke="#475569" strokeWidth="2.5" rx="3" />
+            <rect width="104" height="96" fill="url(#glassReflect)" />
+            <line x1="52" y1="0" x2="52" y2="96" stroke="#334155" strokeWidth="2" />
+            <line x1="0" y1="48" x2="104" y2="48" stroke="#334155" strokeWidth="1.5" />
+            <rect x="5" y="5" width="94" height="86" fill="#fbbf24" opacity={isNightMode ? 0.2 : 0.05} />
           </g>
 
           {/* Window 2 */}
-          <g transform="translate(395, 85)">
-            <rect width="210" height="140" fill="#090d16" stroke="#475569" strokeWidth="4" rx="4" />
-            <rect width="210" height="140" fill="url(#glassReflect)" />
-            <line x1="105" y1="0" x2="105" y2="140" stroke="#334155" strokeWidth="3" />
-            <line x1="0" y1="70" x2="210" y2="70" stroke="#334155" strokeWidth="2" />
-            <rect x="10" y="10" width="190" height="120" fill="#fbbf24" opacity={isNightMode ? 0.22 : 0.05} />
+          <g transform="translate(548, 72)">
+            <rect width="104" height="96" fill="#090d16" stroke="#475569" strokeWidth="2.5" rx="3" />
+            <rect width="104" height="96" fill="url(#glassReflect)" />
+            <line x1="52" y1="0" x2="52" y2="96" stroke="#334155" strokeWidth="2" />
+            <line x1="0" y1="48" x2="104" y2="48" stroke="#334155" strokeWidth="1.5" />
+            <rect x="5" y="5" width="94" height="86" fill="#fbbf24" opacity={isNightMode ? 0.22 : 0.05} />
           </g>
 
           {/* Window 3 */}
-          <g transform="translate(660, 85)">
-            <rect width="210" height="140" fill="#090d16" stroke="#475569" strokeWidth="4" rx="4" />
-            <rect width="210" height="140" fill="url(#glassReflect)" />
-            <line x1="105" y1="0" x2="105" y2="140" stroke="#334155" strokeWidth="3" />
-            <line x1="0" y1="70" x2="210" y2="70" stroke="#334155" strokeWidth="2" />
-            <rect x="10" y="10" width="190" height="120" fill="#fbbf24" opacity={isNightMode ? 0.2 : 0.05} />
+          <g transform="translate(668, 72)">
+            <rect width="104" height="96" fill="#090d16" stroke="#475569" strokeWidth="2.5" rx="3" />
+            <rect width="104" height="96" fill="url(#glassReflect)" />
+            <line x1="52" y1="0" x2="52" y2="96" stroke="#334155" strokeWidth="2" />
+            <line x1="0" y1="48" x2="104" y2="48" stroke="#334155" strokeWidth="1.5" />
+            <rect x="5" y="5" width="94" height="86" fill="#fbbf24" opacity={isNightMode ? 0.2 : 0.05} />
           </g>
 
-          {/* 3. STOREFRONT CANOPY & SIGNAGE FASCIA */}
-          <g transform="translate(80, 248)">
-            <rect width="840" height="42" fill="url(#canopyGrad)" stroke="#1e293b" strokeWidth="3" rx="4" />
-            <line x1="0" y1="2" x2="840" y2="2" stroke="#94a3b8" strokeWidth="1.5" />
-            <rect x="260" y="6" width="320" height="30" fill="#18181b" stroke="#f59e0b" strokeWidth="1.5" rx="3" />
+          {/* STOREFRONT CANOPY & SIGNAGE FASCIA (CENTER STORE) */}
+          <g transform="translate(410, 194)">
+            <rect width="380" height="28" fill="url(#canopyGrad)" stroke="#1e293b" strokeWidth="2" rx="3" />
+            <line x1="0" y1="2" x2="380" y2="2" stroke="#94a3b8" strokeWidth="1" />
+            <rect x="40" y="4" width="300" height="20" fill="#18181b" stroke="#f59e0b" strokeWidth="1.2" rx="2.5" />
             <text
-              x="420"
-              y="26"
+              x="190"
+              y="18"
               textAnchor="middle"
               fill="#fbbf24"
-              fontSize="13"
+              fontSize="11"
               fontWeight="900"
               fontFamily="sans-serif"
-              letterSpacing="3.5"
+              letterSpacing="2"
             >
               UD. FARIADJI PINTU HARMONIKA
             </text>
             {/* Recessed Warm LED Fixtures */}
-            <circle cx="200" cy="39" r="4.5" fill="#fef08a" stroke="#475569" strokeWidth="1" />
-            <circle cx="420" cy="39" r="4.5" fill="#fef08a" stroke="#475569" strokeWidth="1" />
-            <circle cx="640" cy="39" r="4.5" fill="#fef08a" stroke="#475569" strokeWidth="1" />
+            <circle cx="30" cy="26" r="3.5" fill="#fef08a" stroke="#475569" strokeWidth="0.8" />
+            <circle cx="190" cy="26" r="3.5" fill="#fef08a" stroke="#475569" strokeWidth="0.8" />
+            <circle cx="350" cy="26" r="3.5" fill="#fef08a" stroke="#475569" strokeWidth="0.8" />
           </g>
 
           {/* Canopy Drop Shadow */}
-          <rect x="80" y="290" width="840" height="18" fill="#000000" opacity={isNightMode ? 0.6 : 0.35} />
+          <rect x="410" y="222" width="380" height="12" fill="#000000" opacity={isNightMode ? 0.6 : 0.35} />
 
-          {/* 4. GROUND FLOOR PORTAL OPENING */}
+          {/* GROUND FLOOR PORTAL OPENING (CENTER STORE) */}
           <rect
-            x={portalX - 22}
-            y={portalY - 14}
-            width={portalWidth + 44}
-            height={portalHeight + 28}
+            x={portalX - 10}
+            y={portalY - 6}
+            width={portalWidth + 20}
+            height={portalHeight + 12}
             fill={isNightMode ? "#1e293b" : "#475569"}
             stroke="#0f172a"
-            strokeWidth="3"
-            rx="4"
+            strokeWidth="2"
+            rx="3"
           />
 
           {/* Interior Opening Cavity */}
@@ -867,256 +1069,233 @@ export default function HarmonikaVisualizer({
             <rect x={portalX} y={portalY} width={portalWidth} height={portalHeight} fill="#18181b" />
             <ellipse
               cx={portalX + portalWidth / 2}
-              cy={portalY + 50}
-              rx={portalWidth * 0.45}
-              ry="45"
+              cy={portalY + 30}
+              rx={portalWidth * 0.4}
+              ry="25"
               fill="#fef08a"
               opacity="0.25"
             />
 
             {/* Left Showroom Shelf */}
-            <g transform={`translate(${portalX + 40}, ${portalY + 80})`}>
-              <rect width="180" height="230" fill="#27272a" stroke="#3f3f46" strokeWidth="2" rx="4" />
-              <line x1="10" y1="70" x2="170" y2="70" stroke="#52525b" strokeWidth="2" />
-              <line x1="10" y1="140" x2="170" y2="140" stroke="#52525b" strokeWidth="2" />
-              <rect x="25" y="30" width="35" height="38" fill="#f59e0b" rx="2" />
-              <rect x="75" y="25" width="40" height="43" fill="#0284c7" rx="2" />
-              <rect x="125" y="35" width="30" height="33" fill="#10b981" rx="2" />
-              <rect x="30" y="95" width="45" height="42" fill="#be123c" rx="2" />
-              <rect x="95" y="100" width="55" height="37" fill="#6366f1" rx="2" />
+            <g transform={`translate(${portalX + 18}, ${portalY + 45})`}>
+              <rect width="80" height="130" fill="#27272a" stroke="#3f3f46" strokeWidth="1.5" rx="3" />
+              <line x1="5" y1="40" x2="75" y2="40" stroke="#52525b" strokeWidth="1.5" />
+              <line x1="5" y1="80" x2="75" y2="80" stroke="#52525b" strokeWidth="1.5" />
+              <rect x="12" y="15" width="20" height="22" fill="#f59e0b" rx="2" />
+              <rect x="42" y="12" width="24" height="25" fill="#0284c7" rx="2" />
+              <rect x="15" y="52" width="22" height="24" fill="#10b981" rx="2" />
+              <rect x="45" y="55" width="24" height="21" fill="#be123c" rx="2" />
+              <rect x="25" y="92" width="30" height="28" fill="#6366f1" rx="2" />
             </g>
 
             {/* Center Reception Desk with Sign */}
-            <g transform={`translate(${portalX + 260}, ${portalY + 160})`}>
-              <rect width="200" height="150" fill="#27272a" stroke="#3f3f46" strokeWidth="2" rx="6" />
-              <rect x="10" y="10" width="180" height="25" fill="#3f3f46" rx="3" />
+            <g transform={`translate(${portalX + 115}, ${portalY + 85})`}>
+              <rect width="100" height="90" fill="#27272a" stroke="#3f3f46" strokeWidth="1.5" rx="4" />
+              <rect x="5" y="6" width="90" height="18" fill="#3f3f46" rx="2" />
               <text
-                x="100"
-                y="27"
+                x="50"
+                y="18"
                 textAnchor="middle"
                 fill="#fde047"
-                fontSize="11"
+                fontSize="8"
                 fontWeight="bold"
-                letterSpacing="1"
+                letterSpacing="0.8"
               >
                 UD. FARIADJI SHOWROOM
               </text>
-              <rect x="75" y="60" width="50" height="35" fill="#090d16" stroke="#94a3b8" strokeWidth="2" rx="2" />
-              <line x1="100" y1="95" x2="100" y2="115" stroke="#94a3b8" strokeWidth="4" />
-              <line x1="85" y1="115" x2="115" y2="115" stroke="#94a3b8" strokeWidth="3" />
+              <rect x="38" y="32" width="24" height="18" fill="#090d16" stroke="#94a3b8" strokeWidth="1.5" rx="2" />
+              <line x1="50" y1="50" x2="50" y2="60" stroke="#94a3b8" strokeWidth="2.5" />
+              <line x1="42" y1="60" x2="58" y2="60" stroke="#94a3b8" strokeWidth="2" />
             </g>
 
             {/* Right Shelf */}
-            <g transform={`translate(${portalX + 500}, ${portalY + 80})`}>
-              <rect width="180" height="230" fill="#27272a" stroke="#3f3f46" strokeWidth="2" rx="4" />
-              <line x1="10" y1="70" x2="170" y2="70" stroke="#52525b" strokeWidth="2" />
-              <line x1="10" y1="140" x2="170" y2="140" stroke="#52525b" strokeWidth="2" />
-              <rect x="25" y="30" width="40" height="38" fill="#e11d48" rx="2" />
-              <rect x="80" y="25" width="45" height="43" fill="#d97706" rx="2" />
-              <rect x="135" y="32" width="30" height="36" fill="#0d9488" rx="2" />
-              <rect x="40" y="95" width="50" height="42" fill="#4338ca" rx="2" />
-              <rect x="110" y="98" width="45" height="39" fill="#15803d" rx="2" />
+            <g transform={`translate(${portalX + 232}, ${portalY + 45})`}>
+              <rect width="80" height="130" fill="#27272a" stroke="#3f3f46" strokeWidth="1.5" rx="3" />
+              <line x1="5" y1="40" x2="75" y2="40" stroke="#52525b" strokeWidth="1.5" />
+              <line x1="5" y1="80" x2="75" y2="80" stroke="#52525b" strokeWidth="1.5" />
+              <rect x="12" y="15" width="22" height="22" fill="#e11d48" rx="2" />
+              <rect x="44" y="12" width="24" height="25" fill="#d97706" rx="2" />
+              <rect x="15" y="52" width="22" height="24" fill="#0d9488" rx="2" />
+              <rect x="45" y="55" width="24" height="21" fill="#4338ca" rx="2" />
+              <rect x="25" y="92" width="30" height="28" fill="#15803d" rx="2" />
             </g>
 
             {/* Tiled floor */}
-            <rect x={portalX} y={portalY + portalHeight - 40} width={portalWidth} height="40" fill="#334155" opacity="0.8" />
+            <rect x={portalX} y={portalY + portalHeight - 20} width={portalWidth} height="20" fill="#334155" opacity="0.8" />
           </g>
 
-          {/* 5. TOP AND BOTTOM RAILS */}
+          {/* TOP AND BOTTOM RAILS (CENTER STORE) */}
           {/* Top Guide Rail with roller slot */}
-          <rect x={portalX} y={portalY - 2} width={portalWidth} height="18" fill="url(#steelRail)" stroke="#1e293b" strokeWidth="1.5" />
-          <line x1={portalX} y1={portalY + 6} x2={portalX + portalWidth} y2={portalY + 6} stroke="#0f172a" strokeWidth="2.5" />
+          <rect x={portalX} y={portalY - 2} width={portalWidth} height="12" fill="url(#steelRail)" stroke="#1e293b" strokeWidth="1" />
+          <line x1={portalX} y1={portalY + 4} x2={portalX + portalWidth} y2={portalY + 4} stroke="#0f172a" strokeWidth="2" />
 
           {/* Bottom Embedded Track */}
-          <rect x={portalX} y={portalY + portalHeight - 16} width={portalWidth} height="16" fill="url(#steelRail)" stroke="#1e293b" strokeWidth="1.5" />
-          <line x1={portalX} y1={portalY + portalHeight - 8} x2={portalX + portalWidth} y2={portalY + portalHeight - 8} stroke="#0f172a" strokeWidth="2.5" />
+          <rect x={portalX} y={portalY + portalHeight - 10} width={portalWidth} height="10" fill="url(#steelRail)" stroke="#1e293b" strokeWidth="1" />
+          <line x1={portalX} y1={portalY + portalHeight - 5} x2={portalX + portalWidth} y2={portalY + portalHeight - 5} stroke="#0f172a" strokeWidth="2" />
 
           {/* ============================================================== */}
-          {/* 6. DYNAMIC FOLDING GATE SLATS & PINTU EXTRA                    */}
+          {/* DYNAMIC FOLDING GATE SLATS & PINTU EXTRA (CENTER STORE)        */}
           {/* ============================================================== */}
 
-          {/* ------------------------------------------------------------- */}
-          {/* CASE A: 2 BUKAAN (BUKAAN TENGAH / KUPU-TARUNG)                 */}
-          {/* ------------------------------------------------------------- */}
+          {/* CASE A: 2 BUKAAN */}
           {bukaanType === "2_bukaan" && (() => {
-            const halfPortal = portalWidth / 2; // 360
-            
-            // Full gate folding width (leaving 8% stack when full open)
+            const halfPortal = portalWidth / 2; // 165
             const wingWidth = halfPortal * (1 - gateOpen);
 
-            // Leading edges of left and right wings (smoothly moving)
             const leftLeadingX = portalX + wingWidth;
             const rightLeadingX = portalX + portalWidth - wingWidth;
 
-            // Lock pillar width on each side = 12px
-            const lockPillarW = 12;
-
-            // Extra opening sliding gap (cuma 1 tiang = 40px)
-            const gapPerSide = hasPintuExtra ? extraSlide * 40 : 0;
-            
-            // Slat counts: 7 slats per wing
+            const lockPillarW = 10;
+            const gapPerSide = hasPintuExtra ? extraSlide * 24 : 0;
             const slatsPerWing = 7;
             
-            // Left wing solid daun width (from portalX to extra gap)
-            const leftDaunWidth = Math.max(10, (leftLeadingX - portalX - lockPillarW) - gapPerSide);
+            const leftDaunWidth = Math.max(8, (leftLeadingX - portalX - lockPillarW) - gapPerSide);
             const leftSlatW = leftDaunWidth / slatsPerWing;
             
-            // Left slats centers
             const leftCenters: number[] = [];
             for (let i = 0; i < slatsPerWing; i++) {
               leftCenters.push(portalX + i * leftSlatW + leftSlatW / 2);
             }
 
-            // Right wing solid daun width (from extra gap to right jamb)
             const rightDaunStartX = (rightLeadingX + lockPillarW) + gapPerSide;
-            const rightDaunWidth = Math.max(10, (portalX + portalWidth) - rightDaunStartX);
+            const rightDaunWidth = Math.max(8, (portalX + portalWidth) - rightDaunStartX);
             const rightSlatW = rightDaunWidth / slatsPerWing;
 
-            // Right slats centers
             const rightCenters: number[] = [];
             for (let i = 0; i < slatsPerWing; i++) {
               rightCenters.push(rightDaunStartX + i * rightSlatW + rightSlatW / 2);
             }
 
-            // Left gap: between (leftLeadingX - lockPillarW - gapPerSide) and (leftLeadingX - lockPillarW)
             const leftGapLeft = leftLeadingX - lockPillarW - gapPerSide;
             const leftGapRight = leftLeadingX - lockPillarW;
 
-            // Right gap: between (rightLeadingX + lockPillarW) and (rightLeadingX + lockPillarW + gapPerSide)
             const rightGapLeft = rightLeadingX + lockPillarW;
             const rightGapRight = rightLeadingX + lockPillarW + gapPerSide;
 
             return (
               <g>
-                {/* 1. Left Extra Gap (Cuma 1 tiang: Cagak & Silang visible when extraSlide > 0) */}
+                {/* 1. Left Extra Gap (Cuma 1 tiang) */}
                 {hasPintuExtra && gapPerSide > 3 && (
                   renderCagakAndSilangan(leftGapLeft, leftGapRight, "2p-left-extra")
                 )}
 
-                {/* 2. Right Extra Gap (Cuma 1 tiang: Cagak & Silang visible when extraSlide > 0) */}
+                {/* 2. Right Extra Gap (Cuma 1 tiang) */}
                 {hasPintuExtra && gapPerSide > 3 && (
                   renderCagakAndSilangan(rightGapLeft, rightGapRight, "2p-right-extra")
                 )}
 
-                {/* 3. Sayap Kiri (Clean Plat Daun) */}
+                {/* 3. Sayap Kiri */}
                 <g>
                   {leftCenters.map((cx, i) =>
                     renderSingleSlat(cx - leftSlatW / 2, leftSlatW, `2p-left-${i}`)
                   )}
-                  {/* Subtle edge line where left daun slides */}
                   {hasPintuExtra && gapPerSide > 3 && (
                     <line
                       x1={leftGapLeft}
-                      y1={portalY + 8}
+                      y1={portalY + 6}
                       x2={leftGapLeft}
-                      y2={portalY + portalHeight - 8}
+                      y2={portalY + portalHeight - 6}
                       stroke="#0f172a"
-                      strokeWidth="2"
+                      strokeWidth="1.5"
                       opacity="0.6"
                     />
                   )}
                 </g>
 
-                {/* 4. Sayap Kanan (Clean Plat Daun) */}
+                {/* 4. Sayap Kanan */}
                 <g>
                   {rightCenters.map((cx, i) =>
                     renderSingleSlat(cx - rightSlatW / 2, rightSlatW, `2p-right-${i}`)
                   )}
-                  {/* Subtle edge line where right daun slides */}
                   {hasPintuExtra && gapPerSide > 3 && (
                     <line
                       x1={rightGapRight}
-                      y1={portalY + 8}
+                      y1={portalY + 6}
                       x2={rightGapRight}
-                      y2={portalY + portalHeight - 8}
+                      y2={portalY + portalHeight - 6}
                       stroke="#0f172a"
-                      strokeWidth="2"
+                      strokeWidth="1.5"
                       opacity="0.6"
                     />
                   )}
                 </g>
 
-                {/* 5. Left Leading Lock Pillar & Left Main Handle (Smoothly travels with leftLeadingX) */}
+                {/* 5. Left Leading Lock Pillar & Left Main Handle */}
                 <g>
                   <rect
                     x={leftLeadingX - lockPillarW}
-                    y={portalY + 6}
+                    y={portalY + 4}
                     width={lockPillarW}
-                    height={portalHeight - 12}
+                    height={portalHeight - 8}
                     fill="url(#lockPillarGrad)"
                     stroke="#475569"
-                    strokeWidth="1"
+                    strokeWidth="0.8"
                   />
-                  {/* Left Main Handle */}
                   <rect
-                    x={leftLeadingX - 8}
-                    y={portalY + portalHeight / 2 - 25}
-                    width="4.5"
-                    height="50"
+                    x={leftLeadingX - 6}
+                    y={portalY + portalHeight / 2 - 18}
+                    width="3.5"
+                    height="36"
                     fill="#f1f5f9"
                     stroke="#64748b"
-                    strokeWidth="0.8"
-                    rx="2"
+                    strokeWidth="0.6"
+                    rx="1.5"
                   />
                 </g>
 
-                {/* 6. Right Leading Lock Pillar & Right Main Handle (Smoothly travels with rightLeadingX) */}
+                {/* 6. Right Leading Lock Pillar & Right Main Handle */}
                 <g>
                   <rect
                     x={rightLeadingX}
-                    y={portalY + 6}
+                    y={portalY + 4}
                     width={lockPillarW}
-                    height={portalHeight - 12}
+                    height={portalHeight - 8}
                     fill="url(#lockPillarGrad)"
                     stroke="#475569"
-                    strokeWidth="1"
+                    strokeWidth="0.8"
                   />
-                  {/* Right Main Handle */}
                   <rect
-                    x={rightLeadingX + 3.5}
-                    y={portalY + portalHeight / 2 - 25}
-                    width="4.5"
-                    height="50"
+                    x={rightLeadingX + 2.5}
+                    y={portalY + portalHeight / 2 - 18}
+                    width="3.5"
+                    height="36"
                     fill="#f1f5f9"
                     stroke="#64748b"
-                    strokeWidth="0.8"
-                    rx="2"
+                    strokeWidth="0.6"
+                    rx="1.5"
                   />
-                  {/* Brass Keyhole */}
                   <circle
-                    cx={rightLeadingX + 6}
-                    cy={portalY + portalHeight / 2 + 35}
-                    r="2.5"
+                    cx={rightLeadingX + 5}
+                    cy={portalY + portalHeight / 2 + 25}
+                    r="2"
                     fill="#0f172a"
                     stroke="#fbbf24"
-                    strokeWidth="0.8"
+                    strokeWidth="0.6"
                   />
                 </g>
 
-                {/* 7. DUA HANDLE EXTRA DI SISI LUAR CELAH (TOTAL 4 HANDLE DI 2 BUKAAN) */}
+                {/* 7. DUA HANDLE EXTRA (TOTAL 4 HANDLE DI 2 BUKAAN) */}
                 {hasPintuExtra && (
                   <g>
-                    {/* Left Extra Handle on Left Sliding Leaf */}
                     <rect
-                      x={leftGapLeft - 6}
-                      y={portalY + portalHeight / 2 - 22}
-                      width="4"
-                      height="44"
+                      x={leftGapLeft - 4}
+                      y={portalY + portalHeight / 2 - 16}
+                      width="3"
+                      height="32"
                       fill="#f1f5f9"
                       stroke="#64748b"
-                      strokeWidth="0.8"
-                      rx="1.5"
+                      strokeWidth="0.6"
+                      rx="1"
                     />
-                    {/* Right Extra Handle on Right Sliding Leaf */}
                     <rect
-                      x={rightGapRight + 2}
-                      y={portalY + portalHeight / 2 - 22}
-                      width="4"
-                      height="44"
+                      x={rightGapRight + 1}
+                      y={portalY + portalHeight / 2 - 16}
+                      width="3"
+                      height="32"
                       fill="#f1f5f9"
                       stroke="#64748b"
-                      strokeWidth="0.8"
-                      rx="1.5"
+                      strokeWidth="0.6"
+                      rx="1"
                     />
                   </g>
                 )}
@@ -1124,24 +1303,13 @@ export default function HarmonikaVisualizer({
             );
           })()}
 
-          {/* ------------------------------------------------------------- */}
-          {/* CASE B: 1 BUKAAN (GESER 1 ARAH DORONG KE KIRI)                 */}
-          {/* ------------------------------------------------------------- */}
+          {/* CASE B: 1 BUKAAN */}
           {bukaanType === "1_bukaan" && (() => {
-            // Full gate folding width (leaving 8% stack when full open)
             const gateWidth = portalWidth * (1 - gateOpen);
-
-            // Leading edge of 1-bukaan gate (smoothly moving)
             const leadingX = portalX + gateWidth;
-
-            // Leading lock pillar width at right edge = 18px
-            const lockPillarW = 18;
-
-            // Extra opening sliding gap (cuma 1 tiang = 45px)
-            const extraGap = hasPintuExtra ? extraSlide * 45 : 0;
-
-            // Daun width (from left jamb to extra gap)
-            const mainDaunWidth = Math.max(15, (gateWidth - lockPillarW) - extraGap);
+            const lockPillarW = 14;
+            const extraGap = hasPintuExtra ? extraSlide * 28 : 0;
+            const mainDaunWidth = Math.max(10, (gateWidth - lockPillarW) - extraGap);
             const slatCount1P = 14;
             const slatW = mainDaunWidth / slatCount1P;
 
@@ -1150,80 +1318,76 @@ export default function HarmonikaVisualizer({
               slatCenters.push(portalX + i * slatW + slatW / 2);
             }
 
-            // Gap boundaries
             const gapLeft = leadingX - lockPillarW - extraGap;
             const gapRight = leadingX - lockPillarW;
 
             return (
               <g>
-                {/* 1. Extra Gap Next to Handle (1 tiang: Cagak & Silang visible when extraSlide > 0) */}
+                {/* 1. Extra Gap Next to Handle */}
                 {hasPintuExtra && extraGap > 3 && (
                   renderCagakAndSilangan(gapLeft, gapRight, "1p-extra")
                 )}
 
-                {/* 2. Main Gate Daun (Clean Plat Daun) */}
+                {/* 2. Main Gate Daun */}
                 <g>
                   {slatCenters.map((cx, i) =>
                     renderSingleSlat(cx - slatW / 2, slatW, `1p-${i}`)
                   )}
-                  {/* Subtle edge line where daun slides back */}
                   {hasPintuExtra && extraGap > 3 && (
                     <line
                       x1={gapLeft}
-                      y1={portalY + 8}
+                      y1={portalY + 6}
                       x2={gapLeft}
-                      y2={portalY + portalHeight - 8}
+                      y2={portalY + portalHeight - 6}
                       stroke="#0f172a"
-                      strokeWidth="2"
+                      strokeWidth="1.5"
                       opacity="0.6"
                     />
                   )}
                 </g>
 
-                {/* 3. Leading Lock Jamb Pillar with Chrome Handle (Smoothly travels with leadingX) */}
+                {/* 3. Leading Lock Jamb Pillar with Chrome Handle */}
                 <g>
                   <rect
                     x={leadingX - lockPillarW}
-                    y={portalY + 6}
+                    y={portalY + 4}
                     width={lockPillarW}
-                    height={portalHeight - 12}
+                    height={portalHeight - 8}
                     fill="url(#lockPillarGrad)"
                     stroke="#475569"
-                    strokeWidth="1.2"
+                    strokeWidth="0.8"
                   />
-                  {/* Main Handle */}
                   <rect
-                    x={leadingX - lockPillarW / 2 - 2.5}
-                    y={portalY + portalHeight / 2 - 25}
-                    width="5"
-                    height="50"
+                    x={leadingX - lockPillarW / 2 - 2}
+                    y={portalY + portalHeight / 2 - 18}
+                    width="4"
+                    height="36"
                     fill="#f1f5f9"
                     stroke="#64748b"
-                    strokeWidth="0.8"
-                    rx="2"
+                    strokeWidth="0.6"
+                    rx="1.5"
                   />
-                  {/* Keyhole */}
                   <circle
                     cx={leadingX - lockPillarW / 2}
-                    cy={portalY + portalHeight / 2 + 35}
-                    r="2.5"
+                    cy={portalY + portalHeight / 2 + 25}
+                    r="2"
                     fill="#0f172a"
                     stroke="#fbbf24"
-                    strokeWidth="0.8"
+                    strokeWidth="0.6"
                   />
                 </g>
 
-                {/* 4. Extra Handle on Sliding Daun (TOTAL 2 HANDLE DI 1 BUKAAN) */}
+                {/* 4. Extra Handle on Sliding Daun */}
                 {hasPintuExtra && (
                   <rect
-                    x={gapLeft - 6}
-                    y={portalY + portalHeight / 2 - 22}
-                    width="4"
-                    height="44"
+                    x={gapLeft - 5}
+                    y={portalY + portalHeight / 2 - 16}
+                    width="3"
+                    height="32"
                     fill="#f1f5f9"
                     stroke="#64748b"
-                    strokeWidth="0.8"
-                    rx="1.5"
+                    strokeWidth="0.6"
+                    rx="1"
                   />
                 )}
               </g>
@@ -1233,16 +1397,17 @@ export default function HarmonikaVisualizer({
           {/* 7. NIGHT MODE REALISTIC SPOTLIGHT OVERLAYS */}
           {isNightMode && (
             <g pointerEvents="none">
-              <rect x="0" y="0" width="1000" height="700" fill="#000000" opacity="0.25" />
-              <rect x="120" y="280" width="320" height="400" fill="url(#spotlightL)" />
-              <rect x="340" y="280" width="320" height="400" fill="url(#spotlightM)" />
-              <rect x="560" y="280" width="320" height="400" fill="url(#spotlightR)" />
+              <rect x="0" y="0" width="1200" height="480" fill="#000000" opacity="0.2" />
+              <rect x="25" y="200" width="350" height="250" fill="url(#spotlightLeft)" />
+              <rect x="390" y="190" width="420" height="260" fill="url(#spotlightCenter)" />
+              <rect x="825" y="200" width="350" height="250" fill="url(#spotlightRight)" />
             </g>
           )}
 
           {/* 8. PAVEMENT & STREET GROUND */}
-          <rect x="0" y="660" width="1000" height="40" fill={isNightMode ? "#0f172a" : "#334155"} />
-          <line x1="0" y1="662" x2="1000" y2="662" stroke="#64748b" strokeWidth="2" />
+          <rect x="0" y="440" width="1200" height="40" fill={isNightMode ? "#0f172a" : "#334155"} />
+          <line x1="0" y1="442" x2="1200" y2="442" stroke="#64748b" strokeWidth="2" />
+          <line x1="0" y1="462" x2="1200" y2="462" stroke="#475569" strokeWidth="1" strokeDasharray="30 15" />
         </svg>
 
         {/* Click helper badge */}
