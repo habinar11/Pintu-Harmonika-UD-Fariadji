@@ -29,6 +29,7 @@ export default function PriceCalculator({
 }) {
   const [width, setWidth] = useState<number>(3.5);
   const [height, setHeight] = useState<number>(3.0);
+  const [quantity, setQuantity] = useState<number>(1);
   const [selectedProductId, setSelectedProductId] = useState<string>(
     products[0]?.id || ""
   );
@@ -65,16 +66,20 @@ export default function PriceCalculator({
   const stripColorObj =
     STRIP_PRESETS.find((s) => s.id === stripColorId) || STRIP_PRESETS[0];
 
-  const area = Math.max(0, width * height);
-  const effectiveArea = area < 7 && area > 0 ? 7 : area;
+  const safeQuantity = Math.max(1, quantity || 1);
+  const areaPerDoor = Math.max(0, width * height);
+  // Ketentuan standar fabrikasi minimal 7 m² per pintu
+  const effectiveAreaPerDoor = areaPerDoor < 7 && areaPerDoor > 0 ? 7 : areaPerDoor;
+  const totalActualArea = areaPerDoor * safeQuantity;
+  const totalCalculatedArea = effectiveAreaPerDoor * safeQuantity;
 
   const baseRate = selectedProduct ? selectedProduct.pricePerMeter : 1200000;
-  const baseCost = effectiveArea * baseRate;
+  const baseCost = totalCalculatedArea * baseRate;
 
-  // Harga extra mengikuti harga dasarnya
-  const extraCost = hasPintuExtra ? baseRate : 0;
-  // Finishing cat oven harganya 350.000
-  const dualColorCost = isCustomColor ? 350000 : 0;
+  // Harga extra mengikuti harga dasarnya (dihitung per pintu jika dipilih)
+  const extraCost = hasPintuExtra ? baseRate * safeQuantity : 0;
+  // Finishing cat oven kombinasi / strip (Rp 350.000 per unit pintu)
+  const dualColorCost = isCustomColor ? 350000 * safeQuantity : 0;
   const totalCost = baseCost + extraCost + dualColorCost;
 
   const formatRupiah = (num: number) => {
@@ -108,11 +113,12 @@ export default function PriceCalculator({
 
   const selectedWarranty =
     selectedProduct?.warrantyInfo ||
-    (selectedProduct?.name?.includes("SUPER") ? "Garansi 5 Tahun" : "Bergaransi");
+    (selectedProduct?.name?.includes("SUPER") ? "Garansi 5 Tahun" : "Ber-garansi Servis Resmi");
 
   const generateWhatsAppMessage = () => {
     const text = `Halo Admin ${settings.companyName}, saya mau estimasi & pemesanan pintu harmonika:
-- Ukuran: Lebar ${width} m x Tinggi ${height} m (Luas: ${area.toFixed(2)} m²)
+- Ukuran: Lebar ${width} m x Tinggi ${height} m (@ ${areaPerDoor.toFixed(2)} m²/pintu)
+- Jumlah Pintu: ${safeQuantity} Unit (Total Luas: ${totalCalculatedArea.toFixed(2)} m²)
 - Tipe Varian: ${selectedProduct?.name} (Daun: ${selectedProduct?.daunThickness})
 - Jaminan Garansi: ${selectedWarranty}
 - Spesifikasi Rangka: ${selectedProduct?.frameSpec || selectedProduct?.unpSize}
@@ -120,11 +126,11 @@ export default function PriceCalculator({
 - Rel / Cakak / Pipa: ${selectedProduct?.relBesar || "-"} / ${selectedProduct?.cakakTiang || "-"} / ${selectedProduct?.pipaKotak || "-"}
 - Model Bukaan: ${getBukaanLabel()}
 - Skema Cat Oven: ${getColorLabel()}
-- Opsi Pintu Extra (Bukaan Intip): ${hasPintuExtra ? `Ya (+${formatRupiah(baseRate)} mengikuti harga dasar)` : "Tidak"}
-- Opsi Finishing Cat Kombinasi/Strip: ${isCustomColor ? "Ya (+Rp 350.000)" : "Tidak"}
+- Opsi Pintu Extra (Bukaan Intip): ${hasPintuExtra ? `Ya (${safeQuantity} unit @ ${formatRupiah(baseRate)} mengikuti harga dasar)` : "Tidak"}
+- Opsi Finishing Cat Kombinasi/Strip: ${isCustomColor ? `Ya (${safeQuantity} unit @ Rp 350.000)` : "Tidak"}
 - Perkiraan Estimasi Web: ${formatRupiah(totalCost)}
 
-Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jadwal survey lokasi gratis dan penawaran resminya. Terima kasih!`;
+Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jadwal survey lokasi gratis (se-Jawa Timur & se-Jawa Tengah) dan penawaran resminya. Terima kasih!`;
 
     return `https://wa.me/${settings.whatsapp}?text=${encodeURIComponent(text)}`;
   };
@@ -218,12 +224,12 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
               Sesuaikan Ukuran & Spesifikasi Bahan:
             </h4>
             <span className="text-[11px] text-rose-300">
-              Luas Opening: <strong className="text-amber-300">{area.toFixed(2)} m²</strong>
+              Total Luas: <strong className="text-amber-300">{totalActualArea.toFixed(2)} m²</strong> ({safeQuantity} Unit @ {areaPerDoor.toFixed(2)} m²)
             </span>
           </div>
 
-          {/* Input Dimensi Lebar & Tinggi */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          {/* Input Dimensi Lebar, Tinggi & Jumlah Pintu */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             <div className="bg-black/40 border border-maroon-800/80 rounded-2xl p-3.5 sm:p-4">
               <label className="text-xs font-bold text-rose-200 block mb-1">
                 Lebar Opening (Meter)
@@ -241,7 +247,7 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
                 <span className="text-sm font-bold text-rose-300">m</span>
               </div>
               <span className="text-[10px] sm:text-[11px] text-rose-300/70 mt-1 block">
-                Contoh: 3.5 m untuk ruko 1 pintu atau bukaan standar
+                Contoh: 3.5 m per opening pintu
               </span>
             </div>
 
@@ -262,7 +268,28 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
                 <span className="text-sm font-bold text-rose-300">m</span>
               </div>
               <span className="text-[10px] sm:text-[11px] text-rose-300/70 mt-1 block">
-                Contoh: 3.0 m untuk tinggi plafon lantai dasar ruko
+                Contoh: 3.0 m tinggi plafon ruko
+              </span>
+            </div>
+
+            <div className="bg-black/40 border border-maroon-800/80 rounded-2xl p-3.5 sm:p-4">
+              <label className="text-xs font-bold text-rose-200 block mb-1">
+                Jumlah Pintu (Unit)
+              </label>
+              <div className="flex items-center space-x-3">
+                <input
+                  type="number"
+                  step="1"
+                  min="1"
+                  max="50"
+                  value={quantity}
+                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="w-full bg-maroon-950/80 border border-maroon-700 rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-white font-bold text-base sm:text-lg focus:outline-none focus:border-amber-400"
+                />
+                <span className="text-sm font-bold text-rose-300">Unit</span>
+              </div>
+              <span className="text-[10px] sm:text-[11px] text-rose-300/70 mt-1 block">
+                Contoh: 1 unit, 2 unit ruko, dst.
               </span>
             </div>
           </div>
@@ -299,7 +326,7 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
                         ) : (
                           <span className="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full bg-gradient-to-r from-slate-400/20 to-slate-200/20 text-slate-200 border border-slate-300/40 shadow-xs">
                             <ShieldCheck className="w-3 h-3 text-slate-300" />
-                            {p.warrantyInfo || "Bergaransi"}
+                            {p.warrantyInfo || "Ber-garansi Servis Resmi"}
                           </span>
                         )}
                         {isSelected && (
@@ -392,13 +419,27 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
             <div className="flex justify-between">
               <span>Dimensi Opening:</span>
               <span className="font-bold text-white">
-                {width} m × {height} m = {area.toFixed(2)} m²
+                {width} m × {height} m ({areaPerDoor.toFixed(2)} m² / pintu)
               </span>
             </div>
 
-            {area < 7 && area > 0 && (
+            <div className="flex justify-between">
+              <span>Jumlah Pintu:</span>
+              <span className="font-bold text-amber-300">
+                {safeQuantity} Unit
+              </span>
+            </div>
+
+            <div className="flex justify-between">
+              <span>Total Luas Terhitung:</span>
+              <span className="font-bold text-white">
+                {totalCalculatedArea.toFixed(2)} m²
+              </span>
+            </div>
+
+            {areaPerDoor < 7 && areaPerDoor > 0 && (
               <div className="text-[10px] sm:text-[11px] text-amber-300 italic bg-amber-950/40 border border-amber-500/30 p-2 rounded-xl">
-                * Ketentuan standar fabrikasi: luas opening di bawah 7 m² dihitung minimal 7 m².
+                * Ketentuan standar fabrikasi: luas opening di bawah 7 m² per unit dihitung minimal 7 m² (7 m² × {safeQuantity} unit = {totalCalculatedArea.toFixed(2)} m²).
               </div>
             )}
 
@@ -515,15 +556,15 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
 
             {hasPintuExtra && (
               <div className="flex justify-between text-amber-300 font-bold bg-maroon-950/70 p-2 rounded-xl border border-amber-500/30">
-                <span>+ Pintu Extra (Harga Dasar):</span>
-                <span>{formatRupiah(baseRate)}</span>
+                <span>+ Pintu Extra {safeQuantity > 1 ? `(${safeQuantity} unit × ${formatRupiah(baseRate)})` : "(Harga Dasar)"}:</span>
+                <span>{formatRupiah(extraCost)}</span>
               </div>
             )}
 
             {isCustomColor && (
               <div className="flex justify-between text-amber-300 font-bold bg-maroon-950/70 p-2 rounded-xl border border-amber-500/30">
-                <span>+ Finishing Cat Oven (Kombinasi / Strip):</span>
-                <span>Rp 350.000</span>
+                <span>+ Finishing Cat Oven {safeQuantity > 1 ? `(${safeQuantity} unit × Rp 350.000)` : "(Kombinasi / Strip)"}:</span>
+                <span>{formatRupiah(dualColorCost)}</span>
               </div>
             )}
           </div>
@@ -531,7 +572,7 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
           <div className="py-1 space-y-1.5 text-xs text-emerald-400 font-medium">
             <div className="flex items-center">
               <Check className="w-3.5 h-3.5 mr-2 shrink-0 text-emerald-400" />
-              <span>Survey Lokasi & Pengukuran Gratis</span>
+              <span>Survey Lokasi & Pengukuran Gratis Se-Jawa Timur & Se-Jawa Tengah</span>
             </div>
             <div className="flex items-center">
               <Check className="w-3.5 h-3.5 mr-2 shrink-0 text-emerald-400" />
@@ -539,7 +580,11 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
             </div>
             <div className="flex items-center">
               <Check className="w-3.5 h-3.5 mr-2 shrink-0 text-emerald-400" />
-              <span>Garansi Servis Resmi {settings.warrantyYears} Tahun</span>
+              <span>
+                {selectedProduct?.warrantyInfo?.includes("5") || selectedProduct?.name?.includes("SUPER")
+                  ? "Garansi Servis Resmi 5 Tahun"
+                  : "Ber-garansi Servis Resmi"}
+              </span>
             </div>
           </div>
 

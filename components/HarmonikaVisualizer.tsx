@@ -11,7 +11,6 @@ import {
   DoorOpen,
   Palette,
   Layers,
-  Info,
   ShieldCheck,
   ChevronRight,
   Maximize2,
@@ -238,20 +237,6 @@ export default function HarmonikaVisualizer({
       // Standard 1-step toggle: 0 <-> 0.92 (tidak hilang keseluruhan, tumpukan 8% tetap ada di tiang)
       const target = gateOpen > 0.4 ? 0 : MAX_OPEN_RATIO;
       animateTo(target, 0, 700);
-    }
-  };
-
-  // Direct stage trigger for extra door
-  const setStageDirect = (stage: 0 | 1 | 2) => {
-    if (isAnimating) return;
-    setExtraStage(stage);
-    if (stage === 0) {
-      animateTo(0, 0, 600);
-    } else if (stage === 1) {
-      animateTo(0, 1, 600);
-    } else {
-      // Full buka: extra ikut tertutup rapi terlipat ke tiang
-      animateTo(MAX_OPEN_RATIO, 0, 750);
     }
   };
 
@@ -652,55 +637,11 @@ export default function HarmonikaVisualizer({
               className="w-4 h-4 rounded text-red-600 focus:ring-amber-400 bg-maroon-950 border-maroon-700"
             />
             <div className="text-xs">
-              <span className="font-extrabold text-white flex items-center gap-1.5">
+              <span className="font-extrabold text-white">
                 Pakai Pintu Extra (Bukaan Intip & Ventilasi)
-                <span className="text-[9px] bg-amber-400/20 text-amber-300 px-1.5 py-0.2 rounded font-black border border-amber-400/30">
-                  +Rp 250rb
-                </span>
               </span>
             </div>
           </label>
-
-          {/* If Pintu Extra is active, show the 3-step pills */}
-          {hasPintuExtra && (
-            <div className="flex items-center space-x-1 bg-black/60 p-1 rounded-xl border border-maroon-800 text-[10px] font-bold">
-              <button
-                type="button"
-                onClick={() => setStageDirect(0)}
-                className={`px-2 py-0.8 rounded-lg transition-all ${
-                  extraStage === 0
-                    ? "bg-maroon-800 text-white shadow-sm"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                1. Tertutup
-              </button>
-              <span className="text-slate-600">›</span>
-              <button
-                type="button"
-                onClick={() => setStageDirect(1)}
-                className={`px-2 py-0.8 rounded-lg transition-all ${
-                  extraStage === 1
-                    ? "bg-emerald-600 text-white font-black shadow-sm"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                2. Extra Buka (Celah Intip)
-              </button>
-              <span className="text-slate-600">›</span>
-              <button
-                type="button"
-                onClick={() => setStageDirect(2)}
-                className={`px-2 py-0.8 rounded-lg transition-all ${
-                  extraStage === 2
-                    ? "bg-amber-400 text-slate-950 font-black shadow-sm"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                3. Full Buka (92%)
-              </button>
-            </div>
-          )}
         </div>
       </div>
 
@@ -1525,20 +1466,6 @@ export default function HarmonikaVisualizer({
               </div>
             </div>
           )}
-        </div>
-
-        {/* BOTTOM NOTE */}
-        <div className="pt-3 border-t border-maroon-900/80 flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs text-rose-200/80 gap-2">
-          <div className="flex items-center space-x-2">
-            <Info className="w-4 h-4 text-amber-400 shrink-0" />
-            <span>
-              Dimensi opening: <strong className="text-white">{widthMeters} m × {heightMeters} m</strong>. Tumpukan lipatan daun saat dibuka tetap terlihat 8% di samping (tidak hilang 100%).
-            </span>
-          </div>
-
-          <div className="text-[11px] text-amber-300 font-bold">
-            ✓ Double Bearing Jepang • Garansi Servis 5 Tahun
-          </div>
         </div>
       </div>
     </div>
