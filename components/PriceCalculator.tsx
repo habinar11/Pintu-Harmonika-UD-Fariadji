@@ -91,22 +91,19 @@ export default function PriceCalculator({
   };
 
   const getBukaanLabel = () => {
-    const base =
-      bukaanType === "1_bukaan"
-        ? "Model 1 Bukaan (Geser 1 Arah)"
-        : "Model 2 Bukaan (Tengah / Kupu-Tarung)";
-    return hasPintuExtra ? `${base} + Pintu Extra (Bukaan Intip)` : base;
+    const base = bukaanType === "1_bukaan" ? "1 Bukaan" : "2 Bukaan";
+    return hasPintuExtra ? `${base} + Pakai Pintu Extra` : base;
   };
 
   const getColorLabel = () => {
     let label = "";
     if (colorMode === "2_warna") {
-      label = `Kombinasi 2 Warna Atas-Bawah (${primaryColorObj.name} Atas + ${secondaryColorObj.name} Bawah)`;
+      label = `2 Warna: Atas ${primaryColorObj.name} + Bawah ${secondaryColorObj.name}`;
     } else {
-      label = `1 Warna Solid (${primaryColorObj.name})`;
+      label = `1 Warna: ${primaryColorObj.name}`;
     }
     if (hasStrip || colorMode === "strip_warna") {
-      label += ` + List Strip ${stripStyle === "1_garis" ? "1 Garis" : "2 Garis"} (${stripColorObj.name})`;
+      label += ` + Strip ${stripStyle === "1_garis" ? "1 Garis" : "2 Garis"}: ${stripColorObj.name}`;
     }
     return label;
   };
@@ -126,8 +123,8 @@ export default function PriceCalculator({
 - Rel / Cagak / Pipa: ${selectedProduct?.relBesar || "-"} / ${selectedProduct?.cagakTiang || selectedProduct?.cakakTiang || "-"} / ${selectedProduct?.pipaKotak || "-"}
 - Model Bukaan: ${getBukaanLabel()}
 - Skema Cat Oven: ${getColorLabel()}
-- Opsi Pintu Extra (Bukaan Intip): ${hasPintuExtra ? `Ya (${safeQuantity} unit @ ${formatRupiah(baseRate)} mengikuti harga dasar)` : "Tidak"}
-- Opsi Finishing Cat Kombinasi/Strip: ${isCustomColor ? `Ya (${safeQuantity} unit @ Rp 350.000)` : "Tidak"}
+- Opsi Pintu Extra: ${hasPintuExtra ? `Ya (${safeQuantity} unit @ ${formatRupiah(baseRate)} mengikuti harga dasar)` : "Tidak"}
+- Opsi Finishing Cat: ${isCustomColor ? `Ya (${safeQuantity} unit @ Rp 350.000)` : "Tidak"}
 - Perkiraan Estimasi Web: ${formatRupiah(totalCost)}
 
 Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jadwal survey lokasi gratis (se-Jawa Timur & se-Jawa Tengah) dan penawaran resminya. Terima kasih!`;
@@ -409,7 +406,7 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
                 className="w-4 h-4 rounded text-red-600 focus:ring-amber-400 bg-maroon-950 border-maroon-700 shrink-0"
               />
               <span className="font-bold text-xs sm:text-sm text-white block">
-                Pakai Pintu Extra / Bukaan Intip (+{formatRupiah(baseRate)})
+                Pakai Pintu Extra (+{formatRupiah(baseRate)})
               </span>
             </label>
 
@@ -422,7 +419,7 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
                 className="w-4 h-4 rounded text-red-600 focus:ring-amber-400 bg-maroon-950 border-maroon-700 shrink-0"
               />
               <span className="font-bold text-xs sm:text-sm text-white block">
-                Finishing Cat Oven Khusus (Kombinasi 2 Warna / List Strip Aksen) (+Rp 350.000)
+                Finishing Cat Oven 2 Warna / List Strip (+Rp 350.000)
               </span>
             </label>
           </div>
@@ -590,7 +587,7 @@ Saya sudah mencoba simulasi visualisasi ruko di web. Mohon info ketersediaan jad
 
             {isCustomColor && (
               <div className="flex justify-between text-amber-300 font-bold bg-maroon-950/70 p-2 rounded-xl border border-amber-500/30">
-                <span>+ Finishing Cat Oven {safeQuantity > 1 ? `(${safeQuantity} unit × Rp 350.000)` : "(Kombinasi / Strip)"}:</span>
+                <span>+ Finishing Cat Oven {safeQuantity > 1 ? `(${safeQuantity} unit × Rp 350.000)` : "(2 Warna / Strip)"}:</span>
                 <span>{formatRupiah(dualColorCost)}</span>
               </div>
             )}

@@ -522,14 +522,8 @@ export default function HarmonikaVisualizer({
           </div>
           <div>
             <h4 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
-              Studio Visualisasi Ruko Asli & Harmonika
-              <span className="text-[10px] bg-rose-950 text-rose-300 px-2 py-0.5 rounded-full border border-rose-800/80 font-bold hidden sm:inline-block">
-                Interaktif 3D
-              </span>
+              Animasi Pintu Harmonika
             </h4>
-            <p className="text-[11px] text-rose-300/80">
-              Pilih 1 atau 2 bukaan, opsi Pintu Extra (Bukaan Intip & Ventilasi), skema warna atas-bawah, dan strip list aksen tengah.
-            </p>
           </div>
         </div>
 
@@ -549,14 +543,12 @@ export default function HarmonikaVisualizer({
             {isNightMode ? (
               <>
                 <Moon className="w-3.5 h-3.5 text-amber-400" />
-                <span className="hidden sm:inline">Malam (Spotlight)</span>
-                <span className="sm:hidden">Malam</span>
+                <span>Malam</span>
               </>
             ) : (
               <>
                 <Sun className="w-3.5 h-3.5 text-amber-600" />
-                <span className="hidden sm:inline">Siang Hari</span>
-                <span className="sm:hidden">Siang</span>
+                <span>Siang</span>
               </>
             )}
           </button>
@@ -587,7 +579,7 @@ export default function HarmonikaVisualizer({
             ) : (
               <>
                 <DoorOpen className="w-4 h-4 shrink-0" />
-                <span>{hasPintuExtra ? "Buka Pintu Extra (Celah Intip)" : "Buka Pintu"}</span>
+                <span>{hasPintuExtra ? "Buka Pintu Extra" : "Buka Pintu"}</span>
               </>
             )}
           </button>
@@ -611,7 +603,7 @@ export default function HarmonikaVisualizer({
                   : "text-slate-400 hover:text-white"
               }`}
             >
-              2 Bukaan (Tengah / Kupu-Tarung)
+              2 Bukaan
             </button>
             <button
               type="button"
@@ -622,7 +614,7 @@ export default function HarmonikaVisualizer({
                   : "text-slate-400 hover:text-white"
               }`}
             >
-              1 Bukaan (Geser 1 Arah)
+              1 Bukaan
             </button>
           </div>
         </div>
@@ -638,7 +630,7 @@ export default function HarmonikaVisualizer({
             />
             <div className="text-xs">
               <span className="font-extrabold text-white">
-                Pakai Pintu Extra (Bukaan Intip & Ventilasi)
+                Pakai Pintu Extra
               </span>
             </div>
           </label>
@@ -647,13 +639,15 @@ export default function HarmonikaVisualizer({
 
       {/* CRISP ARCHITECTURAL VECTOR SVG RUKO STAGE */}
       <div
-        className="relative w-full overflow-hidden bg-slate-950 cursor-pointer select-none group"
+        className={`relative w-full overflow-hidden cursor-pointer select-none group transition-colors ${
+          isNightMode ? "bg-[#090d16]" : "bg-[#38bdf8]"
+        }`}
         onClick={handleToggleClick}
         title="Klik pintu untuk memutar animasi buka / tutup"
       >
         <svg
           viewBox="0 0 1000 700"
-          className="w-full h-auto max-h-[580px] object-contain drop-shadow-2xl"
+          className="w-full h-auto block drop-shadow-2xl"
           preserveAspectRatio="xMidYMid meet"
         >
           <defs>
@@ -1257,13 +1251,13 @@ export default function HarmonikaVisualizer({
           <span>
             {hasPintuExtra
               ? extraStage === 0
-                ? "Klik 1x: Geser Pintu Extra (Celah Intip & Ventilasi)"
+                ? "Klik 1x: Geser Pintu Extra"
                 : extraStage === 1
-                ? "Klik 2x: Buka Full Harmonika (92%)"
+                ? "Klik 2x: Buka Full Harmonika"
                 : "Klik 3x: Tutup Rapat"
               : gateOpen > 0.4
               ? "Klik untuk Tutup Pintu"
-              : "Klik untuk Buka Pintu (Tumpukan 92%)"}
+              : "Klik untuk Buka Pintu"}
           </span>
         </div>
       </div>
@@ -1279,7 +1273,7 @@ export default function HarmonikaVisualizer({
             <div className="flex items-center space-x-2">
               <Palette className="w-4 h-4 text-amber-400" />
               <span className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider">
-                Skema Cat Oven Duco:
+                Contoh Warna Cat:
               </span>
             </div>
 
@@ -1295,7 +1289,7 @@ export default function HarmonikaVisualizer({
                       : "text-slate-400 hover:text-white"
                   }`}
                 >
-                  1 Warna Solid
+                  1 Warna
                 </button>
                 <button
                   type="button"
@@ -1306,7 +1300,7 @@ export default function HarmonikaVisualizer({
                       : "text-slate-400 hover:text-white"
                   }`}
                 >
-                  Kombinasi 2 Warna (Atas - Bawah)
+                  2 Warna
                 </button>
               </div>
 
@@ -1367,7 +1361,7 @@ export default function HarmonikaVisualizer({
           {colorMode === "2_warna" && (
             <div className="pt-2 border-t border-maroon-900/60 animate-in fade-in duration-200">
               <div className="text-[11px] text-amber-300 font-bold mb-1.5 flex items-center justify-between">
-                <span>Warna Bagian Bawah (Kombinasi Atas - Bawah):</span>
+                <span>Warna Bagian Bawah:</span>
                 <span className="text-[10px] text-rose-300 font-normal">
                   * Garis pemisah horizontal di tengah daun
                 </span>
@@ -1417,7 +1411,7 @@ export default function HarmonikaVisualizer({
                         : "text-slate-400 hover:text-white"
                     }`}
                   >
-                    1 Garis Strip Tengah
+                    1 Garis
                   </button>
                   <button
                     type="button"
@@ -1428,7 +1422,7 @@ export default function HarmonikaVisualizer({
                         : "text-slate-400 hover:text-white"
                     }`}
                   >
-                    2 Garis Strip Tengah (Sejajar)
+                    2 Garis
                   </button>
                 </div>
               </div>
